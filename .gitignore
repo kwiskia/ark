@@ -1,0 +1,14 @@
+bin/
+lib/
+target/
+
+# Eclipse
+target
+.classpath
+.project
+.settings
+
+# IntelliJ
+.idea
+*iml
+*.iws
