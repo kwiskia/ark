@@ -21,6 +21,9 @@
 
 package com.kauri.ark;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * EqualityConstraint
  *
@@ -28,23 +31,21 @@ package com.kauri.ark;
  */
 public class EqualityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
-	private FiniteDomainVariable<T> var1;
-	private FiniteDomainVariable<T> var2;
-
-	public EqualityConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		super(var1, var2);
-		this.var1 = var1;
-		this.var2 = var2;
+	public EqualityConstraint(FiniteDomainVariable<T>... variables) {
+		super(variables);
 	}
 
-	@Override
 	public boolean updateVariable(Solver solver, FiniteDomainVariable<T> variable) {
-		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
+		List<T> values = new ArrayList<>(variable.allowableValues);
 
-		if (other.isUnique()) {
-			return variable.trySetValue(solver, other.allowableValues);
+		for (FiniteDomainVariable<T> v : variables) {
+			if (v != variable) {
+				if (v.isUnique()) {
+					values.retainAll(v.allowableValues);
+				}
+			}
 		}
 
-		return true;
+		return variable.trySetValue(solver, values);
 	}
 }

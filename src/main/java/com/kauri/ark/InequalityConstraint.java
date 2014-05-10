@@ -31,24 +31,23 @@ import java.util.List;
  */
 public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
-	private FiniteDomainVariable<T> var1;
-	private FiniteDomainVariable<T> var2;
-
-	public InequalityConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		super(var1, var2);
-		this.var1 = var1;
-		this.var2 = var2;
+	public InequalityConstraint(FiniteDomainVariable<T>... variables) {
+		super(variables);
 	}
 
 	@Override
 	public boolean updateVariable(Solver solver, FiniteDomainVariable<T> variable) {
-		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
+		if (variable.isUnique()) {
+			for (FiniteDomainVariable<T> v : variables) {
+				if (v != variable) {
+					List<T> values = new ArrayList<>(v.allowableValues);
+					values.removeAll(variable.allowableValues);
 
-		if (other.isUnique()) {
-			List<T> values = new ArrayList<>(variable.allowableValues);
-			values.removeAll(other.allowableValues);
-
-			return variable.trySetValue(solver, values);
+					if (!v.trySetValue(solver, values)) {
+						return false;
+					}
+				}
+			}
 		}
 
 		return true;
