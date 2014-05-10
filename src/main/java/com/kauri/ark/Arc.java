@@ -30,7 +30,6 @@ class Arc<T extends Variable<?>>
 {
 	private T variable;
 	private Constraint constraint;
-	private boolean queuedForUpdate = false;
 
 	public Arc(T variable, Constraint constraint) {
 		this.variable = variable;
@@ -50,16 +49,6 @@ class Arc<T extends Variable<?>>
 	}
 
 	public void markForUpdate(Solver solver) {
-		if (!queuedForUpdate) {
-			solver.queue(this);
-		}
-	}
-
-	public void setUpdateFlag() {
-		queuedForUpdate = true;
-	}
-
-	public void clearUpdateFlag() {
-		queuedForUpdate = false;
+		solver.queue(this);
 	}
 }

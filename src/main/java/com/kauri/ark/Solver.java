@@ -79,13 +79,9 @@ public class Solver
 	protected boolean resolveConstraints() {
 		while (!worklist.isEmpty()) {
 			Arc arc = worklist.poll();
-			arc.clearUpdateFlag();
 
 			if (!arc.update(this)) {
-				while (!worklist.isEmpty()) {
-					worklist.poll().clearUpdateFlag();
-				}
-
+				worklist.clear();
 				return false;
 			}
 		}
@@ -94,8 +90,9 @@ public class Solver
 	}
 
 	protected void queue(Arc arc) {
-		worklist.add(arc);
-		arc.setUpdateFlag();
+		if (!worklist.contains(arc)) {
+			worklist.add(arc);
+		}
 	}
 
 	protected int saveValues() {
@@ -111,9 +108,7 @@ public class Solver
 			stack.pop().restore();
 		}
 
-		while (!worklist.isEmpty()) {
-			worklist.poll().clearUpdateFlag();
-		}
+		worklist.clear();
 	}
 
 	private class VarState<T>
