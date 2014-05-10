@@ -44,12 +44,6 @@ abstract public class Constraint<T extends Variable<?>>
 		}
 	}
 
-	public void queueAllArcs(Solver solver) {
-		for (Arc arc : arcs) {
-			arc.markForUpdate(solver);
-		}
-	}
-
 	public boolean narrowed(Solver solver, T variable) {
 		for (Arc arc : arcs) {
 			if (arc.getVariable().isEmpty()) {
