@@ -39,7 +39,7 @@ public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
 
 		for (FiniteDomainVariable<T> v : variables) {
-			if (v != variable) {
+			if (v != variable && v.isUnique()) {
 				bs.andNot(v.allowableValues);
 			}
 		}
