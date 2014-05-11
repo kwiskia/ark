@@ -22,28 +22,42 @@
 package com.kauri.ark;
 
 import java.util.BitSet;
+import java.util.List;
 
 /**
- * InequalityConstraint
+ * FiniteDomain
  *
  * @author Eric Fritz
  */
-public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
+public class FiniteDomain<T>
 {
-	public InequalityConstraint(FiniteDomainVariable<T>... variables) {
-		super(variables);
+	private List<T> values;
+
+	//
+	// TODO - how to ensure ordering?
+	//
+
+	public FiniteDomain(List<T> values) {
+		this.values = values;
 	}
 
-	@Override
-	public boolean updateVariable(Solver solver, FiniteDomainVariable<T> variable) {
-		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
+	public T getValue(int index) {
+		return values.get(index);
+	}
 
-		for (FiniteDomainVariable<T> v : variables) {
-			if (v != variable) {
-				bs.andNot(v.allowableValues);
-			}
+	public BitSet createBitSet() {
+		BitSet bs = new BitSet(values.size());
+		bs.set(0, values.size());
+		return bs;
+	}
+
+	public BitSet createBitSet(T... including) {
+		BitSet bs = new BitSet(values.size());
+
+		for (T t : including) {
+			bs.set(values.indexOf(t));
 		}
 
-		return variable.trySetValue(solver, bs);
+		return bs;
 	}
 }

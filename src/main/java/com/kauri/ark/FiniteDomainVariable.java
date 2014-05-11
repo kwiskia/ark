@@ -21,34 +21,40 @@
 
 package com.kauri.ark;
 
-import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * FiniteDomainVariable
  *
  * @author Eric Fritz
  */
-public class FiniteDomainVariable<T> extends Variable<List<T>>
+public class FiniteDomainVariable<T> extends Variable<BitSet>
 {
-	public FiniteDomainVariable(String name, List<T> allowableValues) {
-		super(name, allowableValues);
+	private FiniteDomain<T> finiteDomain;
+
+	public FiniteDomainVariable(String name, FiniteDomain<T> finiteDomain) {
+		super(name, finiteDomain.createBitSet());
+		this.finiteDomain = finiteDomain;
+	}
+
+	public FiniteDomain<T> getFiniteDomain() {
+		return finiteDomain;
 	}
 
 	@Override
-	public Iterator<List<T>> getUniqueValues(Solver solver) {
+	public Iterator<BitSet> getUniqueValues(Solver solver) {
 		return new FiniteDomainIterator(solver, solver.saveValues());
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return allowableValues.size() == 0;
+		return allowableValues.cardinality() == 0;
 	}
 
 	@Override
 	public boolean isUnique() {
-		return allowableValues.size() == 1;
+		return allowableValues.cardinality() == 1;
 	}
 
 	@Override
@@ -57,21 +63,21 @@ public class FiniteDomainVariable<T> extends Variable<List<T>>
 			throw new RuntimeException("Not unique.");
 		}
 
-		return allowableValues.get(0);
+		return finiteDomain.getValue(allowableValues.nextSetBit(0));
 	}
 
-	private class FiniteDomainIterator implements Iterator<List<T>>
+	private class FiniteDomainIterator implements Iterator<BitSet>
 	{
 		private Solver solver;
 		private int mark;
-		private Iterator<T> values;
 		private boolean isUnique;
 		private boolean wasUnique = false;
+
+		private int next = -1;
 
 		public FiniteDomainIterator(Solver solver, int mark) {
 			this.solver = solver;
 			this.mark = mark;
-			this.values = allowableValues.iterator();
 		}
 
 		@Override
@@ -96,8 +102,13 @@ public class FiniteDomainVariable<T> extends Variable<List<T>>
 				wasUnique = true;
 				return true;
 			} else {
-				while (values.hasNext()) {
-					if (trySetAndResolveConstraints(solver, Arrays.asList(values.next()))) {
+				while (allowableValues.nextSetBit(next + 1) != -1) {
+					next = allowableValues.nextSetBit(next + 1);
+
+					BitSet bs = new BitSet(allowableValues.size());
+					bs.set(next);
+
+					if (trySetAndResolveConstraints(solver, bs)) {
 						return true;
 					}
 				}
@@ -107,7 +118,7 @@ public class FiniteDomainVariable<T> extends Variable<List<T>>
 		}
 
 		@Override
-		public List<T> next() {
+		public BitSet next() {
 			return allowableValues;
 		}
 	}

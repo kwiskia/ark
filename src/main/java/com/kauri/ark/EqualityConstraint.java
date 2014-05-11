@@ -21,8 +21,7 @@
 
 package com.kauri.ark;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.BitSet;
 
 /**
  * EqualityConstraint
@@ -35,17 +34,16 @@ public class EqualityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 		super(variables);
 	}
 
+	@Override
 	public boolean updateVariable(Solver solver, FiniteDomainVariable<T> variable) {
-		List<T> values = new ArrayList<>(variable.allowableValues);
+		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
 
 		for (FiniteDomainVariable<T> v : variables) {
 			if (v != variable) {
-				if (v.isUnique()) {
-					values.retainAll(v.allowableValues);
-				}
+				bs.and(v.allowableValues);
 			}
 		}
 
-		return variable.trySetValue(solver, values);
+		return variable.trySetValue(solver, bs);
 	}
 }

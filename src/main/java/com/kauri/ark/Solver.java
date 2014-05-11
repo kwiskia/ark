@@ -63,7 +63,7 @@ public class Solver
 					System.out.println("Solution #" + ++solution);
 
 					for (Variable v : variables) {
-						System.out.println(v + ": " + v.allowableValues);
+						System.out.println(v + ": " + v.getUniqueValue());
 					}
 
 					System.out.println();

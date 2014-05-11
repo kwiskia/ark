@@ -21,8 +21,7 @@
 
 package com.kauri.ark;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.BitSet;
 
 /**
  * CardinalityConstraint
@@ -31,16 +30,17 @@ import java.util.List;
  */
 public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
-	private T value;
 	private int min;
 	private int max;
+	private BitSet mask;
 
 	public CardinalityConstraint(T value, int min, int max, FiniteDomainVariable<T>... vars) {
 		super(vars);
 
-		this.value = value;
 		this.min = min;
 		this.max = max;
+
+		mask = vars[0].getFiniteDomain().createBitSet(value);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>
 		int definite = 0;
 
 		for (FiniteDomainVariable<T> v : variables) {
-			if (v.allowableValues.contains(value)) {
+			if (v.allowableValues.intersects(mask)) {
 				possible++;
 
 				if (v.isUnique()) {
@@ -64,11 +64,11 @@ public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>
 
 		if (definite == max) {
 			for (FiniteDomainVariable<T> v : variables) {
-				if (v.allowableValues.contains(value) && !v.isUnique()) {
-					List<T> values = new ArrayList<>(v.allowableValues);
-					values.remove(value);
+				if (v.allowableValues.intersects(mask) && !v.isUnique()) {
+					BitSet bs = v.allowableValues.get(0, v.allowableValues.size());
+					bs.andNot(mask);
 
-					if (!v.trySetValue(solver, values)) {
+					if (!v.trySetValue(solver, bs)) {
 						return false;
 					}
 				}
