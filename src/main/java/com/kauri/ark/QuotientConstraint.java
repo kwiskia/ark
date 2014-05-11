@@ -56,7 +56,7 @@ public class QuotientConstraint extends Constraint<IntegerVariable>
 			int dv = c.allowableValues.getUpperBound();
 
 			if (cv == 0 || dv == 0) {
-				return false;
+				return !c.isUnique();
 			}
 
 			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av/dv, bv/cv, bv/dv));
@@ -68,7 +68,7 @@ public class QuotientConstraint extends Constraint<IntegerVariable>
 			int dv = b.allowableValues.getUpperBound();
 
 			if (cv == 0 || dv == 0) {
-				return false;
+				return !b.isUnique();
 			}
 
 			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av/dv, bv/cv, bv/dv));
