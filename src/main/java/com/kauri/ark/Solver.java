@@ -49,6 +49,18 @@ public class Solver
 		constraints.add(constraint);
 	}
 
+	public void makeQuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+		IntegerVariable z = new IntegerVariable("z", new Interval(0,0));
+		addVariable(z);
+
+		addConstraint(new ProductConstraint(b, c, a));
+		addConstraint(new IntervalInequalityConstraint(b, z));
+	}
+
+	public void makeDifferenceConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+		addConstraint(new SumConstraint(b, c, a));
+	}
+
 	public void solve(SolutionHandler handler) {
 		Stack<Iterator<?>> enumerators = new Stack<>();
 		enumerators.push(variables.get(0).getUniqueValues(this));
