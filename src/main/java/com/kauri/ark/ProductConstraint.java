@@ -48,7 +48,11 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 			int dv = b.allowableValues.getUpperBound();
 
 			if (cv == 0 || dv == 0) {
-				return !b.isUnique();
+				if (a.isUnique() && c.isUnique()) {
+					return c.allowableValues.getLowerBound() == 0;
+				}
+
+				return true;
 			}
 
 			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av/dv, bv/cv, bv/dv));
@@ -60,7 +64,11 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 			int dv = a.allowableValues.getUpperBound();
 
 			if (cv == 0 || dv == 0) {
-				return !a.isUnique();
+				if (b.isUnique() && c.isUnique()) {
+					return c.allowableValues.getLowerBound() == 0;
+				}
+
+				return true;
 			}
 
 			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av/dv, bv/cv, bv/dv));

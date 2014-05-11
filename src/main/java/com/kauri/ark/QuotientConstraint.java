@@ -56,7 +56,11 @@ public class QuotientConstraint extends Constraint<IntegerVariable>
 			int dv = c.allowableValues.getUpperBound();
 
 			if (cv == 0 || dv == 0) {
-				return !c.isUnique();
+				if (a.isUnique() && c.isUnique()) {
+					return a.allowableValues.getLowerBound() == 0;
+				}
+
+				return true;
 			}
 
 			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av/dv, bv/cv, bv/dv));
