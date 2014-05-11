@@ -36,14 +36,18 @@ public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 
 	@Override
 	public boolean updateVariable(Solver solver, FiniteDomainVariable<T> variable) {
-		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
+		FiniteDomainVariable<T> var1 = variables.get(0);
+		FiniteDomainVariable<T> var2 = variables.get(1);
 
-		for (FiniteDomainVariable<T> v : variables) {
-			if (v != variable && v.isUnique()) {
-				bs.andNot(v.allowableValues);
-			}
+		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
+
+		if (other.isUnique()) {
+			BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
+			bs.andNot(other.allowableValues);
+
+			return variable.trySetValue(solver, bs);
 		}
 
-		return variable.trySetValue(solver, bs);
+		return true;
 	}
 }
