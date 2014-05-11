@@ -22,7 +22,6 @@
 package com.kauri.ark;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -89,13 +88,11 @@ public class Solver
 	}
 
 	public void solve(SolutionHandler handler) {
-		Stack<Iterator<?>> enumerators = new Stack<>();
+		Stack<ValueEnumerator> enumerators = new Stack<>();
 		enumerators.push(variables.get(0).getUniqueValues(this));
 
 		while (enumerators.size() > 0) {
-			if (enumerators.lastElement().hasNext()) {
-				enumerators.lastElement().next();
-
+			if (enumerators.lastElement().advance()) {
 				if (enumerators.size() >= variables.size()) {
 					if (!handler.handle()) {
 						return;

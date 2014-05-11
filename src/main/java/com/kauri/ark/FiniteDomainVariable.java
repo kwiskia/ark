@@ -22,7 +22,6 @@
 package com.kauri.ark;
 
 import java.util.BitSet;
-import java.util.Iterator;
 
 /**
  * FiniteDomainVariable
@@ -43,8 +42,8 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 	}
 
 	@Override
-	public Iterator<BitSet> getUniqueValues(Solver solver) {
-		return new FiniteDomainIterator(solver, solver.saveValues());
+	public ValueEnumerator getUniqueValues(Solver solver) {
+		return new FiniteDomainValueEnumerator(solver, solver.saveValues());
 	}
 
 	@Override
@@ -66,60 +65,40 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 		return finiteDomain.getValue(allowableValues.nextSetBit(0));
 	}
 
-	private class FiniteDomainIterator implements Iterator<BitSet>
+	private class FiniteDomainValueEnumerator implements ValueEnumerator
 	{
 		private Solver solver;
 		private int mark;
-		private boolean isUnique;
-		private boolean wasUnique = false;
+		private boolean hasAdvanced = false;
 
 		private int next = -1;
 
-		public FiniteDomainIterator(Solver solver, int mark) {
+		public FiniteDomainValueEnumerator(Solver solver, int mark) {
 			this.solver = solver;
 			this.mark = mark;
 		}
 
 		@Override
-		public boolean hasNext() {
-			if (wasUnique) {
-				solver.restore(mark);
-				return false;
-			}
-
-			if (!isUnique) {
+		public boolean advance() {
+			if (hasAdvanced) {
 				solver.restore(mark);
 			}
 
-			isUnique = isUnique();
+			while (allowableValues.nextSetBit(next + 1) != -1) {
+				next = allowableValues.nextSetBit(next + 1);
 
-			if (isUnique()) {
-				if (!narrowConstraints(solver) || !solver.resolveConstraints()) {
-					solver.restore(mark);
-					return false;
+				BitSet bs = new BitSet(allowableValues.size());
+				bs.set(next);
+
+				if (trySetAndResolveConstraints(solver, bs)) {
+					hasAdvanced = true;
+					return true;
 				}
 
-				wasUnique = true;
-				return true;
-			} else {
-				while (allowableValues.nextSetBit(next + 1) != -1) {
-					next = allowableValues.nextSetBit(next + 1);
-
-					BitSet bs = new BitSet(allowableValues.size());
-					bs.set(next);
-
-					if (trySetAndResolveConstraints(solver, bs)) {
-						return true;
-					}
-				}
+				solver.restore(mark);
 			}
 
 			return false;
-		}
-
-		@Override
-		public BitSet next() {
-			return allowableValues;
 		}
 	}
 }

@@ -21,7 +21,6 @@
 
 package com.kauri.ark;
 
-import java.util.Iterator;
 import java.util.Stack;
 
 /**
@@ -36,8 +35,8 @@ public class IntegerVariable extends Variable<Interval>
 	}
 
 	@Override
-	public Iterator<Interval> getUniqueValues(Solver solver) {
-		return new IntervalIterator(solver, solver.saveValues());
+	public ValueEnumerator getUniqueValues(Solver solver) {
+		return new IntervalValueEnumerator(solver, solver.saveValues());
 	}
 
 	@Override
@@ -59,15 +58,15 @@ public class IntegerVariable extends Variable<Interval>
 		return allowableValues.getLowerBound();
 	}
 
-	private class IntervalIterator implements Iterator<Interval>
+	private class IntervalValueEnumerator implements ValueEnumerator
 	{
 		private Solver solver;
 		private int mark;
-		private boolean hasReturned = false;
+		private boolean hasAdvanced = false;
 
 		private Stack<Interval> candidates = new Stack<>();
 
-		public IntervalIterator(Solver solver, int mark) {
+		public IntervalValueEnumerator(Solver solver, int mark) {
 			this.solver = solver;
 			this.mark = mark;
 
@@ -75,8 +74,8 @@ public class IntegerVariable extends Variable<Interval>
 		}
 
 		@Override
-		public boolean hasNext() {
-			if (hasReturned) {
+		public boolean advance() {
+			if (hasAdvanced) {
 				solver.restore(mark);
 			}
 
@@ -84,9 +83,8 @@ public class IntegerVariable extends Variable<Interval>
 				Interval candidate = candidates.pop();
 
 				if (trySetAndResolveConstraints(solver, candidate)) {
-					hasReturned = candidate.isUnique();
-
 					if (candidate.isUnique()) {
+						hasAdvanced = true;
 						return true;
 					} else {
 						int mid = candidate.getLowerBound() + candidate.getRange() / 2;
@@ -103,11 +101,6 @@ public class IntegerVariable extends Variable<Interval>
 			}
 
 			return false;
-		}
-
-		@Override
-		public Interval next() {
-			return allowableValues;
 		}
 	}
 }

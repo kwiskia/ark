@@ -21,61 +21,12 @@
 
 package com.kauri.ark;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Variable
+ * ValueEnumerator
  *
  * @author Eric Fritz
  */
-abstract public class Variable<T>
+public interface ValueEnumerator
 {
-	protected String name;
-	protected T allowableValues;
-	protected List<Constraint> constraints = new ArrayList<>();
-
-	public Variable(String name, T allowableValues) {
-		this.name = name;
-		this.allowableValues = allowableValues;
-	}
-
-	public String toString() {
-		return name;
-	}
-
-	abstract public ValueEnumerator getUniqueValues(Solver solver);
-
-	abstract public boolean isEmpty();
-
-	abstract public boolean isUnique();
-
-	abstract public Object getUniqueValue();
-
-	protected boolean trySetAndResolveConstraints(Solver solver, T value) {
-		return trySetValue(solver, value) && solver.resolveConstraints();
-	}
-
-	protected boolean trySetValue(Solver solver, T value) {
-		if (!allowableValues.equals(value)) {
-			solver.saveValue(this, allowableValues);
-			allowableValues = value;
-
-			if (!narrowConstraints(solver)) {
-				return false;
-			}
-		}
-
-		return !isEmpty();
-	}
-
-	protected boolean narrowConstraints(Solver solver) {
-		for (Constraint c : constraints) {
-			if (!c.narrowed(solver, this)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
+	public boolean advance();
 }
