@@ -62,6 +62,19 @@ public class Solver
 			}
 		}
 	}
+	public <T> void makeAllEqualConstraint(IntegerVariable... vars) {
+		for (int i = 0; i < vars.length - 1; i++) {
+			addConstraint(new IntervalEqualityConstraint(vars[i], vars[i + 1]));
+		}
+	}
+
+	public <T> void makeAllUniqueConstraint(IntegerVariable... vars) {
+		for (int i = 0; i < vars.length; i++) {
+			for (int j = i + 1; j < vars.length; j++) {
+				addConstraint(new IntervalInequalityConstraint(vars[i], vars[j]));
+			}
+		}
+	}
 
 	public void makeQuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		IntegerVariable z = new IntegerVariable("z", new Interval(0, 0));

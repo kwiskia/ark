@@ -28,21 +28,20 @@ package com.kauri.ark;
  */
 public class IntervalEqualityConstraint extends Constraint<IntegerVariable>
 {
-	public IntervalEqualityConstraint(IntegerVariable... variables) {
-		super(variables);
+	public IntervalEqualityConstraint(IntegerVariable var1, IntegerVariable var2) {
+		super(var1, var2);
 	}
 
 	@Override
 	public boolean updateVariable(Solver solver, IntegerVariable variable) {
-		Interval interval = variable.allowableValues;
+		IntegerVariable var1 = variables.get(0);
+		IntegerVariable var2 = variables.get(1);
 
-		for (IntegerVariable v : variables) {
-			int lower = Math.max(interval.getLowerBound(), v.allowableValues.getLowerBound());
-			int upper = Math.min(interval.getUpperBound(), v.allowableValues.getUpperBound());
+		IntegerVariable other = variable == var1 ? var2 : var1;
 
-			interval = new Interval(lower, upper);
-		}
+		int lower = Math.max(variable.allowableValues.getLowerBound(), other.allowableValues.getLowerBound());
+		int upper = Math.min(variable.allowableValues.getUpperBound(), other.allowableValues.getUpperBound());
 
-		return variable.trySetValue(solver, interval);
+		return variable.trySetValue(solver, new Interval(lower, upper));
 	}
 }
