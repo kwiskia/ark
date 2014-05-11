@@ -49,24 +49,18 @@ public class Solver
 		constraints.add(constraint);
 	}
 
-	public void solve() {
+	public void solve(SolutionHandler handler) {
 		Stack<Iterator<?>> enumerators = new Stack<>();
 		enumerators.push(variables.get(0).getUniqueValues(this));
-
-		int solution = 0;
 
 		while (enumerators.size() > 0) {
 			if (enumerators.lastElement().hasNext()) {
 				enumerators.lastElement().next();
 
 				if (enumerators.size() >= variables.size()) {
-					System.out.println("Solution #" + ++solution);
-
-					for (Variable v : variables) {
-						System.out.println(v + ": " + v.getUniqueValue());
+					if (!handler.handle()) {
+						return;
 					}
-
-					System.out.println();
 				} else {
 					enumerators.push(variables.get(enumerators.size()).getUniqueValues(this));
 				}
