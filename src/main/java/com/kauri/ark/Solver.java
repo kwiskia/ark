@@ -49,6 +49,20 @@ public class Solver
 		constraints.add(constraint);
 	}
 
+	public <T> void makeAllEqualConstraint(FiniteDomainVariable<T>... vars) {
+		for (int i = 0; i < vars.length - 1; i++) {
+			addConstraint(new EqualityConstraint<>(vars[i], vars[i + 1]));
+		}
+	}
+
+	public <T> void makeAllUniqueConstraint(FiniteDomainVariable<T>... vars) {
+		for (int i = 0; i < vars.length; i++) {
+			for (int j = i + 1; j < vars.length; j++) {
+				addConstraint(new InequalityConstraint<>(vars[i], vars[j]));
+			}
+		}
+	}
+
 	public void makeQuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		IntegerVariable z = new IntegerVariable("z", new Interval(0,0));
 		addVariable(z);
