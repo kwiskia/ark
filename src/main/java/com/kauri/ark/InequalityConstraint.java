@@ -30,8 +30,8 @@ import java.util.BitSet;
  */
 public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
-	public InequalityConstraint(FiniteDomainVariable<T>... variables) {
-		super(variables);
+	public InequalityConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		super(var1, var2);
 	}
 
 	@Override

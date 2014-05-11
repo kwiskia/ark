@@ -30,8 +30,8 @@ import java.util.BitSet;
  */
 public class EqualityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
-	public EqualityConstraint(FiniteDomainVariable<T>... variables) {
-		super(variables);
+	public EqualityConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		super(var1, var2);
 	}
 
 	@Override
