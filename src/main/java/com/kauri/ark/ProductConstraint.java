@@ -55,7 +55,7 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 				return true;
 			}
 
-			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av/dv, bv/cv, bv/dv));
+			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av / dv, bv / cv, bv / dv));
 		} else if (variable == b) {
 			// c / a
 			int av = c.allowableValues.getLowerBound();
@@ -71,7 +71,7 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 				return true;
 			}
 
-			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av/dv, bv/cv, bv/dv));
+			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av / dv, bv / cv, bv / dv));
 		} else if (variable == c) {
 			// a * b
 			int av = a.allowableValues.getLowerBound();
