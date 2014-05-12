@@ -92,6 +92,12 @@ public class IntegerVariable extends Variable<Interval>
 						Interval lower = new Interval(candidate.getLowerBound(), mid);
 						Interval upper = new Interval(mid + 1, candidate.getUpperBound());
 
+						if (solver.getExpansionOrder() == Solver.ExpansionOrder.RANDOM && Math.random() < .5) {
+							Interval t = lower;
+							lower = upper;
+							upper = t;
+						}
+
 						if (!candidate.equals(upper)) candidates.push(upper);
 						if (!candidate.equals(lower)) candidates.push(lower);
 					}

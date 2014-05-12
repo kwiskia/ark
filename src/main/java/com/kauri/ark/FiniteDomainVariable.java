@@ -69,29 +69,42 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 	{
 		private Solver solver;
 		private int mark;
-		private boolean hasAdvanced = false;
-
-		private int next = -1;
+		private int[] indices;
+		private int k = 0;
 
 		public FiniteDomainValueEnumerator(Solver solver, int mark) {
 			this.solver = solver;
 			this.mark = mark;
+
+			indices = new int[allowableValues.cardinality()];
+
+			int j = 0;
+			for (int i = allowableValues.nextSetBit(0); i != -1; i = allowableValues.nextSetBit(i + 1)) {
+				indices[j++] = i;
+			}
+
+			if (solver.getExpansionOrder() == Solver.ExpansionOrder.RANDOM) {
+				for (int i = indices.length - 1; i >= 0; i--) {
+					j = (int) (Math.random() * (i + 1));
+
+					int t = indices[j];
+					indices[j] = indices[i];
+					indices[i] = t;
+				}
+			}
 		}
 
 		@Override
 		public boolean advance() {
-			if (hasAdvanced) {
+			if (k > 0) {
 				solver.restore(mark);
 			}
 
-			while (allowableValues.nextSetBit(next + 1) != -1) {
-				next = allowableValues.nextSetBit(next + 1);
-
+			while (k < indices.length) {
 				BitSet bs = new BitSet(allowableValues.size());
-				bs.set(next);
+				bs.set(indices[k++]);
 
 				if (trySetAndResolveConstraints(bs)) {
-					hasAdvanced = true;
 					return true;
 				}
 
