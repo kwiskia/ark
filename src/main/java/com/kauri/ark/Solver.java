@@ -35,7 +35,6 @@ import java.util.Stack;
 public class Solver
 {
 	private List<Variable<?>> variables = new ArrayList<>();
-	private List<Constraint<?>> constraints = new ArrayList<>();
 
 	private Queue<Arc> worklist = new LinkedList<>();
 	private Stack<VarState<?>> stack = new Stack<>();
@@ -44,33 +43,29 @@ public class Solver
 		variables.add(variable);
 	}
 
-	public void addConstraint(Constraint constraint) {
-		constraints.add(constraint);
-	}
-
 	public <T> void makeAllEqualConstraint(FiniteDomainVariable<T>... vars) {
 		for (int i = 0; i < vars.length - 1; i++) {
-			addConstraint(new EqualityConstraint<>(vars[i], vars[i + 1]));
+			new EqualityConstraint<>(vars[i], vars[i + 1]);
 		}
 	}
 
 	public <T> void makeAllUniqueConstraint(FiniteDomainVariable<T>... vars) {
 		for (int i = 0; i < vars.length; i++) {
 			for (int j = i + 1; j < vars.length; j++) {
-				addConstraint(new InequalityConstraint<>(vars[i], vars[j]));
+				new InequalityConstraint<>(vars[i], vars[j]);
 			}
 		}
 	}
 	public <T> void makeAllEqualConstraint(IntegerVariable... vars) {
 		for (int i = 0; i < vars.length - 1; i++) {
-			addConstraint(new IntervalEqualityConstraint(vars[i], vars[i + 1]));
+			new IntervalEqualityConstraint(vars[i], vars[i + 1]);
 		}
 	}
 
 	public <T> void makeAllUniqueConstraint(IntegerVariable... vars) {
 		for (int i = 0; i < vars.length; i++) {
 			for (int j = i + 1; j < vars.length; j++) {
-				addConstraint(new IntervalInequalityConstraint(vars[i], vars[j]));
+				new IntervalInequalityConstraint(vars[i], vars[j]);
 			}
 		}
 	}
@@ -79,12 +74,12 @@ public class Solver
 		IntegerVariable z = new IntegerVariable("z", new Interval(0, 0));
 		addVariable(z);
 
-		addConstraint(new ProductConstraint(b, c, a));
-		addConstraint(new IntervalInequalityConstraint(b, z));
+		new ProductConstraint(b, c, a);
+		new IntervalInequalityConstraint(b, z);
 	}
 
 	public void makeDifferenceConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		addConstraint(new SumConstraint(b, c, a));
+		new SumConstraint(b, c, a);
 	}
 
 	public void solve(SolutionHandler handler) {
