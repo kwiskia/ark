@@ -43,45 +43,6 @@ public class Solver
 		variables.add(variable);
 	}
 
-	public <T> void makeAllEqualConstraint(FiniteDomainVariable<T>... vars) {
-		for (int i = 0; i < vars.length - 1; i++) {
-			new EqualityConstraint<>(vars[i], vars[i + 1]);
-		}
-	}
-
-	public <T> void makeAllUniqueConstraint(FiniteDomainVariable<T>... vars) {
-		for (int i = 0; i < vars.length; i++) {
-			for (int j = i + 1; j < vars.length; j++) {
-				new InequalityConstraint<>(vars[i], vars[j]);
-			}
-		}
-	}
-	public <T> void makeAllEqualConstraint(IntegerVariable... vars) {
-		for (int i = 0; i < vars.length - 1; i++) {
-			new IntervalEqualityConstraint(vars[i], vars[i + 1]);
-		}
-	}
-
-	public <T> void makeAllUniqueConstraint(IntegerVariable... vars) {
-		for (int i = 0; i < vars.length; i++) {
-			for (int j = i + 1; j < vars.length; j++) {
-				new IntervalInequalityConstraint(vars[i], vars[j]);
-			}
-		}
-	}
-
-	public void makeQuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		IntegerVariable z = new IntegerVariable("z", new Interval(0, 0));
-		addVariable(z);
-
-		new ProductConstraint(b, c, a);
-		new IntervalInequalityConstraint(b, z);
-	}
-
-	public void makeDifferenceConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		new SumConstraint(b, c, a);
-	}
-
 	public void solve(SolutionHandler handler) {
 		Stack<ValueEnumerator> enumerators = new Stack<>();
 		enumerators.push(variables.get(0).getUniqueValues(this));
