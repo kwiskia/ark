@@ -35,11 +35,6 @@ public class IntegerVariable extends Variable<Interval>
 	}
 
 	@Override
-	public ValueEnumerator getUniqueValues(Solver solver) {
-		return new IntervalValueEnumerator(solver, solver.saveValues());
-	}
-
-	@Override
 	public boolean isEmpty() {
 		return allowableValues.isEmpty();
 	}
@@ -56,6 +51,11 @@ public class IntegerVariable extends Variable<Interval>
 		}
 
 		return allowableValues.getLowerBound();
+	}
+
+	@Override
+	public ValueEnumerator getUniqueValues(Solver solver) {
+		return new IntervalValueEnumerator(solver, solver.saveValues());
 	}
 
 	private class IntervalValueEnumerator implements ValueEnumerator

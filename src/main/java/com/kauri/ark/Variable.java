@@ -43,18 +43,6 @@ abstract public class Variable<T>
 	public void addConstraint(Constraint constraint) {
 		constraints.add(constraint);
 	}
-	
-	public String toString() {
-		return name;
-	}
-
-	abstract public ValueEnumerator getUniqueValues(Solver solver);
-
-	abstract public boolean isEmpty();
-
-	abstract public boolean isUnique();
-
-	abstract public Object getUniqueValue();
 
 	protected boolean trySetAndResolveConstraints(Solver solver, T value) {
 		return trySetValue(solver, value) && solver.resolveConstraints();
@@ -82,4 +70,16 @@ abstract public class Variable<T>
 
 		return true;
 	}
+
+	public String toString() {
+		return name;
+	}
+
+	abstract public boolean isEmpty();
+
+	abstract public boolean isUnique();
+
+	abstract public Object getUniqueValue();
+
+	abstract public ValueEnumerator getUniqueValues(Solver solver);
 }

@@ -42,11 +42,6 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 	}
 
 	@Override
-	public ValueEnumerator getUniqueValues(Solver solver) {
-		return new FiniteDomainValueEnumerator(solver, solver.saveValues());
-	}
-
-	@Override
 	public boolean isEmpty() {
 		return allowableValues.cardinality() == 0;
 	}
@@ -63,6 +58,11 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 		}
 
 		return finiteDomain.getValue(allowableValues.nextSetBit(0));
+	}
+
+	@Override
+	public ValueEnumerator getUniqueValues(Solver solver) {
+		return new FiniteDomainValueEnumerator(solver, solver.saveValues());
 	}
 
 	private class FiniteDomainValueEnumerator implements ValueEnumerator
