@@ -43,8 +43,4 @@ class Arc<T extends Variable<?>>
 	public Constraint getConstraint() {
 		return constraint;
 	}
-
-	public boolean update(Solver solver) {
-		return constraint.update(variable);
-	}
 }
