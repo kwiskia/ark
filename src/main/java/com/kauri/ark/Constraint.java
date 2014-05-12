@@ -22,7 +22,6 @@
 package com.kauri.ark;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,12 +32,10 @@ import java.util.List;
 abstract public class Constraint<T extends Variable<?>>
 {
 	private Solver solver;
-	protected List<T> variables = new ArrayList<>();
-	protected List<Arc> arcs = new ArrayList<>();
+	private List<Arc> arcs = new ArrayList<>();
 
 	public Constraint(Solver solver, T... variables) {
 		this.solver = solver;
-		this.variables = Arrays.asList(variables);
 
 		for (T t : variables) {
 			arcs.add(new Arc<>(t, this));

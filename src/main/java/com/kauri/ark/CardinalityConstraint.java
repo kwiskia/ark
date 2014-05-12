@@ -21,7 +21,9 @@
 
 package com.kauri.ark;
 
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.List;
 
 /**
  * CardinalityConstraint
@@ -33,14 +35,17 @@ public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>
 	private int min;
 	private int max;
 	private BitSet mask;
+	private List<FiniteDomainVariable<T>> variables;
 
-	public CardinalityConstraint(Solver solver, T value, int min, int max, FiniteDomainVariable<T>... vars) {
-		super(solver, vars);
+	public CardinalityConstraint(Solver solver, T value, int min, int max, FiniteDomainVariable<T>... variables) {
+		super(solver, variables);
+
+		this.variables = Arrays.asList(variables);
 
 		this.min = min;
 		this.max = max;
 
-		mask = vars[0].getFiniteDomain().createBitSet(value);
+		mask = variables[0].getFiniteDomain().createBitSet(value);
 	}
 
 	@Override

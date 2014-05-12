@@ -28,16 +28,20 @@ package com.kauri.ark;
  */
 public class SumConstraint extends Constraint<IntegerVariable>
 {
+	private IntegerVariable a;
+	private IntegerVariable b;
+	private IntegerVariable c;
+
 	public SumConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		super(solver, a, b, c);
+
+		this.a = a;
+		this.b = b;
+		this.c = c;
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		IntegerVariable a = variables.get(0);
-		IntegerVariable b = variables.get(1);
-		IntegerVariable c = variables.get(2);
-
 		Interval result;
 
 		if (variable == a) {

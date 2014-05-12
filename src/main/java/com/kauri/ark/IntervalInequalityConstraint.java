@@ -28,15 +28,15 @@ package com.kauri.ark;
  */
 public class IntervalInequalityConstraint extends Constraint<IntegerVariable>
 {
+	private IntegerVariable var1;
+	private IntegerVariable var2;
+
 	public IntervalInequalityConstraint(Solver solver, IntegerVariable var1, IntegerVariable var2) {
 		super(solver, var1, var2);
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		IntegerVariable var1 = variables.get(0);
-		IntegerVariable var2 = variables.get(1);
-
 		IntegerVariable other = variable == var1 ? var2 : var1;
 
 		if (variable.isUnique() && other.isUnique()) {

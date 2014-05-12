@@ -30,17 +30,23 @@ import java.util.BitSet;
  */
 public class LessThanOrEqualConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
+	private FiniteDomainVariable<T> var1;
+	private FiniteDomainVariable<T> var2;
+
 	public LessThanOrEqualConstraint(Solver solver, FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
 		super(solver, var1, var2);
+
+		this.var1 = var2;
+		this.var2 = var2;
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		FiniteDomainVariable<T> other = variable == variables.get(0) ? variables.get(1) : variables.get(0);
+		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
 
 		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
 
-		if (variable == variables.get(0)) {
+		if (variable == var1) {
 			// remove everything greater than to the largest bit in other
 			bs.clear(other.allowableValues.length(), bs.size());
 		} else {

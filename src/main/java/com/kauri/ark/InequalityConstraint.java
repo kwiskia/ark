@@ -30,15 +30,18 @@ import java.util.BitSet;
  */
 public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
+	private FiniteDomainVariable<T> var1;
+	private FiniteDomainVariable<T> var2;
+
 	public InequalityConstraint(Solver solver, FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
 		super(solver, var1, var2);
+
+		this.var1 = var2;
+		this.var2 = var2;
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		FiniteDomainVariable<T> var1 = variables.get(0);
-		FiniteDomainVariable<T> var2 = variables.get(1);
-
 		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
 
 		if (other.isUnique()) {
