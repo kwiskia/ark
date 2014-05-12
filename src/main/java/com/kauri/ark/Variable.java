@@ -73,7 +73,5 @@ abstract public class Variable<T>
 
 	abstract public boolean isUnique();
 
-	abstract public Object getUniqueValue();
-
 	abstract public ValueEnumerator getValueEnumerator();
 }

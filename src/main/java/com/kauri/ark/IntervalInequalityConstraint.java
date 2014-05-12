@@ -43,7 +43,7 @@ public class IntervalInequalityConstraint extends Constraint<IntegerVariable>
 		IntegerVariable other = variable == var1 ? var2 : var1;
 
 		if (variable.isUnique() && other.isUnique()) {
-			if (variable.getUniqueValue().equals(other.getUniqueValue())) {
+			if (variable.getAssignment() == other.getAssignment()) {
 				return false;
 			}
 		}

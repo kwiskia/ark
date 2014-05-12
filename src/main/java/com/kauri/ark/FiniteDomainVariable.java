@@ -51,10 +51,9 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 		return allowableValues.cardinality() == 1;
 	}
 
-	@Override
-	public T getUniqueValue() {
+	public T getAssignment() {
 		if (!isUnique()) {
-			throw new RuntimeException("Not unique.");
+			throw new RuntimeException("Assignment not unique.");
 		}
 
 		return finiteDomain.getValue(allowableValues.nextSetBit(0));

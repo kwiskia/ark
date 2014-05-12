@@ -44,10 +44,9 @@ public class IntegerVariable extends Variable<Interval>
 		return allowableValues.isUnique();
 	}
 
-	@Override
-	public Integer getUniqueValue() {
+	public int getAssignment() {
 		if (!isUnique()) {
-			throw new RuntimeException("Not unique.");
+			throw new RuntimeException("Assignment not unique.");
 		}
 
 		return allowableValues.getLowerBound();
