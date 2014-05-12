@@ -26,15 +26,13 @@ package com.kauri.ark;
  *
  * @author Eric Fritz
  */
-public class ProductConstraint extends Constraint<IntegerVariable>
+public class ProductConstraint implements Constraint<IntegerVariable>
 {
 	private IntegerVariable a;
 	private IntegerVariable b;
 	private IntegerVariable c;
 
-	public ProductConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		super(solver, a, b, c);
-
+	public ProductConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		this.a = a;
 		this.b = b;
 		this.c = c;

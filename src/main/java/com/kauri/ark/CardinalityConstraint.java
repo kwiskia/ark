@@ -30,16 +30,14 @@ import java.util.List;
  *
  * @author Eric Fritz
  */
-public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
+public class CardinalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
 	private int min;
 	private int max;
 	private BitSet mask;
 	private List<FiniteDomainVariable<T>> variables;
 
-	public CardinalityConstraint(Solver solver, T value, int min, int max, FiniteDomainVariable<T>... variables) {
-		super(solver, variables);
-
+	public CardinalityConstraint(T value, int min, int max, FiniteDomainVariable<T>... variables) {
 		this.variables = Arrays.asList(variables);
 
 		this.min = min;

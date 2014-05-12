@@ -28,14 +28,12 @@ import java.util.BitSet;
  *
  * @author Eric Fritz
  */
-public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
+public class InequalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
 	private FiniteDomainVariable<T> var1;
 	private FiniteDomainVariable<T> var2;
 
-	public InequalityConstraint(Solver solver, FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		super(solver, var1, var2);
-
+	public InequalityConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
 		this.var1 = var2;
 		this.var2 = var2;
 	}

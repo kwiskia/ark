@@ -55,12 +55,13 @@ public class Solver
 		variables.add(variable);
 	}
 
-	public void addConstraintRelation(Constraint<?> constraint, Variable<?> variable) {
-		if (!arcs.containsKey(constraint)) {
-			arcs.put(constraint, new ArrayList<Arc>());
-		}
+	public <T> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
+		arcs.put(constraint, new ArrayList<>());
 
-		arcs.get(constraint).add(new Arc(variable, constraint));
+		for (Variable<T> variable : variables) {
+			variable.addConstraint(constraint);
+			arcs.get(constraint).add(new Arc(variable, constraint));
+		}
 	}
 
 	public void queueForConstraint(Constraint<?> constraint, Variable<?> variable) {

@@ -26,14 +26,7 @@ package com.kauri.ark;
  *
  * @author Eric Fritz
  */
-abstract public class Constraint<T extends Variable<?>>
+public interface Constraint<T extends Variable<?>>
 {
-	public Constraint(Solver solver, T... variables) {
-		for (T variable : variables) {
-			variable.addConstraint(this);
-			solver.addConstraintRelation(this, variable);
-		}
-	}
-
-	abstract public boolean update(T variable);
+	boolean update(T variable);
 }

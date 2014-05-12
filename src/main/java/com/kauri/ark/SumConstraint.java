@@ -26,15 +26,13 @@ package com.kauri.ark;
  *
  * @author Eric Fritz
  */
-public class SumConstraint extends Constraint<IntegerVariable>
+public class SumConstraint implements Constraint<IntegerVariable>
 {
 	private IntegerVariable a;
 	private IntegerVariable b;
 	private IntegerVariable c;
 
-	public SumConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		super(solver, a, b, c);
-
+	public SumConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		this.a = a;
 		this.b = b;
 		this.c = c;

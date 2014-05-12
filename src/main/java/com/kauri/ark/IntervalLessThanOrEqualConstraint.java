@@ -26,14 +26,12 @@ package com.kauri.ark;
  *
  * @author Eric Fritz
  */
-public class IntervalLessThanOrEqualConstraint extends Constraint<IntegerVariable>
+public class IntervalLessThanOrEqualConstraint implements Constraint<IntegerVariable>
 {
 	private IntegerVariable var1;
 	private IntegerVariable var2;
 
-	public IntervalLessThanOrEqualConstraint(Solver solver, IntegerVariable var1, IntegerVariable var2) {
-		super(solver, var1, var2);
-
+	public IntervalLessThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 	}
