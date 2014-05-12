@@ -33,6 +33,9 @@ public class IntervalInequalityConstraint extends Constraint<IntegerVariable>
 
 	public IntervalInequalityConstraint(Solver solver, IntegerVariable var1, IntegerVariable var2) {
 		super(solver, var1, var2);
+
+		this.var1 = var1;
+		this.var2 = var2;
 	}
 
 	@Override
