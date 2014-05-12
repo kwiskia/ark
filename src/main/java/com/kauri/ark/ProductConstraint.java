@@ -41,17 +41,20 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 	}
 
 	@Override
-	public boolean update(  IntegerVariable variable) {
-		Interval result;
+	public boolean update(IntegerVariable variable) {
+		int aLower = a.allowableValues.getLowerBound();
+		int aUpper = a.allowableValues.getUpperBound();
+		int bLower = b.allowableValues.getLowerBound();
+		int bUpper = b.allowableValues.getUpperBound();
+		int cLower = c.allowableValues.getLowerBound();
+		int cUpper = c.allowableValues.getUpperBound();
+
+		int lower;
+		int upper;
 
 		if (variable == a) {
 			// c / b
-			int av = c.allowableValues.getLowerBound();
-			int bv = c.allowableValues.getUpperBound();
-			int cv = b.allowableValues.getLowerBound();
-			int dv = b.allowableValues.getUpperBound();
-
-			if (cv == 0 || dv == 0) {
+			if (bLower == 0 || bUpper == 0) {
 				if (a.isUnique() && c.isUnique()) {
 					return c.allowableValues.getLowerBound() == 0;
 				}
@@ -59,15 +62,11 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 				return true;
 			}
 
-			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av / dv, bv / cv, bv / dv));
+			lower = min(cLower / bLower, cLower / bUpper, cUpper / bLower, cUpper / bUpper);
+			upper = max(cLower / bLower, cLower / bUpper, cUpper / bLower, cUpper / bUpper);
 		} else if (variable == b) {
 			// c / a
-			int av = c.allowableValues.getLowerBound();
-			int bv = c.allowableValues.getUpperBound();
-			int cv = a.allowableValues.getLowerBound();
-			int dv = a.allowableValues.getUpperBound();
-
-			if (cv == 0 || dv == 0) {
+			if (aLower == 0 || aUpper == 0) {
 				if (b.isUnique() && c.isUnique()) {
 					return c.allowableValues.getLowerBound() == 0;
 				}
@@ -75,41 +74,27 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 				return true;
 			}
 
-			result = new Interval(min(av / cv, av / dv, bv / cv, bv / dv), max(av / cv, av / dv, bv / cv, bv / dv));
+			lower = min(cLower / aLower, cLower / aUpper, cUpper / aLower, cUpper / aUpper);
+			upper = max(cLower / aLower, cLower / aUpper, cUpper / aLower, cUpper / aUpper);
 		} else if (variable == c) {
 			// a * b
-			int av = a.allowableValues.getLowerBound();
-			int bv = a.allowableValues.getUpperBound();
-			int cv = b.allowableValues.getLowerBound();
-			int dv = b.allowableValues.getUpperBound();
-
-			result = new Interval(min(av * cv, av * dv, bv * cv, bv * dv), max(av * cv, av * dv, bv * cv, bv * dv));
+			lower = min(aLower * bLower, aLower * bUpper, aUpper * bLower, aUpper * bUpper);
+			upper = max(aLower * bLower, aLower * bUpper, aUpper * bLower, aUpper * bUpper);
 		} else {
 			throw new RuntimeException("Unreachable.");
 		}
 
-		result = new Interval(Math.max(variable.allowableValues.getLowerBound(), result.getLowerBound()), Math.min(variable.allowableValues.getUpperBound(), result.getUpperBound()));
+		lower = Math.max(variable.allowableValues.getLowerBound(), lower);
+		upper = Math.min(variable.allowableValues.getUpperBound(), upper);
 
-		return variable.trySetValue(result);
+		return variable.trySetValue(new Interval(lower, upper));
 	}
 
-	private int min(int... nums) {
-		int min = nums[0];
-
-		for (int n : nums) {
-			min = Math.min(min, n);
-		}
-
-		return min;
+	private int min(int a, int b, int c, int d) {
+		return Math.min(a, Math.min(b, Math.min(c, d)));
 	}
 
-	private int max(int... nums) {
-		int max = nums[0];
-
-		for (int n : nums) {
-			max = Math.max(max, n);
-		}
-
-		return max;
+	private int max(int a, int b, int c, int d) {
+		return Math.max(a, Math.max(b, Math.max(c, d)));
 	}
 }

@@ -42,23 +42,35 @@ public class SumConstraint extends Constraint<IntegerVariable>
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		Interval result;
+		int aLower = a.allowableValues.getLowerBound();
+		int aUpper = a.allowableValues.getUpperBound();
+		int bLower = b.allowableValues.getLowerBound();
+		int bUpper = b.allowableValues.getUpperBound();
+		int cLower = c.allowableValues.getLowerBound();
+		int cUpper = c.allowableValues.getUpperBound();
+
+		int lower;
+		int upper;
 
 		if (variable == a) {
 			// c - b
-			result = new Interval(c.allowableValues.getLowerBound() - b.allowableValues.getUpperBound(), c.allowableValues.getUpperBound() - b.allowableValues.getLowerBound());
+			lower = cLower - bUpper;
+			upper = cUpper - bLower;
 		} else if (variable == b) {
 			// c - a
-			result = new Interval(c.allowableValues.getLowerBound() - a.allowableValues.getUpperBound(), c.allowableValues.getUpperBound() - a.allowableValues.getLowerBound());
+			lower = cLower - aUpper;
+			upper = cUpper - aLower;
 		} else if (variable == c) {
 			// a + b
-			result = new Interval(a.allowableValues.getLowerBound() + b.allowableValues.getLowerBound(), a.allowableValues.getUpperBound() + b.allowableValues.getUpperBound());
+			lower = aLower + bLower;
+			upper = aUpper + bUpper;
 		} else {
 			throw new RuntimeException("Unreachable.");
 		}
 
-		result = new Interval(Math.max(variable.allowableValues.getLowerBound(), result.getLowerBound()), Math.min(variable.allowableValues.getUpperBound(), result.getUpperBound()));
+		lower = Math.max(variable.allowableValues.getLowerBound(), lower);
+		upper = Math.min(variable.allowableValues.getUpperBound(), upper);
 
-		return variable.trySetValue(result);
+		return variable.trySetValue(new Interval(lower, upper));
 	}
 }
