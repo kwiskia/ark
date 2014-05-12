@@ -40,7 +40,7 @@ abstract public class Constraint<T extends Variable<?>>
 
 		for (T t : variables) {
 			arcs.add(new Arc<>(t, this));
-			t.constraints.add(this);
+			t.addConstraint(this);
 		}
 	}
 

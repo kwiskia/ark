@@ -33,13 +33,17 @@ abstract public class Variable<T>
 {
 	protected String name;
 	protected T allowableValues;
-	protected List<Constraint> constraints = new ArrayList<>();
+	private List<Constraint> constraints = new ArrayList<>();
 
 	public Variable(String name, T allowableValues) {
 		this.name = name;
 		this.allowableValues = allowableValues;
 	}
 
+	public void addConstraint(Constraint constraint) {
+		constraints.add(constraint);
+	}
+	
 	public String toString() {
 		return name;
 	}
