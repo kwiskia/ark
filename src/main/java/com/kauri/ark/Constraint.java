@@ -37,9 +37,9 @@ abstract public class Constraint<T extends Variable<?>>
 	public Constraint(Solver solver, T... variables) {
 		this.solver = solver;
 
-		for (T t : variables) {
-			arcs.add(new Arc<>(t, this));
-			t.addConstraint(this);
+		for (T variable : variables) {
+			arcs.add(new Arc<>(variable, this));
+			variable.addConstraint(this);
 		}
 	}
 
