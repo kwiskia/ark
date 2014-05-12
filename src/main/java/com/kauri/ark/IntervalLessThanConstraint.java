@@ -42,12 +42,17 @@ public class IntervalLessThanConstraint extends Constraint<IntegerVariable>
 	public boolean update(IntegerVariable variable) {
 		IntegerVariable other = variable == var1 ? var2 : var1;
 
-		if (variable.isUnique() && other.isUnique()) {
-			if (var1.getAssignment() >= var2.getAssignment()) {
-				return false;
-			}
+		int lower = variable.allowableValues.getLowerBound();
+		int upper = variable.allowableValues.getUpperBound();
+
+		if (variable == var1) {
+			// remove everything greater than or equal to the largest bit in other
+			upper = Math.min(upper, other.allowableValues.getUpperBound() - 1);
+		} else {
+			// remove everything smaller than or equal to the smallest bit in other
+			lower = Math.max(lower, other.allowableValues.getLowerBound() + 1);
 		}
 
-		return true;
+		return variable.trySetValue(new Interval(lower, upper));
 	}
 }
