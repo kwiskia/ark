@@ -30,8 +30,8 @@ import java.util.Stack;
  */
 public class IntegerVariable extends Variable<Interval>
 {
-	public IntegerVariable(String name, Interval interval) {
-		super(name, interval);
+	public IntegerVariable(Solver solver, String name, Interval interval) {
+		super(solver, name, interval);
 	}
 
 	@Override
@@ -54,8 +54,8 @@ public class IntegerVariable extends Variable<Interval>
 	}
 
 	@Override
-	public ValueEnumerator getUniqueValues(Solver solver) {
-		return new IntervalValueEnumerator(solver, solver.saveValues());
+	public ValueEnumerator getUniqueValues() {
+		return new IntervalValueEnumerator(getSolver(), getSolver().saveValues());
 	}
 
 	private class IntervalValueEnumerator implements ValueEnumerator
@@ -82,7 +82,7 @@ public class IntegerVariable extends Variable<Interval>
 			while (!candidates.isEmpty()) {
 				Interval candidate = candidates.pop();
 
-				if (trySetAndResolveConstraints(solver, candidate)) {
+				if (trySetAndResolveConstraints(candidate)) {
 					if (candidate.isUnique()) {
 						hasAdvanced = true;
 						return true;

@@ -48,6 +48,6 @@ public class LessThanOrEqualConstraint<T> extends Constraint<FiniteDomainVariabl
 			bs.clear(0, other.allowableValues.nextSetBit(0));
 		}
 
-		return variable.trySetValue(getSolver(), bs);
+		return variable.trySetValue(bs);
 	}
 }

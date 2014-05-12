@@ -68,7 +68,7 @@ public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>
 					BitSet bs = v.allowableValues.get(0, v.allowableValues.size());
 					bs.andNot(mask);
 
-					if (!v.trySetValue(getSolver(), bs)) {
+					if (!v.trySetValue(bs)) {
 						return false;
 					}
 				}

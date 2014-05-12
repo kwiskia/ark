@@ -32,8 +32,8 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 {
 	private FiniteDomain<T> finiteDomain;
 
-	public FiniteDomainVariable(String name, FiniteDomain<T> finiteDomain) {
-		super(name, finiteDomain.createBitSet());
+	public FiniteDomainVariable(Solver solver, String name, FiniteDomain<T> finiteDomain) {
+		super(solver, name, finiteDomain.createBitSet());
 		this.finiteDomain = finiteDomain;
 	}
 
@@ -61,8 +61,8 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 	}
 
 	@Override
-	public ValueEnumerator getUniqueValues(Solver solver) {
-		return new FiniteDomainValueEnumerator(solver, solver.saveValues());
+	public ValueEnumerator getUniqueValues() {
+		return new FiniteDomainValueEnumerator(getSolver(), getSolver().saveValues());
 	}
 
 	private class FiniteDomainValueEnumerator implements ValueEnumerator
@@ -90,7 +90,7 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 				BitSet bs = new BitSet(allowableValues.size());
 				bs.set(next);
 
-				if (trySetAndResolveConstraints(solver, bs)) {
+				if (trySetAndResolveConstraints(bs)) {
 					hasAdvanced = true;
 					return true;
 				}

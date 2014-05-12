@@ -44,6 +44,6 @@ public class EqualityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
 		bs.and(other.allowableValues);
 
-		return variable.trySetValue(getSolver(), bs);
+		return variable.trySetValue(bs);
 	}
 }

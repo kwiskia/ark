@@ -31,29 +31,35 @@ import java.util.List;
  */
 abstract public class Variable<T>
 {
+	private Solver solver;
 	protected String name;
 	protected T allowableValues;
 	private List<Constraint> constraints = new ArrayList<>();
 
-	public Variable(String name, T allowableValues) {
+	public Variable(Solver solver, String name, T allowableValues) {
+		this.solver = solver;
 		this.name = name;
 		this.allowableValues = allowableValues;
+	}
+
+	public Solver getSolver() {
+		return solver;
 	}
 
 	public void addConstraint(Constraint constraint) {
 		constraints.add(constraint);
 	}
 
-	protected boolean trySetAndResolveConstraints(Solver solver, T value) {
-		return trySetValue(solver, value) && solver.resolveConstraints();
+	protected boolean trySetAndResolveConstraints(T value) {
+		return trySetValue(value) && solver.resolveConstraints();
 	}
 
-	protected boolean trySetValue(Solver solver, T value) {
+	protected boolean trySetValue(T value) {
 		if (!allowableValues.equals(value)) {
 			solver.saveValue(this, allowableValues);
 			allowableValues = value;
 
-			if (!narrowConstraints(solver)) {
+			if (!narrowConstraints()) {
 				return false;
 			}
 		}
@@ -61,7 +67,7 @@ abstract public class Variable<T>
 		return !isEmpty();
 	}
 
-	protected boolean narrowConstraints(Solver solver) {
+	protected boolean narrowConstraints() {
 		for (Constraint c : constraints) {
 			if (!c.narrowed(this)) {
 				return false;
@@ -81,5 +87,5 @@ abstract public class Variable<T>
 
 	abstract public Object getUniqueValue();
 
-	abstract public ValueEnumerator getUniqueValues(Solver solver);
+	abstract public ValueEnumerator getUniqueValues();
 }

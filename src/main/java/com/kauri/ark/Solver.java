@@ -55,7 +55,7 @@ public class Solver
 		}
 
 		Stack<ValueEnumerator> values = new Stack<>();
-		values.push(variables.get(0).getUniqueValues(this));
+		values.push(variables.get(0).getUniqueValues());
 
 		while (!values.isEmpty()) {
 			if (values.lastElement().advance()) {
@@ -64,7 +64,7 @@ public class Solver
 						return;
 					}
 				} else {
-					values.push(variables.get(values.size()).getUniqueValues(this));
+					values.push(variables.get(values.size()).getUniqueValues());
 				}
 			} else {
 				values.pop();

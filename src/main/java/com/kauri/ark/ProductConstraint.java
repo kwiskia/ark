@@ -86,7 +86,7 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 
 		result = new Interval(Math.max(variable.allowableValues.getLowerBound(), result.getLowerBound()), Math.min(variable.allowableValues.getUpperBound(), result.getUpperBound()));
 
-		return variable.trySetValue(getSolver(), result);
+		return variable.trySetValue(result);
 	}
 
 	private int min(int... nums) {

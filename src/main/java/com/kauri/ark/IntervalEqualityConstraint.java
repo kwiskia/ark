@@ -42,6 +42,6 @@ public class IntervalEqualityConstraint extends Constraint<IntegerVariable>
 		int lower = Math.max(variable.allowableValues.getLowerBound(), other.allowableValues.getLowerBound());
 		int upper = Math.min(variable.allowableValues.getUpperBound(), other.allowableValues.getUpperBound());
 
-		return variable.trySetValue(getSolver(), new Interval(lower, upper));
+		return variable.trySetValue(new Interval(lower, upper));
 	}
 }

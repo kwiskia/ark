@@ -45,7 +45,7 @@ public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 			BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
 			bs.andNot(other.allowableValues);
 
-			return variable.trySetValue(getSolver(), bs);
+			return variable.trySetValue(bs);
 		}
 
 		return true;
