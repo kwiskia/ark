@@ -44,20 +44,30 @@ public class Solver
 	}
 
 	public void solve(SolutionHandler handler) {
-		Stack<ValueEnumerator> enumerators = new Stack<>();
-		enumerators.push(variables.get(0).getUniqueValues(this));
+		if (variables.isEmpty()) {
+			return;
+		}
 
-		while (enumerators.size() > 0) {
-			if (enumerators.lastElement().advance()) {
-				if (enumerators.size() >= variables.size()) {
+		for (Variable v : variables) {
+			if (v.isEmpty()) {
+				return;
+			}
+		}
+
+		Stack<ValueEnumerator> values = new Stack<>();
+		values.push(variables.get(0).getUniqueValues(this));
+
+		while (!values.isEmpty()) {
+			if (values.lastElement().advance()) {
+				if (values.size() >= variables.size()) {
 					if (!handler.handle()) {
 						return;
 					}
 				} else {
-					enumerators.push(variables.get(enumerators.size()).getUniqueValues(this));
+					values.push(variables.get(values.size()).getUniqueValues(this));
 				}
 			} else {
-				enumerators.pop();
+				values.pop();
 			}
 		}
 	}
