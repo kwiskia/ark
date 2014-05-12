@@ -57,18 +57,12 @@ abstract public class Variable<T>
 			solver.saveValue(this, allowableValues);
 			allowableValues = value;
 
-			if (!narrowConstraints()) {
+			if (this.isEmpty()) {
 				return false;
 			}
-		}
 
-		return !isEmpty();
-	}
-
-	protected boolean narrowConstraints() {
-		for (Constraint c : constraints) {
-			if (!c.narrowed(this)) {
-				return false;
+			for (Constraint c : constraints) {
+				c.queueArcsExcluding(this);
 			}
 		}
 

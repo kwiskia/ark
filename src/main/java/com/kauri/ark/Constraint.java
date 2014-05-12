@@ -47,18 +47,12 @@ abstract public class Constraint<T extends Variable<?>>
 		return solver;
 	}
 
-	public boolean narrowed(T variable) {
+	public void queueArcsExcluding(T variable) {
 		for (Arc arc : arcs) {
-			if (arc.getVariable().isEmpty()) {
-				return false;
-			}
-
 			if (arc.getVariable() != variable) {
 				arc.markForUpdate(solver);
 			}
 		}
-
-		return true;
 	}
 
 	abstract public boolean update(T variable);
