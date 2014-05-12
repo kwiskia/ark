@@ -50,7 +50,7 @@ public class LessThanOrEqualConstraint<T> extends Constraint<FiniteDomainVariabl
 			// remove everything greater than to the largest bit in other
 			bs.clear(other.allowableValues.length(), bs.size());
 		} else {
-			// remove everything smaller equal to smallest bit in other
+			// remove everything smaller equal to the smallest bit in other
 			bs.clear(0, other.allowableValues.nextSetBit(0));
 		}
 
