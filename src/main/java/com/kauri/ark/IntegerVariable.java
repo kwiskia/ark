@@ -81,7 +81,7 @@ public class IntegerVariable extends Variable<Interval>
 			while (!candidates.isEmpty()) {
 				Interval candidate = candidates.pop();
 
-				if (trySetAndResolveConstraints(candidate)) {
+				if (trySetValue(candidate) && solver.resolveConstraints()) {
 					if (candidate.isUnique()) {
 						hasAdvanced = true;
 						return true;

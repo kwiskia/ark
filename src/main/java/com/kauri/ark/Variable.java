@@ -48,10 +48,6 @@ abstract public class Variable<T>
 		constraints.add(constraint);
 	}
 
-	protected boolean trySetAndResolveConstraints(T value) {
-		return trySetValue(value) && solver.resolveConstraints();
-	}
-
 	protected boolean trySetValue(T value) {
 		if (!allowableValues.equals(value)) {
 			solver.saveValue(this, allowableValues);

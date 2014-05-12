@@ -103,7 +103,7 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 				BitSet bs = new BitSet(allowableValues.size());
 				bs.set(indices[k++]);
 
-				if (trySetAndResolveConstraints(bs)) {
+				if (trySetValue(bs) && solver.resolveConstraints()) {
 					return true;
 				}
 
