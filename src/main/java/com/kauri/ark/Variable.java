@@ -75,5 +75,5 @@ abstract public class Variable<T>
 
 	abstract public Object getUniqueValue();
 
-	abstract public ValueEnumerator getUniqueValues();
+	abstract public ValueEnumerator getValueEnumerator();
 }

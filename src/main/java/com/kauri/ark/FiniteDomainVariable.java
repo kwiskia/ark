@@ -61,7 +61,7 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 	}
 
 	@Override
-	public ValueEnumerator getUniqueValues() {
+	public ValueEnumerator getValueEnumerator() {
 		return new FiniteDomainValueEnumerator(getSolver(), getSolver().saveValues());
 	}
 

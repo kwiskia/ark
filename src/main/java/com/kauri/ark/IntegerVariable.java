@@ -54,7 +54,7 @@ public class IntegerVariable extends Variable<Interval>
 	}
 
 	@Override
-	public ValueEnumerator getUniqueValues() {
+	public ValueEnumerator getValueEnumerator() {
 		return new IntervalValueEnumerator(getSolver(), getSolver().saveValues());
 	}
 

@@ -77,7 +77,7 @@ public class Solver
 		solving = true;
 
 		Stack<ValueEnumerator> values = new Stack<>();
-		values.push(variables.get(0).getUniqueValues());
+		values.push(variables.get(0).getValueEnumerator());
 
 		while (!values.isEmpty()) {
 			if (values.lastElement().advance()) {
@@ -86,7 +86,7 @@ public class Solver
 						break;
 					}
 				} else {
-					values.push(variables.get(values.size()).getUniqueValues());
+					values.push(variables.get(values.size()).getValueEnumerator());
 				}
 			} else {
 				values.pop();
