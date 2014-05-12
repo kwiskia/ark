@@ -46,7 +46,7 @@ abstract public class Constraint<T extends Variable<?>>
 	public void queueArcsExcluding(T variable) {
 		for (Arc arc : arcs) {
 			if (arc.getVariable() != variable) {
-				arc.markForUpdate(solver);
+				solver.queue(arc);
 			}
 		}
 	}
