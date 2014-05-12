@@ -30,28 +30,28 @@ public class Constraints
 {
 	public static <T> void makeAllEqualConstraint(Solver solver, FiniteDomainVariable<T>... vars) {
 		for (int i = 0; i < vars.length - 1; i++) {
-			new EqualityConstraint<>(vars[i], vars[i + 1]);
+			new EqualityConstraint<>(solver, vars[i], vars[i + 1]);
 		}
 	}
 
 	public static <T> void makeAllUniqueConstraint(Solver solver, FiniteDomainVariable<T>... vars) {
 		for (int i = 0; i < vars.length; i++) {
 			for (int j = i + 1; j < vars.length; j++) {
-				new InequalityConstraint<>(vars[i], vars[j]);
+				new InequalityConstraint<>(solver, vars[i], vars[j]);
 			}
 		}
 	}
 
 	public static <T> void makeAllEqualConstraint(Solver solver, IntegerVariable... vars) {
 		for (int i = 0; i < vars.length - 1; i++) {
-			new IntervalEqualityConstraint(vars[i], vars[i + 1]);
+			new IntervalEqualityConstraint(solver, vars[i], vars[i + 1]);
 		}
 	}
 
 	public static <T> void makeAllUniqueConstraint(Solver solver, IntegerVariable... vars) {
 		for (int i = 0; i < vars.length; i++) {
 			for (int j = i + 1; j < vars.length; j++) {
-				new IntervalInequalityConstraint(vars[i], vars[j]);
+				new IntervalInequalityConstraint(solver, vars[i], vars[j]);
 			}
 		}
 	}
@@ -60,11 +60,11 @@ public class Constraints
 		IntegerVariable z = new IntegerVariable("z", new Interval(0, 0));
 		solver.addVariable(z);
 
-		new ProductConstraint(b, c, a);
-		new IntervalInequalityConstraint(b, z);
+		new ProductConstraint(solver, b, c, a);
+		new IntervalInequalityConstraint(solver, b, z);
 	}
 
 	public static void makeDifferenceConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		new SumConstraint(b, c, a);
+		new SumConstraint(solver, b, c, a);
 	}
 }

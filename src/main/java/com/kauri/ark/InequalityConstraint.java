@@ -30,12 +30,12 @@ import java.util.BitSet;
  */
 public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
-	public InequalityConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		super(var1, var2);
+	public InequalityConstraint(Solver solver, FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		super(solver, var1, var2);
 	}
 
 	@Override
-	public boolean update(Solver solver, FiniteDomainVariable<T> variable) {
+	public boolean update(FiniteDomainVariable<T> variable) {
 		FiniteDomainVariable<T> var1 = variables.get(0);
 		FiniteDomainVariable<T> var2 = variables.get(1);
 
@@ -45,7 +45,7 @@ public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 			BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
 			bs.andNot(other.allowableValues);
 
-			return variable.trySetValue(solver, bs);
+			return variable.trySetValue(getSolver(), bs);
 		}
 
 		return true;

@@ -30,12 +30,12 @@ import java.util.BitSet;
  */
 public class LessThanOrEqualConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 {
-	public LessThanOrEqualConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		super(var1, var2);
+	public LessThanOrEqualConstraint(Solver solver, FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		super(solver, var1, var2);
 	}
 
 	@Override
-	public boolean update(Solver solver, FiniteDomainVariable<T> variable) {
+	public boolean update(FiniteDomainVariable<T> variable) {
 		FiniteDomainVariable<T> other = variable == variables.get(0) ? variables.get(1) : variables.get(0);
 
 		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
@@ -48,6 +48,6 @@ public class LessThanOrEqualConstraint<T> extends Constraint<FiniteDomainVariabl
 			bs.clear(0, other.allowableValues.nextSetBit(0));
 		}
 
-		return variable.trySetValue(solver, bs);
+		return variable.trySetValue(getSolver(), bs);
 	}
 }

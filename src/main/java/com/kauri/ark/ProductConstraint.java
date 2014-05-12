@@ -28,12 +28,12 @@ package com.kauri.ark;
  */
 public class ProductConstraint extends Constraint<IntegerVariable>
 {
-	public ProductConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		super(a, b, c);
+	public ProductConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+		super(solver, a, b, c);
 	}
 
 	@Override
-	public boolean update(Solver solver, IntegerVariable variable) {
+	public boolean update(  IntegerVariable variable) {
 		IntegerVariable a = variables.get(0);
 		IntegerVariable b = variables.get(1);
 		IntegerVariable c = variables.get(2);
@@ -86,7 +86,7 @@ public class ProductConstraint extends Constraint<IntegerVariable>
 
 		result = new Interval(Math.max(variable.allowableValues.getLowerBound(), result.getLowerBound()), Math.min(variable.allowableValues.getUpperBound(), result.getUpperBound()));
 
-		return variable.trySetValue(solver, result);
+		return variable.trySetValue(getSolver(), result);
 	}
 
 	private int min(int... nums) {

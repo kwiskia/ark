@@ -28,12 +28,12 @@ package com.kauri.ark;
  */
 public class IntervalInequalityConstraint extends Constraint<IntegerVariable>
 {
-	public IntervalInequalityConstraint(IntegerVariable var1, IntegerVariable var2) {
-		super(var1, var2);
+	public IntervalInequalityConstraint(Solver solver, IntegerVariable var1, IntegerVariable var2) {
+		super(solver, var1, var2);
 	}
 
 	@Override
-	public boolean update(Solver solver, IntegerVariable variable) {
+	public boolean update(IntegerVariable variable) {
 		IntegerVariable var1 = variables.get(0);
 		IntegerVariable var2 = variables.get(1);
 

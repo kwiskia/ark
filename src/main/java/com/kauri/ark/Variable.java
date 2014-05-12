@@ -63,7 +63,7 @@ abstract public class Variable<T>
 
 	protected boolean narrowConstraints(Solver solver) {
 		for (Constraint c : constraints) {
-			if (!c.narrowed(solver, this)) {
+			if (!c.narrowed(this)) {
 				return false;
 			}
 		}

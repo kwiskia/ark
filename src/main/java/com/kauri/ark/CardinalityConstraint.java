@@ -34,8 +34,8 @@ public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>
 	private int max;
 	private BitSet mask;
 
-	public CardinalityConstraint(T value, int min, int max, FiniteDomainVariable<T>... vars) {
-		super(vars);
+	public CardinalityConstraint(Solver solver, T value, int min, int max, FiniteDomainVariable<T>... vars) {
+		super(solver, vars);
 
 		this.min = min;
 		this.max = max;
@@ -44,7 +44,7 @@ public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>
 	}
 
 	@Override
-	public boolean update(Solver solver, FiniteDomainVariable<T> variable) {
+	public boolean update(FiniteDomainVariable<T> variable) {
 		int possible = 0;
 		int definite = 0;
 
@@ -68,7 +68,7 @@ public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>
 					BitSet bs = v.allowableValues.get(0, v.allowableValues.size());
 					bs.andNot(mask);
 
-					if (!v.trySetValue(solver, bs)) {
+					if (!v.trySetValue(getSolver(), bs)) {
 						return false;
 					}
 				}

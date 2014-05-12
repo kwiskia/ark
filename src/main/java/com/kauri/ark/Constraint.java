@@ -32,10 +32,12 @@ import java.util.List;
  */
 abstract public class Constraint<T extends Variable<?>>
 {
+	private Solver solver;
 	protected List<T> variables = new ArrayList<>();
 	protected List<Arc> arcs = new ArrayList<>();
 
-	public Constraint(T... variables) {
+	public Constraint(Solver solver, T... variables) {
+		this.solver = solver;
 		this.variables = Arrays.asList(variables);
 
 		for (T t : variables) {
@@ -44,7 +46,11 @@ abstract public class Constraint<T extends Variable<?>>
 		}
 	}
 
-	public boolean narrowed(Solver solver, T variable) {
+	public Solver getSolver() {
+		return solver;
+	}
+
+	public boolean narrowed(T variable) {
 		for (Arc arc : arcs) {
 			if (arc.getVariable().isEmpty()) {
 				return false;
@@ -58,5 +64,5 @@ abstract public class Constraint<T extends Variable<?>>
 		return true;
 	}
 
-	abstract public boolean update(Solver solver, T variable);
+	abstract public boolean update(T variable);
 }
