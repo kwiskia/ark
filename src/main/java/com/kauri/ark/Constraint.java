@@ -58,5 +58,5 @@ abstract public class Constraint<T extends Variable<?>>
 		return true;
 	}
 
-	abstract public boolean updateVariable(Solver solver, T variable);
+	abstract public boolean update(Solver solver, T variable);
 }

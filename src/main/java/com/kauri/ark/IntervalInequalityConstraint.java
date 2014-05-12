@@ -33,7 +33,7 @@ public class IntervalInequalityConstraint extends Constraint<IntegerVariable>
 	}
 
 	@Override
-	public boolean updateVariable(Solver solver, IntegerVariable variable) {
+	public boolean update(Solver solver, IntegerVariable variable) {
 		IntegerVariable var1 = variables.get(0);
 		IntegerVariable var2 = variables.get(1);
 

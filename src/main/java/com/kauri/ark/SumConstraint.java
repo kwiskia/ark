@@ -33,7 +33,7 @@ public class SumConstraint extends Constraint<IntegerVariable>
 	}
 
 	@Override
-	public boolean updateVariable(Solver solver, IntegerVariable variable) {
+	public boolean update(Solver solver, IntegerVariable variable) {
 		IntegerVariable a = variables.get(0);
 		IntegerVariable b = variables.get(1);
 		IntegerVariable c = variables.get(2);

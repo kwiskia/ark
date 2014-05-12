@@ -44,7 +44,7 @@ public class CardinalityConstraint<T> extends Constraint<FiniteDomainVariable<T>
 	}
 
 	@Override
-	public boolean updateVariable(Solver solver, FiniteDomainVariable<T> variable) {
+	public boolean update(Solver solver, FiniteDomainVariable<T> variable) {
 		int possible = 0;
 		int definite = 0;
 

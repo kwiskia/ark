@@ -35,7 +35,7 @@ public class InequalityConstraint<T> extends Constraint<FiniteDomainVariable<T>>
 	}
 
 	@Override
-	public boolean updateVariable(Solver solver, FiniteDomainVariable<T> variable) {
+	public boolean update(Solver solver, FiniteDomainVariable<T> variable) {
 		FiniteDomainVariable<T> var1 = variables.get(0);
 		FiniteDomainVariable<T> var2 = variables.get(1);
 

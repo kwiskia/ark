@@ -35,7 +35,7 @@ public class LessThanOrEqualConstraint<T> extends Constraint<FiniteDomainVariabl
 	}
 
 	@Override
-	public boolean updateVariable(Solver solver, FiniteDomainVariable<T> variable) {
+	public boolean update(Solver solver, FiniteDomainVariable<T> variable) {
 		FiniteDomainVariable<T> other = variable == variables.get(0) ? variables.get(1) : variables.get(0);
 
 		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
