@@ -21,9 +21,6 @@
 
 package com.kauri.ark;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Constraint
  *
@@ -31,23 +28,10 @@ import java.util.List;
  */
 abstract public class Constraint<T extends Variable<?>>
 {
-	private Solver solver;
-	private List<Arc> arcs = new ArrayList<>();
-
 	public Constraint(Solver solver, T... variables) {
-		this.solver = solver;
-
 		for (T variable : variables) {
-			arcs.add(new Arc<>(variable, this));
 			variable.addConstraint(this);
-		}
-	}
-
-	public void queueArcsExcluding(T variable) {
-		for (Arc arc : arcs) {
-			if (arc.getVariable() != variable) {
-				solver.queue(arc);
-			}
+			solver.addConstraintRelation(this, variable);
 		}
 	}
 

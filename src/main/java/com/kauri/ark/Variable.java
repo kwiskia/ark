@@ -62,7 +62,7 @@ abstract public class Variable<T>
 			}
 
 			for (Constraint c : constraints) {
-				c.queueArcsExcluding(this);
+				solver.queueForConstraint(c, this);
 			}
 		}
 

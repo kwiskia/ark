@@ -22,8 +22,10 @@
 package com.kauri.ark;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -41,6 +43,8 @@ public class Solver
 	}
 
 	private List<Variable<?>> variables = new ArrayList<>();
+	private Map<Constraint, List<Arc>> arcs = new HashMap<>();
+
 	private ExpansionOrder order = ExpansionOrder.DETERMINISTIC;
 
 	private Queue<Arc> worklist = new LinkedList<>();
@@ -49,6 +53,26 @@ public class Solver
 
 	public void addVariable(Variable variable) {
 		variables.add(variable);
+	}
+
+	public void addConstraintRelation(Constraint<?> constraint, Variable<?> variable) {
+		if (!arcs.containsKey(constraint)) {
+			arcs.put(constraint, new ArrayList<Arc>());
+		}
+
+		arcs.get(constraint).add(new Arc(variable, constraint));
+	}
+
+	public void queueForConstraint(Constraint<?> constraint, Variable<?> variable) {
+		if (!arcs.containsKey(constraint)) {
+			return;
+		}
+
+		for (Arc arc : arcs.get(constraint)) {
+			if (arc.variable != variable) {
+				queue(arc);
+			}
+		}
 	}
 
 	public ExpansionOrder getExpansionOrder() {
@@ -100,7 +124,7 @@ public class Solver
 		while (!worklist.isEmpty()) {
 			Arc arc = worklist.poll();
 
-			if (!arc.getConstraint().update(arc.getVariable())) {
+			if (!arc.constraint.update(arc.variable)) {
 				worklist.clear();
 				return false;
 			}
@@ -129,6 +153,17 @@ public class Solver
 		}
 
 		worklist.clear();
+	}
+
+	private class Arc<T extends Variable<?>>
+	{
+		private T variable;
+		private Constraint constraint;
+
+		public Arc(T variable, Constraint constraint) {
+			this.variable = variable;
+			this.constraint = constraint;
+		}
 	}
 
 	private class VarState<T>
