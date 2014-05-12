@@ -32,8 +32,8 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 {
 	private FiniteDomain<T> finiteDomain;
 
-	public FiniteDomainVariable(Solver solver, String name, FiniteDomain<T> finiteDomain) {
-		super(solver, name, finiteDomain.createBitSet());
+	public FiniteDomainVariable(Solver solver, FiniteDomain<T> finiteDomain) {
+		super(solver, finiteDomain.createBitSet());
 		this.finiteDomain = finiteDomain;
 	}
 

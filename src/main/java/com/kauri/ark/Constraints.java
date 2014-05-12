@@ -57,7 +57,7 @@ public class Constraints
 	}
 
 	public static void makeQuotientConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		IntegerVariable z = new IntegerVariable(solver, "z", new Interval(0, 0));
+		IntegerVariable z = new IntegerVariable(solver, new Interval(0, 0));
 		solver.addVariable(z);
 
 		new ProductConstraint(solver, b, c, a);

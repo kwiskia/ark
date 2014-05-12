@@ -32,13 +32,11 @@ import java.util.List;
 abstract public class Variable<T>
 {
 	private Solver solver;
-	protected String name;
 	protected T allowableValues;
 	private List<Constraint> constraints = new ArrayList<>();
 
-	public Variable(Solver solver, String name, T allowableValues) {
+	public Variable(Solver solver, T allowableValues) {
 		this.solver = solver;
-		this.name = name;
 		this.allowableValues = allowableValues;
 	}
 
@@ -75,10 +73,6 @@ abstract public class Variable<T>
 		}
 
 		return true;
-	}
-
-	public String toString() {
-		return name;
 	}
 
 	abstract public boolean isEmpty();
