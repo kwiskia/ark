@@ -38,12 +38,17 @@ public class Solver
 
 	private Queue<Arc> worklist = new LinkedList<>();
 	private Stack<VarState<?>> stack = new Stack<>();
+	private boolean solving = false;
 
 	public void addVariable(Variable variable) {
 		variables.add(variable);
 	}
 
 	public void solve(SolutionHandler handler) {
+		if (solving) {
+			throw new RuntimeException("Already solving.");
+		}
+
 		if (variables.isEmpty()) {
 			return;
 		}
@@ -54,6 +59,8 @@ public class Solver
 			}
 		}
 
+		solving = true;
+
 		Stack<ValueEnumerator> values = new Stack<>();
 		values.push(variables.get(0).getUniqueValues());
 
@@ -61,7 +68,7 @@ public class Solver
 			if (values.lastElement().advance()) {
 				if (values.size() >= variables.size()) {
 					if (!handler.handle()) {
-						return;
+						break;
 					}
 				} else {
 					values.push(variables.get(values.size()).getUniqueValues());
@@ -70,6 +77,8 @@ public class Solver
 				values.pop();
 			}
 		}
+
+		solving = false;
 	}
 
 	protected boolean resolveConstraints() {
