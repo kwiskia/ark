@@ -24,31 +24,28 @@ package com.kauri.ark.integer;
 import com.kauri.ark.Constraint;
 
 /**
- * IntervalEqualityConstraint
+ * IntervalInequalityConstraint
  *
  * @author Eric Fritz
  */
-public class IntervalEqualityConstraint implements Constraint<IntegerVariable>
+public class InequalityConstraint implements Constraint<IntegerVariable>
 {
 	private IntegerVariable[] variables;
 
-	public IntervalEqualityConstraint(IntegerVariable... variables) {
+	public InequalityConstraint(IntegerVariable... variables) {
 		this.variables = variables;
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-
-		int lower = variable.getAllowableValues().getLowerBound();
-		int upper = variable.getAllowableValues().getUpperBound();
-
-		for (IntegerVariable v : variables) {
-			if (v != variable) {
-				lower = Math.max(lower, v.getAllowableValues().getLowerBound());
-				upper = Math.min(upper, v.getAllowableValues().getUpperBound());
+		if (variable.isUnique()) {
+			for (IntegerVariable v : variables) {
+				if (v != variable && v.isUnique() && v.getAssignment() == variable.getAssignment()) {
+					return false;
+				}
 			}
 		}
 
-		return variable.trySetValue(new Interval(lower, upper));
+		return true;
 	}
 }

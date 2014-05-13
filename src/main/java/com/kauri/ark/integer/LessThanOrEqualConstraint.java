@@ -24,16 +24,16 @@ package com.kauri.ark.integer;
 import com.kauri.ark.Constraint;
 
 /**
- * IntervalLessThanConstraint
+ * IntervalLessThanOrEqualConstraint
  *
  * @author Eric Fritz
  */
-public class IntervalLessThanConstraint implements Constraint<IntegerVariable>
+public class LessThanOrEqualConstraint implements Constraint<IntegerVariable>
 {
 	private IntegerVariable var1;
 	private IntegerVariable var2;
 
-	public IntervalLessThanConstraint(IntegerVariable var1, IntegerVariable var2) {
+	public LessThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 	}
@@ -46,11 +46,11 @@ public class IntervalLessThanConstraint implements Constraint<IntegerVariable>
 		int upper = variable.getAllowableValues().getUpperBound();
 
 		if (variable == var1) {
-			// remove everything greater than or equal to the largest bit in other
-			upper = Math.min(upper, other.getAllowableValues().getUpperBound() - 1);
+			// remove everything greater than the largest bit in other
+			upper = Math.min(upper, other.getAllowableValues().getUpperBound());
 		} else {
-			// remove everything smaller than or equal to the smallest bit in other
-			lower = Math.max(lower, other.getAllowableValues().getLowerBound() + 1);
+			// remove everything smaller than the smallest bit in other
+			lower = Math.max(lower, other.getAllowableValues().getLowerBound());
 		}
 
 		return variable.trySetValue(new Interval(lower, upper));

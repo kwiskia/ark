@@ -24,20 +24,31 @@ package com.kauri.ark.integer;
 import com.kauri.ark.Constraint;
 
 /**
- * IntervalGreaterThanOrEqualConstraint
+ * IntervalEqualityConstraint
  *
  * @author Eric Fritz
  */
-public class IntervalGreaterThanOrEqualConstraint implements Constraint<IntegerVariable>
+public class EqualityConstraint implements Constraint<IntegerVariable>
 {
-	private Constraint<IntegerVariable> constraint;
+	private IntegerVariable[] variables;
 
-	public IntervalGreaterThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
-		this.constraint = new IntervalLessThanOrEqualConstraint(var2, var1);
+	public EqualityConstraint(IntegerVariable... variables) {
+		this.variables = variables;
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		return constraint.update(variable);
+
+		int lower = variable.getAllowableValues().getLowerBound();
+		int upper = variable.getAllowableValues().getUpperBound();
+
+		for (IntegerVariable v : variables) {
+			if (v != variable) {
+				lower = Math.max(lower, v.getAllowableValues().getLowerBound());
+				upper = Math.min(upper, v.getAllowableValues().getUpperBound());
+			}
+		}
+
+		return variable.trySetValue(new Interval(lower, upper));
 	}
 }
