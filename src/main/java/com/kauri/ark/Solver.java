@@ -44,7 +44,7 @@ public class Solver
 
 	private List<Variable<?>> variables = new ArrayList<>();
 	private Map<Constraint, List<Arc>> arcs = new HashMap<>();
-	private Map<Variable, List<Constraint>> constraints = new HashMap<>();
+	private Map<Variable, List<Constraint>> edges = new HashMap<>();
 
 	private ExpansionOrder order = ExpansionOrder.DETERMINISTIC;
 
@@ -54,7 +54,7 @@ public class Solver
 
 	public void addVariable(Variable variable) {
 		variables.add(variable);
-		constraints.put(variable, new ArrayList<>());
+		edges.put(variable, new ArrayList<>());
 	}
 
 	public <T> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
@@ -65,13 +65,13 @@ public class Solver
 				throw new RuntimeException("Adding constraint on non-registered variable.");
 			}
 
-			constraints.get(variable).add(constraint);
+			edges.get(variable).add(constraint);
 			arcs.get(constraint).add(new Arc(variable, constraint));
 		}
 	}
 
 	public <T> void queueNeighboringArcs(Variable<T> variable) {
-		for (Constraint constraint : constraints.get(variable)) {
+		for (Constraint constraint : edges.get(variable)) {
 			for (Arc arc : arcs.get(constraint)) {
 				if (arc.variable != variable) {
 					if (!worklist.contains(arc)) {
