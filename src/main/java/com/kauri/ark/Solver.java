@@ -44,7 +44,7 @@ public class Solver
 
 	private List<Variable<?>> variables = new ArrayList<>();
 	private Map<Constraint, List<Arc>> arcs = new HashMap<>();
-	private Map<Variable,List<Constraint>> constraints = new HashMap<>();
+	private Map<Variable, List<Constraint>> constraints = new HashMap<>();
 
 	private ExpansionOrder order = ExpansionOrder.DETERMINISTIC;
 
