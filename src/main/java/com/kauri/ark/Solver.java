@@ -44,6 +44,7 @@ public class Solver
 
 	private List<Variable<?>> variables = new ArrayList<>();
 	private Map<Constraint, List<Arc>> arcs = new HashMap<>();
+	private Map<Variable,List<Constraint>> constraints = new HashMap<>();
 
 	private ExpansionOrder order = ExpansionOrder.DETERMINISTIC;
 
@@ -53,25 +54,30 @@ public class Solver
 
 	public void addVariable(Variable variable) {
 		variables.add(variable);
+		constraints.put(variable, new ArrayList<>());
 	}
 
 	public <T> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
 		arcs.put(constraint, new ArrayList<>());
 
 		for (Variable<T> variable : variables) {
-			variable.addConstraint(constraint);
+			if (!this.variables.contains(variable)) {
+				throw new RuntimeException("Adding constrait on non-registered variable.");
+			}
+
+			constraints.get(variable).add(constraint);
 			arcs.get(constraint).add(new Arc(variable, constraint));
 		}
 	}
 
-	public void queueForConstraint(Constraint<?> constraint, Variable<?> variable) {
-		if (!arcs.containsKey(constraint)) {
-			return;
-		}
-
-		for (Arc arc : arcs.get(constraint)) {
-			if (arc.variable != variable) {
-				queue(arc);
+	public <T> void queueNeighboringArcs(Variable<T> variable) {
+		for (Constraint constraint : constraints.get(variable)) {
+			for (Arc arc : arcs.get(constraint)) {
+				if (arc.variable != variable) {
+					if (!worklist.contains(arc)) {
+						worklist.add(arc);
+					}
+				}
 			}
 		}
 	}
@@ -132,12 +138,6 @@ public class Solver
 		}
 
 		return true;
-	}
-
-	protected void queue(Arc arc) {
-		if (!worklist.contains(arc)) {
-			worklist.add(arc);
-		}
 	}
 
 	protected int saveValues() {

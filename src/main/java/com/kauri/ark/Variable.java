@@ -21,9 +21,6 @@
 
 package com.kauri.ark;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Variable
  *
@@ -33,7 +30,6 @@ abstract public class Variable<T>
 {
 	private Solver solver;
 	protected T allowableValues;
-	private List<Constraint> constraints = new ArrayList<>();
 
 	public Variable(Solver solver, T allowableValues) {
 		this.solver = solver;
@@ -42,10 +38,6 @@ abstract public class Variable<T>
 
 	public Solver getSolver() {
 		return solver;
-	}
-
-	public void addConstraint(Constraint constraint) {
-		constraints.add(constraint);
 	}
 
 	protected boolean trySetValue(T value) {
@@ -57,9 +49,7 @@ abstract public class Variable<T>
 				return false;
 			}
 
-			for (Constraint c : constraints) {
-				solver.queueForConstraint(c, this);
-			}
+			solver.queueNeighboringArcs(this);
 		}
 
 		return true;
