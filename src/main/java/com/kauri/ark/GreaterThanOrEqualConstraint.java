@@ -22,21 +22,20 @@
 package com.kauri.ark;
 
 /**
- * Constraints
+ * GreaterThanOrEqualConstraint
  *
  * @author Eric Fritz
  */
-public class Constraints
+public class GreaterThanOrEqualConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	public static void makeQuotientConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		IntegerVariable z = new IntegerVariable(solver, new Interval(0, 0));
-		solver.addVariable(z);
+	private Constraint<FiniteDomainVariable<T>> constraint;
 
-		solver.addConstraint(new ProductConstraint(b, c, a), a, b, c);
-		solver.addConstraint(new IntervalInequalityConstraint(b, z), b, z);
+	public GreaterThanOrEqualConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		this.constraint = new LessThanOrEqualConstraint(var2, var1);
 	}
 
-	public static void makeDifferenceConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		solver.addConstraint(new SumConstraint(b, c, a), a, b, c);
+	@Override
+	public boolean update(FiniteDomainVariable<T> variable) {
+		return constraint.update(variable);
 	}
 }
