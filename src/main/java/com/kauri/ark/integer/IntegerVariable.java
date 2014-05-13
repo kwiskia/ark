@@ -33,8 +33,8 @@ import java.util.Stack;
  */
 public class IntegerVariable extends Variable<Interval>
 {
-	public IntegerVariable(Solver solver, Interval interval) {
-		super(solver, interval);
+	public IntegerVariable(Solver solver, int low, int high) {
+		super(solver, new Interval(low, high));
 	}
 
 	@Override
