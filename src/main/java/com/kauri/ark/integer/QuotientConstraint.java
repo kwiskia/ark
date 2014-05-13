@@ -19,33 +19,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.integer;
 
-import java.util.BitSet;
+import com.kauri.ark.Constraint;
 
 /**
- * EqualityConstraint
+ * QuotientConstraint
  *
  * @author Eric Fritz
  */
-public class EqualityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class QuotientConstraint implements Constraint<IntegerVariable>
 {
-	private FiniteDomainVariable<T>[] variables;
+	private Constraint<IntegerVariable> constraint;
+	private IntegerVariable b;
 
-	public EqualityConstraint(FiniteDomainVariable<T>... variables) {
-		this.variables = variables;
+	public QuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+		this.constraint = new ProductConstraint(b, c, a);
+		this.b = b;
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
-		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
-
-		for (FiniteDomainVariable<T> v : variables) {
-			if (v != variable) {
-				bs.and(v.getAllowableValues());
-			}
+	public boolean update(IntegerVariable variable) {
+		if (b.isUnique() && b.getAssignment() == 0) {
+			return false;
 		}
 
-		return variable.trySetValue(bs);
+		return constraint.update(variable);
 	}
 }

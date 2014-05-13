@@ -48,7 +48,7 @@ abstract public class Variable<T>
 		this.allowableValues = value;
 	}
 
-	protected boolean trySetValue(T value) {
+	public boolean trySetValue(T value) {
 		if (!allowableValues.equals(value)) {
 			solver.saveValue(this, allowableValues);
 			allowableValues = value;

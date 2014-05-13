@@ -19,45 +19,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.integer;
 
-import java.util.BitSet;
-import java.util.List;
+import com.kauri.ark.Constraint;
 
 /**
- * FiniteDomain
+ * IntervalInequalityConstraint
  *
  * @author Eric Fritz
  */
-public class FiniteDomain<T>
+public class IntervalInequalityConstraint implements Constraint<IntegerVariable>
 {
-	private List<T> values;
+	private IntegerVariable[] variables;
 
-	//
-	// TODO - how to ensure ordering?
-	//
-
-	public FiniteDomain(List<T> values) {
-		this.values = values;
+	public IntervalInequalityConstraint(IntegerVariable... variables) {
+		this.variables = variables;
 	}
 
-	public T getValue(int index) {
-		return values.get(index);
-	}
-
-	public BitSet createBitSet() {
-		BitSet bs = new BitSet(values.size());
-		bs.set(0, values.size());
-		return bs;
-	}
-
-	public BitSet createBitSet(T... including) {
-		BitSet bs = new BitSet(values.size());
-
-		for (T t : including) {
-			bs.set(values.indexOf(t));
+	@Override
+	public boolean update(IntegerVariable variable) {
+		if (variable.isUnique()) {
+			for (IntegerVariable v : variables) {
+				if (v != variable && v.isUnique() && v.getAssignment() == variable.getAssignment()) {
+					return false;
+				}
+			}
 		}
 
-		return bs;
+		return true;
 	}
 }

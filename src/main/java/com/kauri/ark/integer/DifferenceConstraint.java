@@ -19,31 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.integer;
+
+import com.kauri.ark.Constraint;
 
 /**
- * IntervalInequalityConstraint
+ * DifferenceConstraint
  *
  * @author Eric Fritz
  */
-public class IntervalInequalityConstraint implements Constraint<IntegerVariable>
+public class DifferenceConstraint implements Constraint<IntegerVariable>
 {
-	private IntegerVariable[] variables;
+	private Constraint<IntegerVariable> constraint;
 
-	public IntervalInequalityConstraint(IntegerVariable... variables) {
-		this.variables = variables;
+	public DifferenceConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+		this.constraint = new SumConstraint(b, c, a);
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		if (variable.isUnique()) {
-			for (IntegerVariable v : variables) {
-				if (v != variable && v.isUnique() && v.getAssignment() == variable.getAssignment()) {
-					return false;
-				}
-			}
-		}
-
-		return true;
+		return constraint.update(variable);
 	}
 }

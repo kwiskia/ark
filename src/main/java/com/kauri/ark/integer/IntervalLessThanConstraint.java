@@ -19,55 +19,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.integer;
+
+import com.kauri.ark.Constraint;
 
 /**
- * SumConstraint
+ * IntervalLessThanConstraint
  *
  * @author Eric Fritz
  */
-public class SumConstraint implements Constraint<IntegerVariable>
+public class IntervalLessThanConstraint implements Constraint<IntegerVariable>
 {
-	private IntegerVariable a;
-	private IntegerVariable b;
-	private IntegerVariable c;
+	private IntegerVariable var1;
+	private IntegerVariable var2;
 
-	public SumConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		this.a = a;
-		this.b = b;
-		this.c = c;
+	public IntervalLessThanConstraint(IntegerVariable var1, IntegerVariable var2) {
+		this.var1 = var1;
+		this.var2 = var2;
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		int aLower = a.getAllowableValues().getLowerBound();
-		int aUpper = a.getAllowableValues().getUpperBound();
-		int bLower = b.getAllowableValues().getLowerBound();
-		int bUpper = b.getAllowableValues().getUpperBound();
-		int cLower = c.getAllowableValues().getLowerBound();
-		int cUpper = c.getAllowableValues().getUpperBound();
+		IntegerVariable other = variable == var1 ? var2 : var1;
 
-		int lower;
-		int upper;
+		int lower = variable.getAllowableValues().getLowerBound();
+		int upper = variable.getAllowableValues().getUpperBound();
 
-		if (variable == a) {
-			// c - b
-			lower = cLower - bUpper;
-			upper = cUpper - bLower;
-		} else if (variable == b) {
-			// c - a
-			lower = cLower - aUpper;
-			upper = cUpper - aLower;
-		} else if (variable == c) {
-			// a + b
-			lower = aLower + bLower;
-			upper = aUpper + bUpper;
+		if (variable == var1) {
+			// remove everything greater than or equal to the largest bit in other
+			upper = Math.min(upper, other.getAllowableValues().getUpperBound() - 1);
 		} else {
-			throw new RuntimeException("Unreachable.");
+			// remove everything smaller than or equal to the smallest bit in other
+			lower = Math.max(lower, other.getAllowableValues().getLowerBound() + 1);
 		}
-
-		lower = Math.max(variable.getAllowableValues().getLowerBound(), lower);
-		upper = Math.min(variable.getAllowableValues().getUpperBound(), upper);
 
 		return variable.trySetValue(new Interval(lower, upper));
 	}

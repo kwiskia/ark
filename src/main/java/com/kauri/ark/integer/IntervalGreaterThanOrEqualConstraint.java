@@ -19,53 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.integer;
+
+import com.kauri.ark.Constraint;
 
 /**
- * Interval
+ * IntervalGreaterThanOrEqualConstraint
  *
  * @author Eric Fritz
  */
-public class Interval
+public class IntervalGreaterThanOrEqualConstraint implements Constraint<IntegerVariable>
 {
-	private int lowerBound;
-	private int upperBound;
+	private Constraint<IntegerVariable> constraint;
 
-	public Interval(int lowerBound, int upperBound) {
-		this.lowerBound = lowerBound;
-		this.upperBound = upperBound;
+	public IntervalGreaterThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
+		this.constraint = new IntervalLessThanOrEqualConstraint(var2, var1);
 	}
 
-	public int getLowerBound() {
-		return lowerBound;
-	}
-
-	public int getUpperBound() {
-		return upperBound;
-	}
-
-	public int getRange() {
-		return upperBound - lowerBound;
-	}
-
-	public boolean isUnique() {
-		return lowerBound == upperBound;
-	}
-
-	public boolean isEmpty() {
-		return lowerBound > upperBound;
-	}
-
-	public boolean equals(Object o) {
-		if (o == null || !(o instanceof Interval)) {
-			return false;
-		}
-
-		Interval i = (Interval) o;
-		return i.lowerBound == lowerBound && i.upperBound == upperBound;
-	}
-
-	public String toString (){
-		return String.format("[%d, %d]", lowerBound, upperBound);
+	@Override
+	public boolean update(IntegerVariable variable) {
+		return constraint.update(variable);
 	}
 }

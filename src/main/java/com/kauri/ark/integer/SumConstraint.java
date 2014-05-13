@@ -19,33 +19,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.integer;
+
+import com.kauri.ark.Constraint;
 
 /**
- * IntervalEqualityConstraint
+ * SumConstraint
  *
  * @author Eric Fritz
  */
-public class IntervalEqualityConstraint implements Constraint<IntegerVariable>
+public class SumConstraint implements Constraint<IntegerVariable>
 {
-	private IntegerVariable[] variables;
+	private IntegerVariable a;
+	private IntegerVariable b;
+	private IntegerVariable c;
 
-	public IntervalEqualityConstraint(IntegerVariable... variables) {
-		this.variables = variables;
+	public SumConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+		this.a = a;
+		this.b = b;
+		this.c = c;
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
+		int aLower = a.getAllowableValues().getLowerBound();
+		int aUpper = a.getAllowableValues().getUpperBound();
+		int bLower = b.getAllowableValues().getLowerBound();
+		int bUpper = b.getAllowableValues().getUpperBound();
+		int cLower = c.getAllowableValues().getLowerBound();
+		int cUpper = c.getAllowableValues().getUpperBound();
 
-		int lower = variable.getAllowableValues().getLowerBound();
-		int upper = variable.getAllowableValues().getUpperBound();
+		int lower;
+		int upper;
 
-		for (IntegerVariable v : variables) {
-			if (v != variable) {
-				lower = Math.max(lower, v.getAllowableValues().getLowerBound());
-				upper = Math.min(upper, v.getAllowableValues().getUpperBound());
-			}
+		if (variable == a) {
+			// c - b
+			lower = cLower - bUpper;
+			upper = cUpper - bLower;
+		} else if (variable == b) {
+			// c - a
+			lower = cLower - aUpper;
+			upper = cUpper - aLower;
+		} else if (variable == c) {
+			// a + b
+			lower = aLower + bLower;
+			upper = aUpper + bUpper;
+		} else {
+			throw new RuntimeException("Unreachable.");
 		}
+
+		lower = Math.max(variable.getAllowableValues().getLowerBound(), lower);
+		upper = Math.min(variable.getAllowableValues().getUpperBound(), upper);
 
 		return variable.trySetValue(new Interval(lower, upper));
 	}

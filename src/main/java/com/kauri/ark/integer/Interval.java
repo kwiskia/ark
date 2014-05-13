@@ -19,29 +19,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.integer;
 
 /**
- * QuotientConstraint
+ * Interval
  *
  * @author Eric Fritz
  */
-public class QuotientConstraint implements Constraint<IntegerVariable>
+public class Interval
 {
-	private Constraint<IntegerVariable> constraint;
-	private IntegerVariable b;
+	private int lowerBound;
+	private int upperBound;
 
-	public QuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		this.constraint = new ProductConstraint(b, c, a);
-		this.b = b;
+	public Interval(int lowerBound, int upperBound) {
+		this.lowerBound = lowerBound;
+		this.upperBound = upperBound;
 	}
 
-	@Override
-	public boolean update(IntegerVariable variable) {
-		if (b.isUnique() && b.getAssignment() == 0) {
+	public int getLowerBound() {
+		return lowerBound;
+	}
+
+	public int getUpperBound() {
+		return upperBound;
+	}
+
+	public int getRange() {
+		return upperBound - lowerBound;
+	}
+
+	public boolean isUnique() {
+		return lowerBound == upperBound;
+	}
+
+	public boolean isEmpty() {
+		return lowerBound > upperBound;
+	}
+
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof Interval)) {
 			return false;
 		}
 
-		return constraint.update(variable);
+		Interval i = (Interval) o;
+		return i.lowerBound == lowerBound && i.upperBound == upperBound;
+	}
+
+	public String toString (){
+		return String.format("[%d, %d]", lowerBound, upperBound);
 	}
 }

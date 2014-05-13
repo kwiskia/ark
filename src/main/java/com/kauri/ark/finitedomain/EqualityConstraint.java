@@ -19,65 +19,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.finitedomain;
 
-import java.util.Arrays;
+import com.kauri.ark.Constraint;
 import java.util.BitSet;
-import java.util.List;
 
 /**
- * CardinalityConstraint
+ * EqualityConstraint
  *
  * @author Eric Fritz
  */
-public class CardinalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class EqualityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private int min;
-	private int max;
-	private BitSet mask;
-	private List<FiniteDomainVariable<T>> variables;
+	private FiniteDomainVariable<T>[] variables;
 
-	public CardinalityConstraint(T value, int min, int max, FiniteDomainVariable<T>... variables) {
-		this.variables = Arrays.asList(variables);
-
-		this.min = min;
-		this.max = max;
-
-		mask = variables[0].getFiniteDomain().createBitSet(value);
+	public EqualityConstraint(FiniteDomainVariable<T>... variables) {
+		this.variables = variables;
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		int possible = 0;
-		int definite = 0;
+		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
 
 		for (FiniteDomainVariable<T> v : variables) {
-			if (v.getAllowableValues().intersects(mask)) {
-				possible++;
-
-				if (v.isUnique()) {
-					definite++;
-				}
+			if (v != variable) {
+				bs.and(v.getAllowableValues());
 			}
 		}
 
-		if (possible < min || definite > max) {
-			return false;
-		}
-
-		if (definite == max) {
-			for (FiniteDomainVariable<T> v : variables) {
-				if (v.getAllowableValues().intersects(mask) && !v.isUnique()) {
-					BitSet bs = v.getAllowableValues().get(0, v.getAllowableValues().size());
-					bs.andNot(mask);
-
-					if (!v.trySetValue(bs)) {
-						return false;
-					}
-				}
-			}
-		}
-
-		return true;
+		return variable.trySetValue(bs);
 	}
 }

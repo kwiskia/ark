@@ -19,39 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.integer;
 
-import java.util.BitSet;
+import com.kauri.ark.Constraint;
 
 /**
- * LessThanConstraint
+ * IntervalGreaterThanConstraint
  *
  * @author Eric Fritz
  */
-public class LessThanConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class IntervalGreaterThanConstraint implements Constraint<IntegerVariable>
 {
-	private FiniteDomainVariable<T> var1;
-	private FiniteDomainVariable<T> var2;
+	private Constraint<IntegerVariable> constraint;
 
-	public LessThanConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.var1 = var2;
-		this.var2 = var2;
+	public IntervalGreaterThanConstraint(IntegerVariable var1, IntegerVariable var2) {
+		this.constraint = new IntervalLessThanConstraint(var2, var1);
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
-		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
-
-		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
-
-		if (variable == var1) {
-			// remove everything greater than or equal to the largest bit in other
-			bs.clear(other.getAllowableValues().length() + 1, bs.size());
-		} else {
-			// remove everything smaller than or equal to the smallest bit in other
-			bs.clear(0, other.getAllowableValues().nextSetBit(0) + 1);
-		}
-
-		return variable.trySetValue(bs);
+	public boolean update(IntegerVariable variable) {
+		return constraint.update(variable);
 	}
 }

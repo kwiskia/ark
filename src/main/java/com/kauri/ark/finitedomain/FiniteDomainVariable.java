@@ -19,87 +19,95 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.finitedomain;
 
-import java.util.Stack;
+import com.kauri.ark.Solver;
+import com.kauri.ark.ValueEnumerator;
+import com.kauri.ark.Variable;
+import java.util.BitSet;
 
 /**
- * IntervalVariable
+ * FiniteDomainVariable
  *
  * @author Eric Fritz
  */
-public class IntegerVariable extends Variable<Interval>
+public class FiniteDomainVariable<T> extends Variable<BitSet>
 {
-	public IntegerVariable(Solver solver, Interval interval) {
-		super(solver, interval);
+	private FiniteDomain<T> finiteDomain;
+
+	public FiniteDomainVariable(Solver solver, FiniteDomain<T> finiteDomain) {
+		super(solver, finiteDomain.createBitSet());
+		this.finiteDomain = finiteDomain;
+	}
+
+	public FiniteDomain<T> getFiniteDomain() {
+		return finiteDomain;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return getAllowableValues().isEmpty();
+		return getAllowableValues().cardinality() == 0;
 	}
 
 	@Override
 	public boolean isUnique() {
-		return getAllowableValues().isUnique();
+		return getAllowableValues().cardinality() == 1;
 	}
 
-	public int getAssignment() {
+	public T getAssignment() {
 		if (!isUnique()) {
 			throw new RuntimeException("Assignment not unique.");
 		}
 
-		return getAllowableValues().getLowerBound();
+		return finiteDomain.getValue(getAllowableValues().nextSetBit(0));
 	}
 
 	@Override
 	public ValueEnumerator getValueEnumerator() {
-		return new IntervalValueEnumerator(getSolver(), getSolver().saveValues());
+		return new FiniteDomainValueEnumerator(getSolver(), getSolver().saveValues());
 	}
 
-	private class IntervalValueEnumerator implements ValueEnumerator
+	private class FiniteDomainValueEnumerator implements ValueEnumerator
 	{
 		private Solver solver;
 		private int mark;
-		private boolean hasAdvanced = false;
+		private int[] indices;
+		private int k = 0;
 
-		private Stack<Interval> candidates = new Stack<>();
-
-		public IntervalValueEnumerator(Solver solver, int mark) {
+		public FiniteDomainValueEnumerator(Solver solver, int mark) {
 			this.solver = solver;
 			this.mark = mark;
 
-			candidates.push(getAllowableValues());
+			indices = new int[getAllowableValues().cardinality()];
+
+			int j = 0;
+			for (int i = getAllowableValues().nextSetBit(0); i != -1; i = getAllowableValues().nextSetBit(i + 1)) {
+				indices[j++] = i;
+			}
+
+			if (solver.getExpansionOrder() == Solver.ExpansionOrder.RANDOM) {
+				for (int i = indices.length - 1; i >= 0; i--) {
+					j = (int) (Math.random() * (i + 1));
+
+					int t = indices[j];
+					indices[j] = indices[i];
+					indices[i] = t;
+				}
+			}
 		}
 
 		@Override
 		public boolean advance() {
-			if (hasAdvanced) {
+			if (k > 0) {
 				solver.restore(mark);
 			}
 
-			while (!candidates.isEmpty()) {
-				Interval candidate = candidates.pop();
+			while (k < indices.length) {
+				BitSet bs = new BitSet(getAllowableValues().size());
+				bs.set(indices[k++]);
 
-				if (trySetValue(candidate) && solver.resolveConstraints()) {
-					if (candidate.isUnique()) {
-						hasAdvanced = true;
-						return true;
-					} else {
-						int mid = candidate.getLowerBound() + candidate.getRange() / 2;
-
-						Interval lower = new Interval(candidate.getLowerBound(), mid);
-						Interval upper = new Interval(mid + 1, candidate.getUpperBound());
-
-						if (solver.getExpansionOrder() == Solver.ExpansionOrder.RANDOM && Math.random() < .5) {
-							Interval t = lower;
-							lower = upper;
-							upper = t;
-						}
-
-						if (!candidate.equals(upper)) candidates.push(upper);
-						if (!candidate.equals(lower)) candidates.push(lower);
-					}
+				if (trySetValue(bs) && solver.resolveConstraints()) {
+					return true;
 				}
 
 				solver.restore(mark);

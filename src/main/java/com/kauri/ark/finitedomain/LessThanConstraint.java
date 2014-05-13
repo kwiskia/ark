@@ -19,23 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.finitedomain;
+
+import com.kauri.ark.Constraint;
+import java.util.BitSet;
 
 /**
- * GreaterThanConstraint
+ * LessThanConstraint
  *
  * @author Eric Fritz
  */
-public class GreaterThanConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class LessThanConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private Constraint<FiniteDomainVariable<T>> constraint;
+	private FiniteDomainVariable<T> var1;
+	private FiniteDomainVariable<T> var2;
 
-	public GreaterThanConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.constraint = new LessThanConstraint(var2, var1);
+	public LessThanConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		this.var1 = var2;
+		this.var2 = var2;
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		return constraint.update(variable);
+		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
+
+		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
+
+		if (variable == var1) {
+			// remove everything greater than or equal to the largest bit in other
+			bs.clear(other.getAllowableValues().length() + 1, bs.size());
+		} else {
+			// remove everything smaller than or equal to the smallest bit in other
+			bs.clear(0, other.getAllowableValues().nextSetBit(0) + 1);
+		}
+
+		return variable.trySetValue(bs);
 	}
 }

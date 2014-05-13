@@ -127,7 +127,7 @@ public class Solver
 		solving = false;
 	}
 
-	protected boolean resolveConstraints() {
+	public boolean resolveConstraints() {
 		while (!worklist.isEmpty()) {
 			Arc arc = worklist.poll();
 
@@ -140,15 +140,15 @@ public class Solver
 		return true;
 	}
 
-	protected int saveValues() {
+	public int saveValues() {
 		return stack.size();
 	}
 
-	protected <T> void saveValue(Variable<T> variable, T allowableValues) {
+	public <T> void saveValue(Variable<T> variable, T allowableValues) {
 		stack.push(new VarState(variable, allowableValues));
 	}
 
-	protected void restore(int mark) {
+	public void restore(int mark) {
 		while (stack.size() > mark) {
 			stack.pop().restore();
 		}

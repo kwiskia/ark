@@ -19,23 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark;
+package com.kauri.ark.finitedomain;
+
+import java.util.BitSet;
+import java.util.List;
 
 /**
- * IntervalGreaterThanOrEqualConstraint
+ * FiniteDomain
  *
  * @author Eric Fritz
  */
-public class IntervalGreaterThanOrEqualConstraint implements Constraint<IntegerVariable>
+public class FiniteDomain<T>
 {
-	private Constraint<IntegerVariable> constraint;
+	private List<T> values;
 
-	public IntervalGreaterThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
-		this.constraint = new IntervalLessThanOrEqualConstraint(var2, var1);
+	//
+	// TODO - how to ensure ordering?
+	//
+
+	public FiniteDomain(List<T> values) {
+		this.values = values;
 	}
 
-	@Override
-	public boolean update(IntegerVariable variable) {
-		return constraint.update(variable);
+	public T getValue(int index) {
+		return values.get(index);
+	}
+
+	public BitSet createBitSet() {
+		BitSet bs = new BitSet(values.size());
+		bs.set(0, values.size());
+		return bs;
+	}
+
+	public BitSet createBitSet(T... including) {
+		BitSet bs = new BitSet(values.size());
+
+		for (T t : including) {
+			bs.set(values.indexOf(t));
+		}
+
+		return bs;
 	}
 }
