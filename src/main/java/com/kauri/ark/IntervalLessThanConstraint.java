@@ -40,15 +40,15 @@ public class IntervalLessThanConstraint implements Constraint<IntegerVariable>
 	public boolean update(IntegerVariable variable) {
 		IntegerVariable other = variable == var1 ? var2 : var1;
 
-		int lower = variable.allowableValues.getLowerBound();
-		int upper = variable.allowableValues.getUpperBound();
+		int lower = variable.getAllowableValues().getLowerBound();
+		int upper = variable.getAllowableValues().getUpperBound();
 
 		if (variable == var1) {
 			// remove everything greater than or equal to the largest bit in other
-			upper = Math.min(upper, other.allowableValues.getUpperBound() - 1);
+			upper = Math.min(upper, other.getAllowableValues().getUpperBound() - 1);
 		} else {
 			// remove everything smaller than or equal to the smallest bit in other
-			lower = Math.max(lower, other.allowableValues.getLowerBound() + 1);
+			lower = Math.max(lower, other.getAllowableValues().getLowerBound() + 1);
 		}
 
 		return variable.trySetValue(new Interval(lower, upper));

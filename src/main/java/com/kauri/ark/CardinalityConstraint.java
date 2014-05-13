@@ -52,7 +52,7 @@ public class CardinalityConstraint<T> implements Constraint<FiniteDomainVariable
 		int definite = 0;
 
 		for (FiniteDomainVariable<T> v : variables) {
-			if (v.allowableValues.intersects(mask)) {
+			if (v.getAllowableValues().intersects(mask)) {
 				possible++;
 
 				if (v.isUnique()) {
@@ -67,8 +67,8 @@ public class CardinalityConstraint<T> implements Constraint<FiniteDomainVariable
 
 		if (definite == max) {
 			for (FiniteDomainVariable<T> v : variables) {
-				if (v.allowableValues.intersects(mask) && !v.isUnique()) {
-					BitSet bs = v.allowableValues.get(0, v.allowableValues.size());
+				if (v.getAllowableValues().intersects(mask) && !v.isUnique()) {
+					BitSet bs = v.getAllowableValues().get(0, v.getAllowableValues().size());
 					bs.andNot(mask);
 
 					if (!v.trySetValue(bs)) {

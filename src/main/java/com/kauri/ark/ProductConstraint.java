@@ -40,12 +40,12 @@ public class ProductConstraint implements Constraint<IntegerVariable>
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		int aLower = a.allowableValues.getLowerBound();
-		int aUpper = a.allowableValues.getUpperBound();
-		int bLower = b.allowableValues.getLowerBound();
-		int bUpper = b.allowableValues.getUpperBound();
-		int cLower = c.allowableValues.getLowerBound();
-		int cUpper = c.allowableValues.getUpperBound();
+		int aLower = a.getAllowableValues().getLowerBound();
+		int aUpper = a.getAllowableValues().getUpperBound();
+		int bLower = b.getAllowableValues().getLowerBound();
+		int bUpper = b.getAllowableValues().getUpperBound();
+		int cLower = c.getAllowableValues().getLowerBound();
+		int cUpper = c.getAllowableValues().getUpperBound();
 
 		int lower;
 		int upper;
@@ -54,7 +54,7 @@ public class ProductConstraint implements Constraint<IntegerVariable>
 			// c / b
 			if (bLower == 0 || bUpper == 0) {
 				if (a.isUnique() && c.isUnique()) {
-					return c.allowableValues.getLowerBound() == 0;
+					return c.getAllowableValues().getLowerBound() == 0;
 				}
 
 				return true;
@@ -66,7 +66,7 @@ public class ProductConstraint implements Constraint<IntegerVariable>
 			// c / a
 			if (aLower == 0 || aUpper == 0) {
 				if (b.isUnique() && c.isUnique()) {
-					return c.allowableValues.getLowerBound() == 0;
+					return c.getAllowableValues().getLowerBound() == 0;
 				}
 
 				return true;
@@ -82,8 +82,8 @@ public class ProductConstraint implements Constraint<IntegerVariable>
 			throw new RuntimeException("Unreachable.");
 		}
 
-		lower = Math.max(variable.allowableValues.getLowerBound(), lower);
-		upper = Math.min(variable.allowableValues.getUpperBound(), upper);
+		lower = Math.max(variable.getAllowableValues().getLowerBound(), lower);
+		upper = Math.min(variable.getAllowableValues().getUpperBound(), upper);
 
 		return variable.trySetValue(new Interval(lower, upper));
 	}

@@ -29,7 +29,7 @@ package com.kauri.ark;
 abstract public class Variable<T>
 {
 	private Solver solver;
-	protected T allowableValues;
+	private T allowableValues;
 
 	public Variable(Solver solver, T allowableValues) {
 		this.solver = solver;
@@ -38,6 +38,14 @@ abstract public class Variable<T>
 
 	public Solver getSolver() {
 		return solver;
+	}
+
+	public T getAllowableValues() {
+		return allowableValues;
+	}
+
+	public void set(T value) {
+		this.allowableValues = value;
 	}
 
 	protected boolean trySetValue(T value) {

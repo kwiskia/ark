@@ -38,11 +38,11 @@ public class EqualityConstraint<T> implements Constraint<FiniteDomainVariable<T>
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
+		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
 
 		for (FiniteDomainVariable<T> v : variables) {
 			if (v != variable) {
-				bs.and(v.allowableValues);
+				bs.and(v.getAllowableValues());
 			}
 		}
 

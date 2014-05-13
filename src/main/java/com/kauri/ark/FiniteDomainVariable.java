@@ -43,12 +43,12 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 
 	@Override
 	public boolean isEmpty() {
-		return allowableValues.cardinality() == 0;
+		return getAllowableValues().cardinality() == 0;
 	}
 
 	@Override
 	public boolean isUnique() {
-		return allowableValues.cardinality() == 1;
+		return getAllowableValues().cardinality() == 1;
 	}
 
 	public T getAssignment() {
@@ -56,7 +56,7 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 			throw new RuntimeException("Assignment not unique.");
 		}
 
-		return finiteDomain.getValue(allowableValues.nextSetBit(0));
+		return finiteDomain.getValue(getAllowableValues().nextSetBit(0));
 	}
 
 	@Override
@@ -75,10 +75,10 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 			this.solver = solver;
 			this.mark = mark;
 
-			indices = new int[allowableValues.cardinality()];
+			indices = new int[getAllowableValues().cardinality()];
 
 			int j = 0;
-			for (int i = allowableValues.nextSetBit(0); i != -1; i = allowableValues.nextSetBit(i + 1)) {
+			for (int i = getAllowableValues().nextSetBit(0); i != -1; i = getAllowableValues().nextSetBit(i + 1)) {
 				indices[j++] = i;
 			}
 
@@ -100,7 +100,7 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 			}
 
 			while (k < indices.length) {
-				BitSet bs = new BitSet(allowableValues.size());
+				BitSet bs = new BitSet(getAllowableValues().size());
 				bs.set(indices[k++]);
 
 				if (trySetValue(bs) && solver.resolveConstraints()) {

@@ -178,7 +178,7 @@ public class Solver
 		}
 
 		public void restore() {
-			variable.allowableValues = allowableValues;
+			variable.set(allowableValues);
 		}
 	}
 }

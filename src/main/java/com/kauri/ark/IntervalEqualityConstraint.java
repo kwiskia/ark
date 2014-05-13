@@ -37,13 +37,13 @@ public class IntervalEqualityConstraint implements Constraint<IntegerVariable>
 	@Override
 	public boolean update(IntegerVariable variable) {
 
-		int lower = variable.allowableValues.getLowerBound();
-		int upper = variable.allowableValues.getUpperBound();
+		int lower = variable.getAllowableValues().getLowerBound();
+		int upper = variable.getAllowableValues().getUpperBound();
 
 		for (IntegerVariable v : variables) {
 			if (v != variable) {
-				lower = Math.max(lower, v.allowableValues.getLowerBound());
-				upper = Math.min(upper, v.allowableValues.getUpperBound());
+				lower = Math.max(lower, v.getAllowableValues().getLowerBound());
+				upper = Math.min(upper, v.getAllowableValues().getUpperBound());
 			}
 		}
 

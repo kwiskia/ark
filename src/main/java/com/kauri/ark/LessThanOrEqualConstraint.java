@@ -42,14 +42,14 @@ public class LessThanOrEqualConstraint<T> implements Constraint<FiniteDomainVari
 	public boolean update(FiniteDomainVariable<T> variable) {
 		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
 
-		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
+		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
 
 		if (variable == var1) {
 			// remove everything greater than to the largest bit in other
-			bs.clear(other.allowableValues.length(), bs.size());
+			bs.clear(other.getAllowableValues().length(), bs.size());
 		} else {
 			// remove everything smaller equal to the smallest bit in other
-			bs.clear(0, other.allowableValues.nextSetBit(0));
+			bs.clear(0, other.getAllowableValues().nextSetBit(0));
 		}
 
 		return variable.trySetValue(bs);
