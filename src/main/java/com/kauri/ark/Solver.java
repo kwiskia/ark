@@ -62,7 +62,7 @@ public class Solver
 
 		for (Variable<T> variable : variables) {
 			if (!this.variables.contains(variable)) {
-				throw new RuntimeException("Adding constrait on non-registered variable.");
+				throw new RuntimeException("Adding constraint on non-registered variable.");
 			}
 
 			constraints.get(variable).add(constraint);
