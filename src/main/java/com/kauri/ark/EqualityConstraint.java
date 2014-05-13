@@ -30,20 +30,21 @@ import java.util.BitSet;
  */
 public class EqualityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private FiniteDomainVariable<T> var1;
-	private FiniteDomainVariable<T> var2;
+	private FiniteDomainVariable<T>[] variables;
 
-	public EqualityConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.var1 = var2;
-		this.var2 = var2;
+	public EqualityConstraint(FiniteDomainVariable<T>... variables) {
+		this.variables = variables;
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
-
 		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
-		bs.and(other.allowableValues);
+
+		for (FiniteDomainVariable<T> v : variables) {
+			if (v != variable) {
+				bs.and(v.allowableValues);
+			}
+		}
 
 		return variable.trySetValue(bs);
 	}

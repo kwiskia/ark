@@ -28,21 +28,19 @@ package com.kauri.ark;
  */
 public class IntervalInequalityConstraint implements Constraint<IntegerVariable>
 {
-	private IntegerVariable var1;
-	private IntegerVariable var2;
+	private IntegerVariable[] variables;
 
-	public IntervalInequalityConstraint(IntegerVariable var1, IntegerVariable var2) {
-		this.var1 = var1;
-		this.var2 = var2;
+	public IntervalInequalityConstraint(IntegerVariable... variables) {
+		this.variables = variables;
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		IntegerVariable other = variable == var1 ? var2 : var1;
-
-		if (variable.isUnique() && other.isUnique()) {
-			if (variable.getAssignment() == other.getAssignment()) {
-				return false;
+		if (variable.isUnique()) {
+			for (IntegerVariable v : variables) {
+				if (v != variable && v.isUnique() && v.getAssignment() == variable.getAssignment()) {
+					return false;
+				}
 			}
 		}
 

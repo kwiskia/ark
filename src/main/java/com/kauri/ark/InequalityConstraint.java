@@ -30,25 +30,22 @@ import java.util.BitSet;
  */
 public class InequalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private FiniteDomainVariable<T> var1;
-	private FiniteDomainVariable<T> var2;
+	private FiniteDomainVariable<T>[] variables;
 
-	public InequalityConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.var1 = var2;
-		this.var2 = var2;
+	public InequalityConstraint(FiniteDomainVariable<T>... variables) {
+		this.variables = variables;
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
+		BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
 
-		if (other.isUnique()) {
-			BitSet bs = variable.allowableValues.get(0, variable.allowableValues.size());
-			bs.andNot(other.allowableValues);
-
-			return variable.trySetValue(bs);
+		for (FiniteDomainVariable<T> v : variables) {
+			if (v != variable && v.isUnique()) {
+				bs.andNot(v.allowableValues);
+			}
 		}
 
-		return true;
+		return variable.trySetValue(bs);
 	}
 }

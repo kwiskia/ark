@@ -28,34 +28,6 @@ package com.kauri.ark;
  */
 public class Constraints
 {
-	public static <T> void makeAllEqualConstraint(Solver solver, FiniteDomainVariable<T>... vars) {
-		for (int i = 0; i < vars.length - 1; i++) {
-			solver.addConstraint(new EqualityConstraint<>(vars[i], vars[i + 1]), vars[i], vars[i + 1]);
-		}
-	}
-
-	public static <T> void makeAllUniqueConstraint(Solver solver, FiniteDomainVariable<T>... vars) {
-		for (int i = 0; i < vars.length; i++) {
-			for (int j = i + 1; j < vars.length; j++) {
-				solver.addConstraint(new InequalityConstraint<>(vars[i], vars[j]), vars[i], vars[j]);
-			}
-		}
-	}
-
-	public static <T> void makeAllEqualConstraint(Solver solver, IntegerVariable... vars) {
-		for (int i = 0; i < vars.length - 1; i++) {
-			solver.addConstraint(new IntervalEqualityConstraint(vars[i], vars[i + 1]), vars[i], vars[i + 1]);
-		}
-	}
-
-	public static <T> void makeAllUniqueConstraint(Solver solver, IntegerVariable... vars) {
-		for (int i = 0; i < vars.length; i++) {
-			for (int j = i + 1; j < vars.length; j++) {
-				solver.addConstraint(new IntervalInequalityConstraint(vars[i], vars[j]), vars[i], vars[j]);
-			}
-		}
-	}
-
 	public static void makeQuotientConstraint(Solver solver, IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		IntegerVariable z = new IntegerVariable(solver, new Interval(0, 0));
 		solver.addVariable(z);
