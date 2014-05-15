@@ -23,47 +23,61 @@ package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Solver;
 import com.kauri.ark.ValueEnumerator;
-import com.kauri.ark.Variable;
 import java.util.BitSet;
 
 /**
- * FiniteDomainVariable
+ * FiniteDomainValueEnumerator
  *
  * @author Eric Fritz
  */
-public class FiniteDomainVariable<T> extends Variable<BitSet>
+class FiniteDomainValueEnumerator<T> implements ValueEnumerator
 {
-	private FiniteDomain<T> finiteDomain;
+	private FiniteDomainVariable<T> finiteDomainVariable;
+	private Solver solver;
+	private int mark;
+	private int[] indices;
+	private int k = 0;
 
-	public FiniteDomainVariable(Solver solver, FiniteDomain<T> finiteDomain) {
-		super(solver, finiteDomain.createBitSet());
-		this.finiteDomain = finiteDomain;
-	}
+	public FiniteDomainValueEnumerator(FiniteDomainVariable<T> finiteDomainVariable, Solver solver, int mark) {
+		this.finiteDomainVariable = finiteDomainVariable;
+		this.solver = solver;
+		this.mark = mark;
 
-	public FiniteDomain<T> getFiniteDomain() {
-		return finiteDomain;
-	}
+		indices = new int[finiteDomainVariable.getAllowableValues().cardinality()];
 
-	@Override
-	public boolean isEmpty() {
-		return getAllowableValues().cardinality() == 0;
-	}
-
-	@Override
-	public boolean isUnique() {
-		return getAllowableValues().cardinality() == 1;
-	}
-
-	public T getAssignment() {
-		if (!isUnique()) {
-			throw new RuntimeException("Assignment not unique.");
+		int j = 0;
+		for (int i = finiteDomainVariable.getAllowableValues().nextSetBit(0); i != -1; i = finiteDomainVariable.getAllowableValues().nextSetBit(i + 1)) {
+			indices[j++] = i;
 		}
 
-		return finiteDomain.getValue(getAllowableValues().nextSetBit(0));
+		if (solver.getExpansionOrder() == Solver.ExpansionOrder.RANDOM) {
+			for (int i = indices.length - 1; i >= 0; i--) {
+				j = (int) (Math.random() * (i + 1));
+
+				int t = indices[j];
+				indices[j] = indices[i];
+				indices[i] = t;
+			}
+		}
 	}
 
 	@Override
-	public ValueEnumerator getValueEnumerator() {
-		return new FiniteDomainValueEnumerator<>(this, getSolver(), getSolver().saveValues());
+	public boolean advance() {
+		if (k > 0) {
+			solver.restore(mark);
+		}
+
+		while (k < indices.length) {
+			BitSet bs = new BitSet(finiteDomainVariable.getAllowableValues().size());
+			bs.set(indices[k++]);
+
+			if (finiteDomainVariable.trySetValue(bs) && solver.resolveConstraints()) {
+				return true;
+			}
+
+			solver.restore(mark);
+		}
+
+		return false;
 	}
 }
