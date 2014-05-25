@@ -54,11 +54,11 @@ public class Solver
 
 	public void addVariable(Variable variable) {
 		variables.add(variable);
-		edges.put(variable, new ArrayList<>());
+		edges.put(variable, new ArrayList<Constraint>());
 	}
 
 	public <T> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
-		arcs.put(constraint, new ArrayList<>());
+		arcs.put(constraint, new ArrayList<Arc>());
 
 		for (Variable<T> variable : variables) {
 			if (!this.variables.contains(variable)) {
