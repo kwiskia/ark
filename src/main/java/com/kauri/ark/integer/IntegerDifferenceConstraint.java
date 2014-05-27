@@ -19,25 +19,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark.finitedomain;
+package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
 
 /**
- * GreaterThanConstraint
+ * DifferenceConstraint
  *
  * @author Eric Fritz
  */
-public class GreaterThanConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class IntegerDifferenceConstraint implements Constraint<IntegerVariable>
 {
-	private Constraint<FiniteDomainVariable<T>> constraint;
+	private Constraint<IntegerVariable> constraint;
 
-	public GreaterThanConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.constraint = new LessThanConstraint(var2, var1);
+	public IntegerDifferenceConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+		this.constraint = new IntegerSumConstraint(b, c, a);
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
+	public boolean update(IntegerVariable variable) {
 		return constraint.update(variable);
 	}
 }

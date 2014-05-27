@@ -24,17 +24,17 @@ package com.kauri.ark.integer;
 import com.kauri.ark.Constraint;
 
 /**
- * ProductConstraint
+ * SumConstraint
  *
  * @author Eric Fritz
  */
-public class ProductConstraint implements Constraint<IntegerVariable>
+public class IntegerSumConstraint implements Constraint<IntegerVariable>
 {
 	private IntegerVariable a;
 	private IntegerVariable b;
 	private IntegerVariable c;
 
-	public ProductConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+	public IntegerSumConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
@@ -53,33 +53,17 @@ public class ProductConstraint implements Constraint<IntegerVariable>
 		int upper;
 
 		if (variable == a) {
-			// c / b
-			if (bLower == 0 || bUpper == 0) {
-				if (a.isUnique() && c.isUnique()) {
-					return c.getAllowableValues().getLowerBound() == 0;
-				}
-
-				return true;
-			}
-
-			lower = min(cLower / bLower, cLower / bUpper, cUpper / bLower, cUpper / bUpper);
-			upper = max(cLower / bLower, cLower / bUpper, cUpper / bLower, cUpper / bUpper);
+			// c - b
+			lower = cLower - bUpper;
+			upper = cUpper - bLower;
 		} else if (variable == b) {
-			// c / a
-			if (aLower == 0 || aUpper == 0) {
-				if (b.isUnique() && c.isUnique()) {
-					return c.getAllowableValues().getLowerBound() == 0;
-				}
-
-				return true;
-			}
-
-			lower = min(cLower / aLower, cLower / aUpper, cUpper / aLower, cUpper / aUpper);
-			upper = max(cLower / aLower, cLower / aUpper, cUpper / aLower, cUpper / aUpper);
+			// c - a
+			lower = cLower - aUpper;
+			upper = cUpper - aLower;
 		} else if (variable == c) {
-			// a * b
-			lower = min(aLower * bLower, aLower * bUpper, aUpper * bLower, aUpper * bUpper);
-			upper = max(aLower * bLower, aLower * bUpper, aUpper * bLower, aUpper * bUpper);
+			// a + b
+			lower = aLower + bLower;
+			upper = aUpper + bUpper;
 		} else {
 			throw new RuntimeException("Unreachable.");
 		}
@@ -88,13 +72,5 @@ public class ProductConstraint implements Constraint<IntegerVariable>
 		upper = Math.min(variable.getAllowableValues().getUpperBound(), upper);
 
 		return variable.trySetValue(new Interval(lower, upper));
-	}
-
-	private int min(int a, int b, int c, int d) {
-		return Math.min(a, Math.min(b, Math.min(c, d)));
-	}
-
-	private int max(int a, int b, int c, int d) {
-		return Math.max(a, Math.max(b, Math.max(c, d)));
 	}
 }

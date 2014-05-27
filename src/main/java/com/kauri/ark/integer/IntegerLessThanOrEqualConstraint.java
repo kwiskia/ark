@@ -19,25 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark.finitedomain;
+package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
 
 /**
- * GreaterThanOrEqualConstraint
+ * IntervalLessThanOrEqualConstraint
  *
  * @author Eric Fritz
  */
-public class GreaterThanOrEqualConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerVariable>
 {
-	private Constraint<FiniteDomainVariable<T>> constraint;
+	private IntegerVariable var1;
+	private IntegerVariable var2;
 
-	public GreaterThanOrEqualConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.constraint = new LessThanOrEqualConstraint(var2, var1);
+	public IntegerLessThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
+		this.var1 = var1;
+		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
-		return constraint.update(variable);
+	public boolean update(IntegerVariable variable) {
+		IntegerVariable other = variable == var1 ? var2 : var1;
+
+		int lower = variable.getAllowableValues().getLowerBound();
+		int upper = variable.getAllowableValues().getUpperBound();
+
+		if (variable == var1) {
+			// remove everything greater than the largest bit in other
+			upper = Math.min(upper, other.getAllowableValues().getUpperBound());
+		} else {
+			// remove everything smaller than the smallest bit in other
+			lower = Math.max(lower, other.getAllowableValues().getLowerBound());
+		}
+
+		return variable.trySetValue(new Interval(lower, upper));
 	}
 }

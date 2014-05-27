@@ -19,40 +19,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark.finitedomain;
+package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
-import java.util.BitSet;
 
 /**
- * LessThanOrEqualConstraint
+ * QuotientConstraint
  *
  * @author Eric Fritz
  */
-public class LessThanOrEqualConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class IntegerQuotientConstraint implements Constraint<IntegerVariable>
 {
-	private FiniteDomainVariable<T> var1;
-	private FiniteDomainVariable<T> var2;
+	private Constraint<IntegerVariable> constraint;
+	private IntegerVariable b;
 
-	public LessThanOrEqualConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.var1 = var1;
-		this.var2 = var2;
+	public IntegerQuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+		this.constraint = new IntegerProductConstraint(b, c, a);
+		this.b = b;
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
-		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
-
-		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
-
-		if (variable == var1) {
-			// remove everything greater than to the largest bit in other
-			bs.clear(other.getAllowableValues().length(), bs.size());
-		} else {
-			// remove everything smaller equal to the smallest bit in other
-			bs.clear(0, other.getAllowableValues().nextSetBit(0));
+	public boolean update(IntegerVariable variable) {
+		if (b.isUnique() && b.getAssignment() == 0) {
+			return false;
 		}
 
-		return variable.trySetValue(bs);
+		return constraint.update(variable);
 	}
 }

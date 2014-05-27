@@ -22,24 +22,63 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.List;
 
 /**
- * LessThanConstraint
+ * CardinalityConstraint
  *
  * @author Eric Fritz
  */
-public class LessThanConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private Constraint<FiniteDomainVariable<T>> constraint1;
-	private Constraint<FiniteDomainVariable<T>> constraint2;
+	private int min;
+	private int max;
+	private BitSet mask;
+	private List<FiniteDomainVariable<T>> variables;
 
-	public LessThanConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.constraint1 = new InequalityConstraint<>(var1, var2);
-		this.constraint2 = new LessThanOrEqualConstraint<>(var1, var2);
+	public FiniteDomainCardinalityConstraint(T value, int min, int max, FiniteDomainVariable<T>... variables) {
+		this.variables = Arrays.asList(variables);
+
+		this.min = min;
+		this.max = max;
+
+		mask = variables[0].getFiniteDomain().createBitSet(value);
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		return constraint1.update(variable) && constraint2.update(variable);
+		int possible = 0;
+		int definite = 0;
+
+		for (FiniteDomainVariable<T> v : variables) {
+			if (v.getAllowableValues().intersects(mask)) {
+				possible++;
+
+				if (v.isUnique()) {
+					definite++;
+				}
+			}
+		}
+
+		if (possible < min || definite > max) {
+			return false;
+		}
+
+		if (definite == max) {
+			for (FiniteDomainVariable<T> v : variables) {
+				if (v.getAllowableValues().intersects(mask) && !v.isUnique()) {
+					BitSet bs = v.getAllowableValues().get(0, v.getAllowableValues().size());
+					bs.andNot(mask);
+
+					if (!v.trySetValue(bs)) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
 	}
 }

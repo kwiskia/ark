@@ -24,26 +24,20 @@ package com.kauri.ark.integer;
 import com.kauri.ark.Constraint;
 
 /**
- * QuotientConstraint
+ * IntervalGreaterThanConstraint
  *
  * @author Eric Fritz
  */
-public class QuotientConstraint implements Constraint<IntegerVariable>
+public class IntegerGreaterThanConstraint implements Constraint<IntegerVariable>
 {
 	private Constraint<IntegerVariable> constraint;
-	private IntegerVariable b;
 
-	public QuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
-		this.constraint = new ProductConstraint(b, c, a);
-		this.b = b;
+	public IntegerGreaterThanConstraint(IntegerVariable var1, IntegerVariable var2) {
+		this.constraint = new IntegerLessThanConstraint(var2, var1);
 	}
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		if (b.isUnique() && b.getAssignment() == 0) {
-			return false;
-		}
-
 		return constraint.update(variable);
 	}
 }

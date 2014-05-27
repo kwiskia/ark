@@ -25,26 +25,32 @@ import com.kauri.ark.Constraint;
 import java.util.BitSet;
 
 /**
- * InequalityConstraint
+ * LessThanOrEqualConstraint
  *
  * @author Eric Fritz
  */
-public class InequalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class FiniteDomainLessThanOrEqualConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private FiniteDomainVariable<T>[] variables;
+	private FiniteDomainVariable<T> var1;
+	private FiniteDomainVariable<T> var2;
 
-	public InequalityConstraint(FiniteDomainVariable<T>... variables) {
-		this.variables = variables;
+	public FiniteDomainLessThanOrEqualConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		this.var1 = var1;
+		this.var2 = var2;
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
+		FiniteDomainVariable<T> other = variable == var1 ? var2 : var1;
+
 		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
 
-		for (FiniteDomainVariable<T> v : variables) {
-			if (v != variable && v.isUnique()) {
-				bs.andNot(v.getAllowableValues());
-			}
+		if (variable == var1) {
+			// remove everything greater than to the largest bit in other
+			bs.clear(other.getAllowableValues().length(), bs.size());
+		} else {
+			// remove everything smaller equal to the smallest bit in other
+			bs.clear(0, other.getAllowableValues().nextSetBit(0));
 		}
 
 		return variable.trySetValue(bs);

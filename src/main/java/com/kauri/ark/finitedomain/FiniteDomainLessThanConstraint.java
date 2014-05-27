@@ -19,25 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark.integer;
+package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
 
 /**
- * IntervalGreaterThanOrEqualConstraint
+ * LessThanConstraint
  *
  * @author Eric Fritz
  */
-public class GreaterThanOrEqualConstraint implements Constraint<IntegerVariable>
+public class FiniteDomainLessThanConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private Constraint<IntegerVariable> constraint;
+	private Constraint<FiniteDomainVariable<T>> constraint1;
+	private Constraint<FiniteDomainVariable<T>> constraint2;
 
-	public GreaterThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
-		this.constraint = new LessThanOrEqualConstraint(var2, var1);
+	public FiniteDomainLessThanConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		this.constraint1 = new FiniteDomainInequalityConstraint<>(var1, var2);
+		this.constraint2 = new FiniteDomainLessThanOrEqualConstraint<>(var1, var2);
 	}
 
 	@Override
-	public boolean update(IntegerVariable variable) {
-		return constraint.update(variable);
+	public boolean update(FiniteDomainVariable<T> variable) {
+		return constraint1.update(variable) && constraint2.update(variable);
 	}
 }

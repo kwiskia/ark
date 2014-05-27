@@ -22,31 +22,22 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
-import java.util.BitSet;
 
 /**
- * EqualityConstraint
+ * GreaterThanConstraint
  *
  * @author Eric Fritz
  */
-public class EqualityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class FiniteDomainGreaterThanConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private FiniteDomainVariable<T>[] variables;
+	private Constraint<FiniteDomainVariable<T>> constraint;
 
-	public EqualityConstraint(FiniteDomainVariable<T>... variables) {
-		this.variables = variables;
+	public FiniteDomainGreaterThanConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
+		this.constraint = new FiniteDomainLessThanConstraint(var2, var1);
 	}
 
 	@Override
 	public boolean update(FiniteDomainVariable<T> variable) {
-		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
-
-		for (FiniteDomainVariable<T> v : variables) {
-			if (v != variable) {
-				bs.and(v.getAllowableValues());
-			}
-		}
-
-		return variable.trySetValue(bs);
+		return constraint.update(variable);
 	}
 }

@@ -19,25 +19,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark.integer;
+package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
+import java.util.BitSet;
 
 /**
- * IntervalGreaterThanConstraint
+ * EqualityConstraint
  *
  * @author Eric Fritz
  */
-public class GreaterThanConstraint implements Constraint<IntegerVariable>
+public class FiniteDomainEqualityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private Constraint<IntegerVariable> constraint;
+	private FiniteDomainVariable<T>[] variables;
 
-	public GreaterThanConstraint(IntegerVariable var1, IntegerVariable var2) {
-		this.constraint = new LessThanConstraint(var2, var1);
+	public FiniteDomainEqualityConstraint(FiniteDomainVariable<T>... variables) {
+		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(IntegerVariable variable) {
-		return constraint.update(variable);
+	public boolean update(FiniteDomainVariable<T> variable) {
+		BitSet bs = variable.getAllowableValues().get(0, variable.getAllowableValues().size());
+
+		for (FiniteDomainVariable<T> v : variables) {
+			if (v != variable) {
+				bs.and(v.getAllowableValues());
+			}
+		}
+
+		return variable.trySetValue(bs);
 	}
 }

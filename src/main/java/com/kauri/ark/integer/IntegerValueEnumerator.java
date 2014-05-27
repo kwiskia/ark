@@ -30,7 +30,7 @@ import java.util.Stack;
  *
  * @author Eric Fritz
  */
-class IntervalValueEnumerator implements ValueEnumerator
+class IntegerValueEnumerator implements ValueEnumerator
 {
 	private IntegerVariable integerVariable;
 	private Solver solver;
@@ -39,7 +39,7 @@ class IntervalValueEnumerator implements ValueEnumerator
 
 	private Stack<Interval> candidates = new Stack<>();
 
-	public IntervalValueEnumerator(IntegerVariable integerVariable, Solver solver, int mark) {
+	public IntegerValueEnumerator(IntegerVariable integerVariable, Solver solver, int mark) {
 		this.integerVariable = integerVariable;
 		this.solver = solver;
 		this.mark = mark;
