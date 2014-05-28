@@ -39,13 +39,13 @@ public class IntegerEqualityConstraint implements Constraint<IntegerVariable>
 	@Override
 	public boolean update(IntegerVariable variable) {
 
-		int lower = variable.getAllowableValues().getLowerBound();
-		int upper = variable.getAllowableValues().getUpperBound();
+		int lower = variable.getCurrentAllowableValues().getLowerBound();
+		int upper = variable.getCurrentAllowableValues().getUpperBound();
 
 		for (IntegerVariable v : variables) {
 			if (v != variable) {
-				lower = Math.max(lower, v.getAllowableValues().getLowerBound());
-				upper = Math.min(upper, v.getAllowableValues().getUpperBound());
+				lower = Math.max(lower, v.getCurrentAllowableValues().getLowerBound());
+				upper = Math.min(upper, v.getCurrentAllowableValues().getUpperBound());
 			}
 		}
 

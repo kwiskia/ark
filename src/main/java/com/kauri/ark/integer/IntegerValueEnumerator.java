@@ -44,7 +44,7 @@ class IntegerValueEnumerator implements ValueEnumerator
 		this.solver = solver;
 		this.mark = mark;
 
-		candidates.push(integerVariable.getAllowableValues());
+		candidates.push(integerVariable.getCurrentAllowableValues());
 	}
 
 	@Override

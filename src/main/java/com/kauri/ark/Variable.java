@@ -44,23 +44,12 @@ abstract public class Variable<T>
 		return allowableValues;
 	}
 
-	public void set(T value) {
-		this.allowableValues = value;
+	public T getCurrentAllowableValues() {
+		return solver.getAssignment(this);
 	}
 
 	public boolean trySetValue(T value) {
-		if (!allowableValues.equals(value)) {
-			solver.saveValue(this, allowableValues);
-			allowableValues = value;
-
-			if (this.isEmpty()) {
-				return false;
-			}
-
-			solver.queueNeighboringArcs(this);
-		}
-
-		return true;
+		return solver.trySetValue(this, value);
 	}
 
 	abstract public boolean isEmpty();

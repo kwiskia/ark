@@ -43,10 +43,10 @@ class FiniteDomainValueEnumerator<T> implements ValueEnumerator
 		this.solver = solver;
 		this.mark = mark;
 
-		indices = new int[finiteDomainVariable.getAllowableValues().cardinality()];
+		indices = new int[finiteDomainVariable.getCurrentAllowableValues().cardinality()];
 
 		int j = 0;
-		for (int i = finiteDomainVariable.getAllowableValues().nextSetBit(0); i != -1; i = finiteDomainVariable.getAllowableValues().nextSetBit(i + 1)) {
+		for (int i = finiteDomainVariable.getCurrentAllowableValues().nextSetBit(0); i != -1; i = finiteDomainVariable.getCurrentAllowableValues().nextSetBit(i + 1)) {
 			indices[j++] = i;
 		}
 
@@ -68,7 +68,7 @@ class FiniteDomainValueEnumerator<T> implements ValueEnumerator
 		}
 
 		while (k < indices.length) {
-			BitSet bs = new BitSet(finiteDomainVariable.getAllowableValues().size());
+			BitSet bs = new BitSet(finiteDomainVariable.getCurrentAllowableValues().size());
 			bs.set(indices[k++]);
 
 			if (finiteDomainVariable.trySetValue(bs) && solver.resolveConstraints()) {

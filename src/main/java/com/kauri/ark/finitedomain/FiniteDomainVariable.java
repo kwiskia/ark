@@ -46,12 +46,12 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 
 	@Override
 	public boolean isEmpty() {
-		return getAllowableValues().cardinality() == 0;
+		return getCurrentAllowableValues().cardinality() == 0;
 	}
 
 	@Override
 	public boolean isUnique() {
-		return getAllowableValues().cardinality() == 1;
+		return getCurrentAllowableValues().cardinality() == 1;
 	}
 
 	public T getAssignment() {
@@ -59,7 +59,7 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 			throw new RuntimeException("Assignment not unique.");
 		}
 
-		return finiteDomain.getValue(getAllowableValues().nextSetBit(0));
+		return finiteDomain.getValue(getCurrentAllowableValues().nextSetBit(0));
 	}
 
 	@Override

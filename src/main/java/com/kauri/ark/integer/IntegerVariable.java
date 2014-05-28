@@ -38,12 +38,12 @@ public class IntegerVariable extends Variable<Interval>
 
 	@Override
 	public boolean isEmpty() {
-		return getAllowableValues().isEmpty();
+		return getCurrentAllowableValues().isEmpty();
 	}
 
 	@Override
 	public boolean isUnique() {
-		return getAllowableValues().isUnique();
+		return getCurrentAllowableValues().isUnique();
 	}
 
 	public int getAssignment() {
@@ -51,7 +51,7 @@ public class IntegerVariable extends Variable<Interval>
 			throw new RuntimeException("Assignment not unique.");
 		}
 
-		return getAllowableValues().getLowerBound();
+		return getCurrentAllowableValues().getLowerBound();
 	}
 
 	@Override

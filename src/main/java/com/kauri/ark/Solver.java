@@ -45,6 +45,7 @@ public class Solver
 	private List<Variable<?>> variables = new ArrayList<>();
 	private Map<Constraint, List<Arc>> arcs = new HashMap<>();
 	private Map<Variable, List<Constraint>> edges = new HashMap<>();
+	private Map<Variable, Object> assignments = new HashMap<>();
 
 	private ExpansionOrder order = ExpansionOrder.DETERMINISTIC;
 
@@ -55,6 +56,7 @@ public class Solver
 	public void addVariable(Variable variable) {
 		variables.add(variable);
 		edges.put(variable, new ArrayList<Constraint>());
+		assignments.put(variable, variable.getAllowableValues());
 	}
 
 	public <T> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
@@ -80,6 +82,33 @@ public class Solver
 				}
 			}
 		}
+	}
+
+	public <T> boolean trySetValue(Variable<T> variable, T value) {
+		if (!variables.contains(variable)) {
+			throw new RuntimeException("Setting assignment on non-registered variable.");
+		}
+
+		if (!assignments.get(variable).equals(value)) {
+			saveValue(variable, (T) assignments.get(variable));
+			assignments.put(variable, value);
+
+			if (variable.isEmpty()) {
+				return false;
+			}
+
+			queueNeighboringArcs(variable);
+		}
+
+		return true;
+	}
+
+	public <T> T getAssignment(Variable<T> variable) {
+		if (!variables.contains(variable)) {
+			throw new RuntimeException("Getting assignment on non-registered variable.");
+		}
+
+		return (T) assignments.get(variable);
 	}
 
 	public ExpansionOrder getExpansionOrder() {
@@ -178,7 +207,7 @@ public class Solver
 		}
 
 		public void restore() {
-			variable.set(allowableValues);
+			assignments.put(variable, allowableValues);
 		}
 	}
 }
