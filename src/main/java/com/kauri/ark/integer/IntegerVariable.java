@@ -58,5 +58,4 @@ public class IntegerVariable extends Variable<Interval>
 	public ValueEnumerator getValueEnumerator() {
 		return new IntegerValueEnumerator(this, getSolver(), getSolver().saveValues());
 	}
-
 }
