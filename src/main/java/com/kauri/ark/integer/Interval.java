@@ -65,7 +65,7 @@ public class Interval
 		return i.lowerBound == lowerBound && i.upperBound == upperBound;
 	}
 
-	public String toString (){
+	public String toString() {
 		return String.format("[%d, %d]", lowerBound, upperBound);
 	}
 }
