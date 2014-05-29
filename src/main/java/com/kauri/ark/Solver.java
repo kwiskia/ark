@@ -120,10 +120,6 @@ public class Solver
 	}
 
 	public void solve(SolutionHandler handler) {
-		if (solving) {
-			throw new RuntimeException("Already solving.");
-		}
-
 		if (variables.isEmpty()) {
 			return;
 		}
@@ -132,6 +128,10 @@ public class Solver
 			if (v.isEmpty()) {
 				return;
 			}
+		}
+
+		if (solving) {
+			throw new RuntimeException("Already solving.");
 		}
 
 		solving = true;
