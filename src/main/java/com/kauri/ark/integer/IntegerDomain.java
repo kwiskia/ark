@@ -89,6 +89,14 @@ public class IntegerDomain implements Domain<Integer>
 		return intervals.get(intervals.size() - 1).getUpperBound();
 	}
 
+	public Integer getUniqueValue() {
+		if (!isUnique()) {
+			throw new RuntimeException("Domain has not been narrowed to a unique value.");
+		}
+
+		return getMinimum();
+	}
+
 	private class IntegerValueEnumerator implements UniqueValueIterator<Domain<Integer>>
 	{
 		private Iterator<Interval> iterator;

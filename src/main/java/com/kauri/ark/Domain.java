@@ -32,5 +32,7 @@ public interface Domain<T>
 
 	boolean isUnique();
 
+	T getUniqueValue();
+
 	UniqueValueIterator<Domain<T>> getUniqueValues();
 }

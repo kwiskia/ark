@@ -108,6 +108,14 @@ public class FiniteDomain<T> implements Domain<T>
 		return new FiniteDomain<>(elements, newSet);
 	}
 
+	public T getUniqueValue() {
+		if (!isUnique()) {
+			throw new RuntimeException("Domain has not been narrowed to a unique value.");
+		}
+
+		return elements.get(bitset.nextSetBit(0));
+	}
+
 	@Override
 	public UniqueValueIterator<Domain<T>> getUniqueValues() {
 		return new FiniteDomainValueEnumerator(bitset);
