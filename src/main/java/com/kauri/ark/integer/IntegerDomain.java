@@ -33,7 +33,6 @@ import java.util.Iterator;
 public class IntegerDomain implements Domain<IntervalSet>
 {
 	private IntervalSet set;
-	private int retu;
 
 	public IntegerDomain(IntervalSet set) {
 		this.set = set;
