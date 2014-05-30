@@ -41,8 +41,9 @@ public class Solver
 	private Map<Variable, List<Constraint>> edges = new HashMap<>();
 
 	private Queue<Arc> worklist = new LinkedList<>();
-	private Stack<VarState<?>> stack = new Stack<>();
 	private boolean solving = false;
+
+	private Trail trail = new Trail();
 
 	public void addVariable(Variable variable) {
 		variables.add(variable);
@@ -80,7 +81,7 @@ public class Solver
 		}
 
 		if (!variable.getCurrentAllowableValues().equals(value)) {
-			saveValue(variable, variable.getCurrentAllowableValues());
+			trail.save(variable, variable.getCurrentAllowableValues());
 			variable.setValue(value);
 
 			if (variable.isEmpty()) {
@@ -113,7 +114,7 @@ public class Solver
 		Stack<ValueAdvancer> values = new Stack<>();
 
 		Variable v = variables.get(0);
-		values.push(new ValueAdvancer(v, this.saveValues()));
+		values.push(new ValueAdvancer(v, trail.size()));
 
 		while (!values.isEmpty()) {
 			if (values.lastElement().advance()) {
@@ -123,7 +124,7 @@ public class Solver
 					}
 				} else {
 					v = variables.get(values.size());
-					values.push(new ValueAdvancer(v, this.saveValues()));
+					values.push(new ValueAdvancer(v, trail.size()));
 				}
 			} else {
 				values.pop();
@@ -148,7 +149,9 @@ public class Solver
 
 		public boolean advance() {
 			if (hasAdvanced) {
-				Solver.this.restore(mark);
+				trail.restore(mark);
+				// TODO - is clear necessary?
+				worklist.clear();
 			}
 
 			while (true) {
@@ -162,7 +165,9 @@ public class Solver
 					return true;
 				}
 
-				Solver.this.restore(mark);
+				trail.restore(mark);
+				// TODO - is clear necessary?
+				worklist.clear();
 			}
 		}
 	}
@@ -180,22 +185,6 @@ public class Solver
 		return true;
 	}
 
-	public int saveValues() {
-		return stack.size();
-	}
-
-	public <T> void saveValue(Variable<T> variable, T allowableValues) {
-		stack.push(new VarState(variable, allowableValues));
-	}
-
-	public void restore(int mark) {
-		while (stack.size() > mark) {
-			stack.pop().restore();
-		}
-
-		worklist.clear();
-	}
-
 	private class Arc<T extends Variable<?>>
 	{
 		private T variable;
@@ -204,21 +193,6 @@ public class Solver
 		public Arc(T variable, Constraint constraint) {
 			this.variable = variable;
 			this.constraint = constraint;
-		}
-	}
-
-	private class VarState<T>
-	{
-		private Variable<T> variable;
-		private T allowableValues;
-
-		public VarState(Variable<T> variable, T allowableValues) {
-			this.variable = variable;
-			this.allowableValues = allowableValues;
-		}
-
-		public void restore() {
-			variable.setValue(allowableValues);
 		}
 	}
 }
