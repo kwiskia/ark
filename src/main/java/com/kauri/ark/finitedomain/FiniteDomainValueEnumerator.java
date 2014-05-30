@@ -29,30 +29,25 @@ import java.util.BitSet;
  *
  * @author Eric Fritz
  */
-class FiniteDomainValueEnumerator<T> implements ValueEnumerator<BitSet>
+class FiniteDomainValueEnumerator implements ValueEnumerator<BitSet>
 {
-	private int size;
-	private int k = 0;
-	private int[] indices;
+	private BitSet bitset;
+	private int k = -1;
 
-	public FiniteDomainValueEnumerator(FiniteDomainVariable<T> variable) {
-		size = variable.getAllowableValues().size();
-		indices = new int[variable.getCurrentAllowableValues().cardinality()];
-
-		int j = 0;
-		for (int i = variable.getCurrentAllowableValues().nextSetBit(0); i != -1; i = variable.getCurrentAllowableValues().nextSetBit(i + 1)) {
-			indices[j++] = i;
-		}
+	public FiniteDomainValueEnumerator(BitSet bitset) {
+		this.bitset = bitset;
 	}
 
 	@Override
 	public BitSet next() {
-		if (k < indices.length) {
-			BitSet bs = new BitSet(size);
-			bs.set(indices[k++]);
-			return bs;
+		k = bitset.nextSetBit(k + 1);
+
+		if (k == -1) {
+			return null;
 		}
 
-		return null;
+		BitSet bs = new BitSet(bitset.size());
+		bs.set(k);
+		return bs;
 	}
 }

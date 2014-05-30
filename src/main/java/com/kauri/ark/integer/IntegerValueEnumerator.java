@@ -33,9 +33,9 @@ class IntegerValueEnumerator implements ValueEnumerator<Interval>
 	private int lower;
 	private int upper;
 
-	public IntegerValueEnumerator(IntegerVariable integerVariable) {
-		lower = integerVariable.getCurrentAllowableValues().getLowerBound();
-		upper = integerVariable.getCurrentAllowableValues().getUpperBound();
+	public IntegerValueEnumerator(Interval interval) {
+		lower = interval.getLowerBound();
+		upper = interval.getUpperBound();
 	}
 
 	@Override
