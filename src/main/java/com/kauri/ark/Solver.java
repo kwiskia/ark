@@ -36,18 +36,10 @@ import java.util.Stack;
  */
 public class Solver
 {
-	public enum ExpansionOrder
-	{
-		DETERMINISTIC,
-		RANDOM
-	}
-
 	private List<Variable<?>> variables = new ArrayList<>();
 	private Map<Constraint, List<Arc>> arcs = new HashMap<>();
 	private Map<Variable, List<Constraint>> edges = new HashMap<>();
 	private Map<Variable, Object> assignments = new HashMap<>();
-
-	private ExpansionOrder order = ExpansionOrder.DETERMINISTIC;
 
 	private Queue<Arc> worklist = new LinkedList<>();
 	private Stack<VarState<?>> stack = new Stack<>();
@@ -109,14 +101,6 @@ public class Solver
 		}
 
 		return (T) assignments.get(variable);
-	}
-
-	public ExpansionOrder getExpansionOrder() {
-		return order;
-	}
-
-	public void setExpansionOrder(ExpansionOrder order) {
-		this.order = order;
 	}
 
 	public void solve(SolutionHandler handler) {

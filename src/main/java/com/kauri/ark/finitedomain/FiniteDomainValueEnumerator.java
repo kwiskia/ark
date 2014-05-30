@@ -49,16 +49,6 @@ class FiniteDomainValueEnumerator<T> implements ValueEnumerator
 		for (int i = finiteDomainVariable.getCurrentAllowableValues().nextSetBit(0); i != -1; i = finiteDomainVariable.getCurrentAllowableValues().nextSetBit(i + 1)) {
 			indices[j++] = i;
 		}
-
-		if (solver.getExpansionOrder() == Solver.ExpansionOrder.RANDOM) {
-			for (int i = indices.length - 1; i >= 0; i--) {
-				j = (int) (Math.random() * (i + 1));
-
-				int t = indices[j];
-				indices[j] = indices[i];
-				indices[i] = t;
-			}
-		}
 	}
 
 	@Override
