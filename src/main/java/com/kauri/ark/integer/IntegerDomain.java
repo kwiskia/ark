@@ -25,6 +25,7 @@ import com.kauri.ark.Domain;
 import com.kauri.ark.UniqueValueIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -230,7 +231,7 @@ public class IntegerDomain implements Domain<Integer>
 			}
 		}
 
-		intervals.sort(new Comparator<Interval>()
+		Collections.sort(intervals, new Comparator<Interval>()
 		{
 			@Override
 			public int compare(Interval o1, Interval o2) {
