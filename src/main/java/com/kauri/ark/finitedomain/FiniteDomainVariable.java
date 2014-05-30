@@ -25,6 +25,7 @@ import com.kauri.ark.Solver;
 import com.kauri.ark.ValueEnumerator;
 import com.kauri.ark.Variable;
 import java.util.BitSet;
+import java.util.List;
 
 /**
  * FiniteDomainVariable
@@ -33,6 +34,10 @@ import java.util.BitSet;
  */
 public class FiniteDomainVariable<T> extends Variable<BitSet>
 {
+	public static <T> FiniteDomainVariable<T> create(Solver solver, List<T> elements) {
+		return new FiniteDomainVariable<>(solver, new FiniteDomain<>(elements));
+	}
+
 	private FiniteDomain<T> finiteDomain;
 
 	public FiniteDomainVariable(Solver solver, FiniteDomain<T> finiteDomain) {
