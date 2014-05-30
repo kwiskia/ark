@@ -22,31 +22,31 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
-import java.util.BitSet;
+import com.kauri.ark.Variable;
 
 /**
  * InequalityConstraint
  *
  * @author Eric Fritz
  */
-public class FiniteDomainInequalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class FiniteDomainInequalityConstraint<T> implements Constraint<Variable<FiniteDomain<T>>>
 {
-	private FiniteDomainVariable<T>[] variables;
+	private Variable<FiniteDomain<T>>[] variables;
 
-	public FiniteDomainInequalityConstraint(FiniteDomainVariable<T>... variables) {
+	public FiniteDomainInequalityConstraint(Variable<FiniteDomain<T>>... variables) {
 		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
-		BitSet bs = (BitSet) variable.getCurrentAllowableValues().clone();
+	public boolean update(Variable<FiniteDomain<T>> variable) {
+		FiniteDomain<T> domain = variable.getDomain();
 
-		for (FiniteDomainVariable<T> v : variables) {
-			if (v != variable && v.isUnique()) {
-				bs.andNot(v.getCurrentAllowableValues());
+		for (Variable<FiniteDomain<T>> v : variables) {
+			if (v != variable && v.getDomain().isUnique()) {
+				domain = domain.removeAll(v.getDomain());
 			}
 		}
 
-		return variable.trySetValue(bs);
+		return variable.trySetValue(domain);
 	}
 }

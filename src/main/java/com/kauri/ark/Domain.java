@@ -19,25 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.kauri.ark.finitedomain;
-
-import com.kauri.ark.Constraint;
+package com.kauri.ark;
 
 /**
- * GreaterThanConstraint
+ * Domain
  *
  * @author Eric Fritz
  */
-public class FiniteDomainGreaterThanConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public interface Domain<T>
 {
-	private Constraint<FiniteDomainVariable<T>> constraint;
+	boolean isEmpty();
 
-	public FiniteDomainGreaterThanConstraint(FiniteDomainVariable<T> var1, FiniteDomainVariable<T> var2) {
-		this.constraint = new FiniteDomainLessThanConstraint(var2, var1);
-	}
+	boolean isUnique();
 
-	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
-		return constraint.update(variable);
-	}
+	UniqueValueIterator<Domain<T>> getUniqueValues();
 }

@@ -22,32 +22,33 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
+import com.kauri.ark.Variable;
 
 /**
  * SumConstraint
  *
  * @author Eric Fritz
  */
-public class IntegerSumConstraint implements Constraint<IntegerVariable>
+public class IntegerSumConstraint implements Constraint<Variable<IntegerDomain>>
 {
-	private IntegerVariable a;
-	private IntegerVariable b;
-	private IntegerVariable c;
+	private Variable<IntegerDomain> a;
+	private Variable<IntegerDomain> b;
+	private Variable<IntegerDomain> c;
 
-	public IntegerSumConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+	public IntegerSumConstraint(Variable<IntegerDomain> a, Variable<IntegerDomain> b, Variable<IntegerDomain> c) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
 	}
 
 	@Override
-	public boolean update(IntegerVariable variable) {
-		int aLower = a.getCurrentAllowableValues().getMinimum();
-		int aUpper = a.getCurrentAllowableValues().getMaximum();
-		int bLower = b.getCurrentAllowableValues().getMinimum();
-		int bUpper = b.getCurrentAllowableValues().getMaximum();
-		int cLower = c.getCurrentAllowableValues().getMinimum();
-		int cUpper = c.getCurrentAllowableValues().getMaximum();
+	public boolean update(Variable<IntegerDomain> variable) {
+		int aLower = a.getDomain().getMinimum();
+		int aUpper = a.getDomain().getMaximum();
+		int bLower = b.getDomain().getMinimum();
+		int bUpper = b.getDomain().getMaximum();
+		int cLower = c.getDomain().getMinimum();
+		int cUpper = c.getDomain().getMaximum();
 
 		int lower;
 		int upper;
@@ -68,12 +69,9 @@ public class IntegerSumConstraint implements Constraint<IntegerVariable>
 			throw new RuntimeException("Unreachable.");
 		}
 
-		lower = Math.max(variable.getCurrentAllowableValues().getMinimum(), lower);
-		upper = Math.min(variable.getCurrentAllowableValues().getMaximum(), upper);
+		lower = Math.max(variable.getDomain().getMinimum(), lower);
+		upper = Math.min(variable.getDomain().getMaximum(), upper);
 
-		IntervalSet set = new IntervalSet();
-		set.add(new Interval(lower, upper));
-
-		return variable.trySetValue(set);
+		return variable.trySetValue(variable.getDomain().add(new Interval(lower, upper)));
 	}
 }

@@ -22,31 +22,31 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
-import java.util.BitSet;
+import com.kauri.ark.Variable;
 
 /**
  * EqualityConstraint
  *
  * @author Eric Fritz
  */
-public class FiniteDomainEqualityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class FiniteDomainEqualityConstraint<T> implements Constraint<Variable<FiniteDomain<T>>>
 {
-	private FiniteDomainVariable<T>[] variables;
+	private Variable<FiniteDomain<T>>[] variables;
 
-	public FiniteDomainEqualityConstraint(FiniteDomainVariable<T>... variables) {
+	public FiniteDomainEqualityConstraint(Variable<FiniteDomain<T>>... variables) {
 		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
-		BitSet bs = (BitSet) variable.getCurrentAllowableValues().clone();
+	public boolean update(Variable<FiniteDomain<T>> variable) {
+		FiniteDomain<T> domain = variable.getDomain();
 
-		for (FiniteDomainVariable<T> v : variables) {
+		for (Variable<FiniteDomain<T>> v : variables) {
 			if (v != variable) {
-				bs.and(v.getCurrentAllowableValues());
+				domain = domain.retainAll(v.getDomain());
 			}
 		}
 
-		return variable.trySetValue(bs);
+		return variable.trySetValue(domain);
 	}
 }

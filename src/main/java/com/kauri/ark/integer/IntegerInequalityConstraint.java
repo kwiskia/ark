@@ -22,30 +22,31 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
+import com.kauri.ark.Variable;
 
 /**
  * IntervalInequalityConstraint
  *
  * @author Eric Fritz
  */
-public class IntegerInequalityConstraint implements Constraint<IntegerVariable>
+public class IntegerInequalityConstraint implements Constraint<Variable<IntegerDomain>>
 {
-	private IntegerVariable[] variables;
+	private Variable<IntegerDomain>[] variables;
 
-	public IntegerInequalityConstraint(IntegerVariable... variables) {
+	public IntegerInequalityConstraint(Variable<IntegerDomain>... variables) {
 		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(IntegerVariable variable) {
-		IntervalSet set = new IntervalSet(variable.getCurrentAllowableValues());
+	public boolean update(Variable<IntegerDomain> variable) {
+		IntegerDomain domain = variable.getDomain();
 
-		for (IntegerVariable v : variables) {
-			if (v != variable && v.isUnique()) {
-				set.removeAll(v.getCurrentAllowableValues());
+		for (Variable<IntegerDomain> v : variables) {
+			if (v != variable && v.getDomain().isUnique()) {
+				domain = domain.removeAll(v.getDomain());
 			}
 		}
 
-		return variable.trySetValue(set);
+		return variable.trySetValue(domain);
 	}
 }

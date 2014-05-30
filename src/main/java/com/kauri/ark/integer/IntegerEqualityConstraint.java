@@ -22,30 +22,31 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
+import com.kauri.ark.Variable;
 
 /**
  * IntervalEqualityConstraint
  *
  * @author Eric Fritz
  */
-public class IntegerEqualityConstraint implements Constraint<IntegerVariable>
+public class IntegerEqualityConstraint implements Constraint<Variable<IntegerDomain>>
 {
-	private IntegerVariable[] variables;
+	private Variable<IntegerDomain>[] variables;
 
-	public IntegerEqualityConstraint(IntegerVariable... variables) {
+	public IntegerEqualityConstraint(Variable<IntegerDomain>... variables) {
 		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(IntegerVariable variable) {
-		IntervalSet bs = new IntervalSet(variable.getCurrentAllowableValues());
+	public boolean update(Variable<IntegerDomain> variable) {
+		IntegerDomain domain = variable.getDomain();
 
-		for (IntegerVariable v : variables) {
+		for (Variable<IntegerDomain> v : variables) {
 			if (v != variable) {
-				bs.retainAll(v.getCurrentAllowableValues());
+				domain = domain.retainAll(v.getDomain());
 			}
 		}
 
-		return variable.trySetValue(bs);
+		return variable.trySetValue(domain);
 	}
 }

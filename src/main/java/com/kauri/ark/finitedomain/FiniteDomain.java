@@ -21,43 +21,126 @@
 
 package com.kauri.ark.finitedomain;
 
+import com.kauri.ark.Domain;
+import com.kauri.ark.UniqueValueIterator;
 import java.util.BitSet;
 import java.util.List;
 
 /**
- * FiniteDomain
+ * TempFiniteDomain
  *
  * @author Eric Fritz
  */
-public class FiniteDomain<T>
+public class FiniteDomain<T> implements Domain<T>
 {
-	private List<T> values;
+	private List<T> elements;
+	private BitSet bitset;
 
-	//
-	// TODO - how to ensure ordering?
-	//
-
-	public FiniteDomain(List<T> values) {
-		this.values = values;
+	public FiniteDomain(List<T> elements) {
+		this(elements, null);
 	}
 
-	public T getValue(int index) {
-		return values.get(index);
-	}
-
-	public BitSet createBitSet() {
-		BitSet bs = new BitSet(values.size());
-		bs.set(0, values.size());
-		return bs;
-	}
-
-	public BitSet createBitSet(T... including) {
-		BitSet bs = new BitSet(values.size());
-
-		for (T t : including) {
-			bs.set(values.indexOf(t));
+	public FiniteDomain(List<T> elements, BitSet bitset) {
+		if (bitset == null) {
+			bitset = new BitSet(elements.size());
+			bitset.set(0, elements.size());
 		}
 
-		return bs;
+		this.elements = elements;
+		this.bitset = bitset;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return bitset.cardinality() == 0;
+	}
+
+	@Override
+	public boolean isUnique() {
+		return bitset.cardinality() == 1;
+	}
+
+	public boolean contains(T element) {
+		if (!elements.contains(element)) {
+			throw new RuntimeException("Element does not belong to finite domain.");
+		}
+
+		return bitset.get(elements.indexOf(element));
+	}
+
+	public FiniteDomain<T> add(T element) {
+		if (!elements.contains(element)) {
+			throw new RuntimeException("Element does not belong to finite domain.");
+		}
+
+		BitSet newSet = bitset.get(0, bitset.size());
+		newSet.set(elements.indexOf(element));
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	public FiniteDomain<T> remove(T element) {
+		if (!elements.contains(element)) {
+			throw new RuntimeException("Element does not belong to finite domain.");
+		}
+
+		BitSet newSet = bitset.get(0, bitset.size());
+		newSet.clear(elements.indexOf(element));
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	public FiniteDomain<T> retainAll(FiniteDomain<T> other) {
+		if (!elements.equals(other.elements)) {
+			throw new RuntimeException("Finite domains do not match.");
+		}
+
+		BitSet newSet = bitset.get(0, bitset.size());
+		newSet.and(other.bitset);
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	public FiniteDomain<T> removeAll(FiniteDomain<T> other) {
+		if (!elements.equals(other.elements)) {
+			throw new RuntimeException("Finite domains do not match.");
+		}
+
+		BitSet newSet = bitset.get(0, bitset.size());
+		newSet.andNot(other.bitset);
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	@Override
+	public UniqueValueIterator<Domain<T>> getUniqueValues() {
+		return new FiniteDomainValueEnumerator(bitset);
+	}
+
+	private class FiniteDomainValueEnumerator implements UniqueValueIterator<Domain<T>>
+	{
+		private BitSet bitset;
+		private int k = -1;
+
+		public FiniteDomainValueEnumerator(BitSet bitset) {
+			this.bitset = bitset;
+		}
+
+		@Override
+		public FiniteDomain<T> next() {
+			k = bitset.nextSetBit(k + 1);
+
+			if (k == -1) {
+				return null;
+			}
+
+			BitSet bs = new BitSet(bitset.size());
+			bs.set(k);
+			return new FiniteDomain<>(elements, bs);
+		}
+	}
+
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof FiniteDomain)) {
+			return false;
+		}
+
+		return elements.equals(((FiniteDomain) o).elements) && bitset.equals(((FiniteDomain) o).bitset);
 	}
 }

@@ -26,41 +26,29 @@ package com.kauri.ark;
  *
  * @author Eric Fritz
  */
-abstract public class Variable<T>
+public class Variable<T extends Domain>
 {
 	private Solver solver;
-	private T allowableValues;
-	private T currentAllowableValues;
+	private T domain;
 
-	public Variable(Solver solver, T allowableValues) {
+	public Variable(Solver solver, T domain) {
 		this.solver = solver;
-		this.allowableValues = allowableValues;
-		this.currentAllowableValues = allowableValues;
+		this.domain = domain;
 	}
 
 	public Solver getSolver() {
 		return solver;
 	}
 
-	public T getAllowableValues() {
-		return allowableValues;
+	public T getDomain() {
+		return domain;
 	}
 
-	public T getCurrentAllowableValues() {
-		return currentAllowableValues;
-	}
-
-	public void setValue(T value) {
-		currentAllowableValues = value;
+	public void setDomain(T domain) {
+		this.domain = domain;
 	}
 
 	public boolean trySetValue(T value) {
 		return solver.trySetValue(this, value);
 	}
-
-	abstract public boolean isEmpty();
-
-	abstract public boolean isUnique();
-
-	abstract public ValueEnumerator getValueEnumerator();
 }

@@ -50,7 +50,7 @@ public class Solver
 		edges.put(variable, new ArrayList<Constraint>());
 	}
 
-	public <T> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
+	public <T extends Domain> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
 		arcs.put(constraint, new ArrayList<Arc>());
 
 		for (Variable<T> variable : variables) {
@@ -69,7 +69,7 @@ public class Solver
 		}
 
 		for (Variable v : variables) {
-			if (v.isEmpty()) {
+			if (v.getDomain().isEmpty()) {
 				return;
 			}
 		}
@@ -103,26 +103,25 @@ public class Solver
 		solving = false;
 	}
 
-	public <T> boolean trySetValue(Variable<T> variable, T value) {
+	public <T extends Domain> boolean trySetValue(Variable<T> variable, T domain) {
 		if (!variables.contains(variable)) {
 			throw new RuntimeException("Setting assignment on non-registered variable.");
 		}
 
-		if (!variable.getCurrentAllowableValues().equals(value)) {
-			trail.save(variable, variable.getCurrentAllowableValues());
-			variable.setValue(value);
+		if (domain.isEmpty()) {
+			return false;
+		}
 
-			if (variable.isEmpty()) {
-				return false;
-			}
-
+		if (!variable.getDomain().equals(domain)) {
+			trail.save(variable, variable.getDomain());
+			variable.setDomain(domain);
 			queueNeighboringArcs(variable);
 		}
 
 		return true;
 	}
 
-	private <T> void queueNeighboringArcs(Variable<T> variable) {
+	private <T extends Domain> void queueNeighboringArcs(Variable<T> variable) {
 		for (Constraint constraint : edges.get(variable)) {
 			for (Arc arc : arcs.get(constraint)) {
 				if (arc.variable == variable) {
@@ -160,16 +159,16 @@ public class Solver
 		}
 	}
 
-	private class ValueAdvancer<T>
+	private class ValueAdvancer<T extends Domain>
 	{
 		private Variable<T> variable;
-		private ValueEnumerator<T> enumerator;
+		private UniqueValueIterator<T> enumerator;
 		private boolean hasAdvanced = false;
 		private int mark;
 
 		public ValueAdvancer(Variable<T> variable, int mark) {
 			this.variable = variable;
-			this.enumerator = variable.getValueEnumerator();
+			this.enumerator = variable.getDomain().getUniqueValues();
 			this.mark = mark;
 		}
 
@@ -182,6 +181,7 @@ public class Solver
 
 			while (true) {
 				T value = enumerator.next();
+
 				if (value == null) {
 					return false;
 				}

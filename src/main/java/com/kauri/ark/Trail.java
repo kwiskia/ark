@@ -36,8 +36,8 @@ public class Trail
 		return stack.size();
 	}
 
-	public <T> void save(Variable<T> variable, T value) {
-		stack.push(new VarState(variable, value));
+	public <T extends Domain> void save(Variable<T> variable, Domain<T> domain) {
+		stack.push(new VarState(variable, domain));
 	}
 
 	public void restore(int mark) {
@@ -46,18 +46,18 @@ public class Trail
 		}
 	}
 
-	private class VarState<T>
+	private class VarState<T extends Domain>
 	{
 		private Variable<T> variable;
-		private T value;
+		private T domain;
 
-		public VarState(Variable<T> variable, T value) {
+		public VarState(Variable<T> variable, T domain) {
 			this.variable = variable;
-			this.value = value;
+			this.domain = domain;
 		}
 
 		public void restore() {
-			variable.setValue(value);
+			variable.setDomain(domain);
 		}
 	}
 }

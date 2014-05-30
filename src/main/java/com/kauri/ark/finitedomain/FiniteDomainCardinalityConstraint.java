@@ -22,8 +22,8 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
+import com.kauri.ark.Variable;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -31,32 +31,34 @@ import java.util.List;
  *
  * @author Eric Fritz
  */
-public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class FiniteDomainCardinalityConstraint<T> implements Constraint<Variable<FiniteDomain<T>>>
 {
+	private List<Variable<FiniteDomain<T>>> variables;
+
 	private int min;
 	private int max;
-	private BitSet mask;
-	private List<FiniteDomainVariable<T>> variables;
 
-	public FiniteDomainCardinalityConstraint(T value, int min, int max, FiniteDomainVariable<T>... variables) {
+	private T value;
+
+	public FiniteDomainCardinalityConstraint(T value, int min, int max, Variable<FiniteDomain<T>>... variables) {
 		this.variables = Arrays.asList(variables);
 
 		this.min = min;
 		this.max = max;
 
-		mask = variables[0].getFiniteDomain().createBitSet(value);
+		this.value = value;
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
+	public boolean update(Variable<FiniteDomain<T>> variable) {
 		int possible = 0;
 		int definite = 0;
 
-		for (FiniteDomainVariable<T> v : variables) {
-			if (v.getCurrentAllowableValues().intersects(mask)) {
+		for (Variable<FiniteDomain<T>> v : variables) {
+			if (v.getDomain().contains(value)) {
 				possible++;
 
-				if (v.isUnique()) {
+				if (v.getDomain().isUnique()) {
 					definite++;
 				}
 			}
@@ -66,13 +68,17 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDo
 			return false;
 		}
 
-		if (definite == max) {
-			for (FiniteDomainVariable<T> v : variables) {
-				if (v.getCurrentAllowableValues().intersects(mask) && !v.isUnique()) {
-					BitSet bs = (BitSet) v.getCurrentAllowableValues().clone();
-					bs.andNot(mask);
+		if (possible == min) {
+			// TODO
+		}
 
-					if (!v.trySetValue(bs)) {
+		if (definite == max) {
+			for (Variable<FiniteDomain<T>> v : variables) {
+				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
+					FiniteDomain<T> domain = v.getDomain();
+					domain = domain.remove(value);
+
+					if (!v.trySetValue(domain)) {
 						return false;
 					}
 				}

@@ -21,59 +21,79 @@
 
 package com.kauri.ark.integer;
 
-import com.kauri.ark.Solver;
-import com.kauri.ark.ValueEnumerator;
-import com.kauri.ark.Variable;
+import com.kauri.ark.Domain;
+import com.kauri.ark.UniqueValueIterator;
 import java.util.Iterator;
 
 /**
- * IntervalVariable
+ * TempIntegerDomain
  *
  * @author Eric Fritz
  */
-public class IntegerVariable extends Variable<IntervalSet>
+public class IntegerDomain implements Domain<IntervalSet>
 {
-	public static IntegerVariable create(Solver solver, int lower, int upper) {
-		IntervalSet set = new IntervalSet();
-		set.add(new Interval(lower, upper));
+	private IntervalSet set;
+	private int retu;
 
-		return new IntegerVariable(solver, set);
-	}
-
-	public IntegerVariable(Solver solver, IntervalSet set) {
-		super(solver, set);
+	public IntegerDomain(IntervalSet set) {
+		this.set = set;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return getCurrentAllowableValues().isEmpty();
+		return set.isEmpty();
 	}
 
 	@Override
 	public boolean isUnique() {
-		return getCurrentAllowableValues().isUnique();
+		return set.isUnique();
 	}
 
-	public int getAssignment() {
-		if (!isUnique()) {
-			throw new RuntimeException("Assignment not unique.");
-		}
+	public IntegerDomain add(Interval interval) {
+		IntervalSet newSet = new IntervalSet(set);
+		newSet.add(interval);
+		return new IntegerDomain(newSet);
+	}
 
-		return getCurrentAllowableValues().getMinimum();
+	public IntegerDomain remove(Interval interval) {
+		IntervalSet newSet = new IntervalSet(set);
+		newSet.remove(interval);
+		return new IntegerDomain(newSet);
+	}
+
+	public IntegerDomain retainAll(IntegerDomain other) {
+		IntervalSet newSet = new IntervalSet(set);
+		newSet.retainAll(other.set);
+		return new IntegerDomain(newSet);
+	}
+
+	public IntegerDomain removeAll(IntegerDomain other) {
+		IntervalSet newSet = new IntervalSet(set);
+		newSet.removeAll(other.set);
+		return new IntegerDomain(newSet);
 	}
 
 	@Override
-	public ValueEnumerator getValueEnumerator() {
-		return new IntegerValueEnumerator(this.getCurrentAllowableValues());
+	public UniqueValueIterator<Domain<IntervalSet>> getUniqueValues() {
+		return new IntegerValueEnumerator(set);
 	}
 
-	private class IntegerValueEnumerator implements ValueEnumerator<IntervalSet>
+	public int getMinimum() {
+		return set.getMinimum();
+	}
+
+	public int getMaximum() {
+		return set.getMaximum();
+	}
+
+	private class IntegerValueEnumerator implements UniqueValueIterator<Domain<IntervalSet>>
 	{
 		private Iterator<Interval> iterator;
 		private Interval current;
 		private int value = 0;
 
 		public IntegerValueEnumerator(IntervalSet set) {
+			// TODO - make immutable
 			this.iterator = new IntervalSet(set).iterator();
 
 			if (iterator.hasNext()) {
@@ -83,7 +103,7 @@ public class IntegerVariable extends Variable<IntervalSet>
 		}
 
 		@Override
-		public IntervalSet next() {
+		public IntegerDomain next() {
 			if (current == null) {
 				return null;
 			}
@@ -99,7 +119,15 @@ public class IntegerVariable extends Variable<IntervalSet>
 
 			IntervalSet set = new IntervalSet();
 			set.add(new Interval(value, value++));
-			return set;
+			return new IntegerDomain(set);
 		}
+	}
+
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof IntegerDomain)) {
+			return false;
+		}
+
+		return set.equals(((IntegerDomain) o).set);
 	}
 }
