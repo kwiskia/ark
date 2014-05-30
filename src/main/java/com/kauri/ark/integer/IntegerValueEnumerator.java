@@ -23,7 +23,6 @@ package com.kauri.ark.integer;
 
 import com.kauri.ark.Solver;
 import com.kauri.ark.ValueEnumerator;
-import java.util.Stack;
 
 /**
  * IntervalValueEnumerator
@@ -37,14 +36,16 @@ class IntegerValueEnumerator implements ValueEnumerator
 	private int mark;
 	private boolean hasAdvanced = false;
 
-	private Stack<Interval> candidates = new Stack<>();
+	private int lower;
+	private int upper;
 
 	public IntegerValueEnumerator(IntegerVariable integerVariable, Solver solver, int mark) {
 		this.integerVariable = integerVariable;
 		this.solver = solver;
 		this.mark = mark;
 
-		candidates.push(integerVariable.getCurrentAllowableValues());
+		lower = integerVariable.getCurrentAllowableValues().getLowerBound();
+		upper = integerVariable.getCurrentAllowableValues().getUpperBound();
 	}
 
 	@Override
@@ -53,28 +54,11 @@ class IntegerValueEnumerator implements ValueEnumerator
 			solver.restore(mark);
 		}
 
-		while (!candidates.isEmpty()) {
-			Interval candidate = candidates.pop();
-
-			if (integerVariable.trySetValue(candidate) && solver.resolveConstraints()) {
-				if (candidate.isUnique()) {
-					hasAdvanced = true;
-					return true;
-				} else {
-					int mid = candidate.getLowerBound() + candidate.getRange() / 2;
-
-					Interval lower = new Interval(candidate.getLowerBound(), mid);
-					Interval upper = new Interval(mid + 1, candidate.getUpperBound());
-
-					if (solver.getExpansionOrder() == Solver.ExpansionOrder.RANDOM && Math.random() < .5) {
-						Interval t = lower;
-						lower = upper;
-						upper = t;
-					}
-
-					if (!candidate.equals(upper)) candidates.push(upper);
-					if (!candidate.equals(lower)) candidates.push(lower);
-				}
+		for (; lower <= upper; lower++) {
+			if (integerVariable.trySetValue(new Interval(lower, lower)) && solver.resolveConstraints()) {
+				lower++;
+				hasAdvanced = true;
+				return true;
 			}
 
 			solver.restore(mark);
