@@ -72,6 +72,10 @@ public class IntegerSumConstraint implements Constraint<Variable<IntegerDomain>>
 		lower = Math.max(variable.getDomain().getMinimum(), lower);
 		upper = Math.min(variable.getDomain().getMaximum(), upper);
 
-		return variable.trySetValue(variable.getDomain().add(new Interval(lower, upper)));
+		if (upper < lower) {
+			return false;
+		}
+
+		return variable.trySetValue(variable.getDomain().retain(new Interval(lower, upper)));
 	}
 }

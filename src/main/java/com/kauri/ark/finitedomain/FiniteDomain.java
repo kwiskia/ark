@@ -68,12 +68,12 @@ public class FiniteDomain<T> implements Domain<T>
 		return bitset.get(elements.indexOf(element));
 	}
 
-	public FiniteDomain<T> add(T element) {
+	public FiniteDomain<T> retain(T element) {
 		if (!elements.contains(element)) {
 			throw new RuntimeException("Element does not belong to finite domain.");
 		}
 
-		BitSet newSet = bitset.get(0, bitset.size());
+		BitSet newSet = new BitSet(bitset.size());
 		newSet.set(elements.indexOf(element));
 		return new FiniteDomain<>(elements, newSet);
 	}

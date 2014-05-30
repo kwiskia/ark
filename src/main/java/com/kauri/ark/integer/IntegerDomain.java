@@ -25,11 +25,8 @@ import com.kauri.ark.Domain;
 import com.kauri.ark.UniqueValueIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * TempIntegerDomain
@@ -58,8 +55,8 @@ public class IntegerDomain implements Domain<Integer>
 		return intervals.size() == 1 && intervals.get(0).getLower() == intervals.get(0).getUpper();
 	}
 
-	public IntegerDomain add(Interval interval) {
-		return new IntegerDomain(add(intervals, interval));
+	public IntegerDomain retain(Interval interval) {
+		return new IntegerDomain(retain(intervals, interval));
 	}
 
 	public IntegerDomain remove(Interval interval) {
@@ -140,43 +137,19 @@ public class IntegerDomain implements Domain<Integer>
 	//
 	// Interval Implementation
 
-	private List<Interval> add(List<Interval> intervals, Interval interval) {
-		int index = Collections.binarySearch(intervals, interval, new Comparator<Interval>()
-		{
-			@Override
-			public int compare(Interval o1, Interval o2) {
-				Integer l1 = o1.getLower();
-				Integer l2 = o2.getLower();
+	private List<Interval> retain(List<Interval> intervals, Interval interval) {
+		List<Interval> newIntervals = new ArrayList<>();
 
-				return l1.compareTo(l2);
-			}
-		});
+		for (Interval interval1 : intervals) {
+			int lower = Math.max(interval1.getLower(), interval.getLower());
+			int upper = Math.min(interval1.getUpper(), interval.getUpper());
 
-		if (index < 0) {
-			index = ~index;
-		}
-
-		List<Interval> newIntervals = new ArrayList<>(intervals);
-		newIntervals.add(index, interval);
-
-		Stack<Interval> stack = new Stack<>();
-		stack.push(newIntervals.get(0));
-
-		for (int i = 0; i < newIntervals.size(); i++) {
-			Interval top = stack.peek();
-			Interval now = newIntervals.get(i);
-
-			if (now.getLower() > top.getUpper()) {
-				stack.push(now);
-			} else {
-				if (now.getUpper() > top.getUpper()) {
-					stack.pop();
-					stack.push(new Interval(top.getLower(), now.getUpper()));
-				}
+			if (lower <= upper) {
+				newIntervals.add(new Interval(lower, upper));
 			}
 		}
 
-		return new ArrayList<>(stack);
+		return newIntervals;
 	}
 
 	private List<Interval> remove(List<Interval> intervals, Interval interval) {
