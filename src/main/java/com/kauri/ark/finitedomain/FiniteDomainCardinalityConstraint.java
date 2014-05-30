@@ -69,7 +69,7 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDo
 		if (definite == max) {
 			for (FiniteDomainVariable<T> v : variables) {
 				if (v.getCurrentAllowableValues().intersects(mask) && !v.isUnique()) {
-					BitSet bs = (BitSet) variable.getCurrentAllowableValues().clone();
+					BitSet bs = (BitSet) v.getCurrentAllowableValues().clone();
 					bs.andNot(mask);
 
 					if (!v.trySetValue(bs)) {
