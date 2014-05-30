@@ -168,22 +168,26 @@ public class IntervalSet implements Iterable<Interval>
 			}
 		});
 
-		Interval last = intervals.get(0);
 		List<Interval> newIntervals = new ArrayList<>();
 
-		for (int i = 1; i < intervals.size(); i++) {
-			Interval i1 = last;
-			Interval i2 = intervals.get(i);
+		if (intervals.size() > 0) {
+			Interval last = intervals.get(0);
 
-			if (i2.getLowerBound() <= i1.getUpperBound()) {
-				last = new Interval(i1.getLowerBound(), i2.getUpperBound());
-			} else {
-				newIntervals.add(last);
-				last = i2;
+			for (int i = 1; i < intervals.size(); i++) {
+				Interval i1 = last;
+				Interval i2 = intervals.get(i);
+
+				if (i2.getLowerBound() <= i1.getUpperBound()) {
+					last = new Interval(i1.getLowerBound(), i2.getUpperBound());
+				} else {
+					newIntervals.add(last);
+					last = i2;
+				}
 			}
+
+			newIntervals.add(last);
 		}
 
-		newIntervals.add(last);
 		this.intervals = newIntervals;
 	}
 
