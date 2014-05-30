@@ -125,10 +125,12 @@ public class Solver
 	private <T> void queueNeighboringArcs(Variable<T> variable) {
 		for (Constraint constraint : edges.get(variable)) {
 			for (Arc arc : arcs.get(constraint)) {
-				if (arc.variable != variable) {
-					if (!worklist.contains(arc)) {
-						worklist.add(arc);
-					}
+				if (arc.variable == variable) {
+					continue;
+				}
+
+				if (!worklist.contains(arc)) {
+					worklist.add(arc);
 				}
 			}
 		}
