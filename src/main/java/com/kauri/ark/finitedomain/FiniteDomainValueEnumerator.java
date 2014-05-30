@@ -21,7 +21,6 @@
 
 package com.kauri.ark.finitedomain;
 
-import com.kauri.ark.Solver;
 import com.kauri.ark.ValueEnumerator;
 import java.util.BitSet;
 
@@ -30,44 +29,30 @@ import java.util.BitSet;
  *
  * @author Eric Fritz
  */
-class FiniteDomainValueEnumerator<T> implements ValueEnumerator
+class FiniteDomainValueEnumerator<T> implements ValueEnumerator<BitSet>
 {
-	private FiniteDomainVariable<T> finiteDomainVariable;
-	private Solver solver;
-	private int mark;
-	private int[] indices;
+	private int size;
 	private int k = 0;
+	private int[] indices;
 
-	public FiniteDomainValueEnumerator(FiniteDomainVariable<T> finiteDomainVariable, Solver solver, int mark) {
-		this.finiteDomainVariable = finiteDomainVariable;
-		this.solver = solver;
-		this.mark = mark;
-
-		indices = new int[finiteDomainVariable.getCurrentAllowableValues().cardinality()];
+	public FiniteDomainValueEnumerator(FiniteDomainVariable<T> variable) {
+		size = variable.getAllowableValues().size();
+		indices = new int[variable.getCurrentAllowableValues().cardinality()];
 
 		int j = 0;
-		for (int i = finiteDomainVariable.getCurrentAllowableValues().nextSetBit(0); i != -1; i = finiteDomainVariable.getCurrentAllowableValues().nextSetBit(i + 1)) {
+		for (int i = variable.getCurrentAllowableValues().nextSetBit(0); i != -1; i = variable.getCurrentAllowableValues().nextSetBit(i + 1)) {
 			indices[j++] = i;
 		}
 	}
 
 	@Override
-	public boolean advance() {
-		if (k > 0) {
-			solver.restore(mark);
-		}
-
-		while (k < indices.length) {
-			BitSet bs = new BitSet(finiteDomainVariable.getCurrentAllowableValues().size());
+	public BitSet next() {
+		if (k < indices.length) {
+			BitSet bs = new BitSet(size);
 			bs.set(indices[k++]);
-
-			if (finiteDomainVariable.trySetValue(bs) && solver.resolveConstraints()) {
-				return true;
-			}
-
-			solver.restore(mark);
+			return bs;
 		}
 
-		return false;
+		return null;
 	}
 }

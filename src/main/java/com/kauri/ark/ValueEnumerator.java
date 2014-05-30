@@ -26,7 +26,7 @@ package com.kauri.ark;
  *
  * @author Eric Fritz
  */
-public interface ValueEnumerator
+public interface ValueEnumerator<T>
 {
-	public boolean advance();
+	public T next();
 }

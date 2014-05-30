@@ -21,7 +21,6 @@
 
 package com.kauri.ark.integer;
 
-import com.kauri.ark.Solver;
 import com.kauri.ark.ValueEnumerator;
 
 /**
@@ -29,41 +28,22 @@ import com.kauri.ark.ValueEnumerator;
  *
  * @author Eric Fritz
  */
-class IntegerValueEnumerator implements ValueEnumerator
+class IntegerValueEnumerator implements ValueEnumerator<Interval>
 {
-	private IntegerVariable integerVariable;
-	private Solver solver;
-	private int mark;
-	private boolean hasAdvanced = false;
-
 	private int lower;
 	private int upper;
 
-	public IntegerValueEnumerator(IntegerVariable integerVariable, Solver solver, int mark) {
-		this.integerVariable = integerVariable;
-		this.solver = solver;
-		this.mark = mark;
-
+	public IntegerValueEnumerator(IntegerVariable integerVariable) {
 		lower = integerVariable.getCurrentAllowableValues().getLowerBound();
 		upper = integerVariable.getCurrentAllowableValues().getUpperBound();
 	}
 
 	@Override
-	public boolean advance() {
-		if (hasAdvanced) {
-			solver.restore(mark);
+	public Interval next() {
+		if (lower <= upper) {
+			return new Interval(lower, lower++);
 		}
 
-		for (; lower <= upper; lower++) {
-			if (integerVariable.trySetValue(new Interval(lower, lower)) && solver.resolveConstraints()) {
-				lower++;
-				hasAdvanced = true;
-				return true;
-			}
-
-			solver.restore(mark);
-		}
-
-		return false;
+		return null;
 	}
 }

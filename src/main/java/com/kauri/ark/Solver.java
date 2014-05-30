@@ -120,8 +120,10 @@ public class Solver
 
 		solving = true;
 
-		Stack<ValueEnumerator> values = new Stack<>();
-		values.push(variables.get(0).getValueEnumerator());
+		Stack<ValueAdvancer> values = new Stack<>();
+
+		Variable v = variables.get(0);
+		values.push(new ValueAdvancer(v, this.saveValues()));
 
 		while (!values.isEmpty()) {
 			if (values.lastElement().advance()) {
@@ -130,7 +132,8 @@ public class Solver
 						break;
 					}
 				} else {
-					values.push(variables.get(values.size()).getValueEnumerator());
+					v = variables.get(values.size());
+					values.push(new ValueAdvancer(v, this.saveValues()));
 				}
 			} else {
 				values.pop();
@@ -138,6 +141,40 @@ public class Solver
 		}
 
 		solving = false;
+	}
+
+	private class ValueAdvancer<T>
+	{
+		private Variable<T> variable;
+		private ValueEnumerator<T> enumerator;
+		private boolean hasAdvanced = false;
+		private int mark;
+
+		public ValueAdvancer(Variable<T> variable, int mark) {
+			this.variable = variable;
+			this.enumerator = variable.getValueEnumerator();
+			this.mark = mark;
+		}
+
+		public boolean advance() {
+			if (hasAdvanced) {
+				Solver.this.restore(mark);
+			}
+
+			while (true) {
+				T value = enumerator.next();
+				if (value == null) {
+					return false;
+				}
+
+				if (variable.trySetValue(value) && Solver.this.resolveConstraints()) {
+					hasAdvanced = true;
+					return true;
+				}
+
+				Solver.this.restore(mark);
+			}
+		}
 	}
 
 	public boolean resolveConstraints() {
