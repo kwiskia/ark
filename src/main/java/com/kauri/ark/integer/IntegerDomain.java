@@ -23,77 +23,80 @@ package com.kauri.ark.integer;
 
 import com.kauri.ark.Domain;
 import com.kauri.ark.UniqueValueIterator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * TempIntegerDomain
  *
  * @author Eric Fritz
  */
-public class IntegerDomain implements Domain<IntervalSet>
+public class IntegerDomain implements Domain<Integer>
 {
-	private IntervalSet set;
+	private List<Interval> intervals = new ArrayList<>();
 
-	public IntegerDomain(IntervalSet set) {
-		this.set = set;
+	public IntegerDomain(Interval interval) {
+		this(Arrays.asList(interval));
+	}
+
+	public IntegerDomain(List<Interval> intervals) {
+		this.intervals = intervals;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return set.isEmpty();
+		return intervals.isEmpty();
 	}
 
 	@Override
 	public boolean isUnique() {
-		return set.isUnique();
+		return intervals.size() == 1 && intervals.get(0).isUnique();
 	}
 
 	public IntegerDomain add(Interval interval) {
-		IntervalSet newSet = new IntervalSet(set);
-		newSet.add(interval);
-		return new IntegerDomain(newSet);
+		List<Interval> newIntervals = new ArrayList<>(intervals);
+		newIntervals.add(interval);
+		normalize(newIntervals);
+
+		return new IntegerDomain(newIntervals);
 	}
 
 	public IntegerDomain remove(Interval interval) {
-		IntervalSet newSet = new IntervalSet(set);
-		newSet.remove(interval);
-		return new IntegerDomain(newSet);
+		return new IntegerDomain(normalize(remove(intervals, interval)));
 	}
 
 	public IntegerDomain retainAll(IntegerDomain other) {
-		IntervalSet newSet = new IntervalSet(set);
-		newSet.retainAll(other.set);
-		return new IntegerDomain(newSet);
+		return new IntegerDomain(normalize(retainAll(intervals, other.intervals)));
 	}
 
 	public IntegerDomain removeAll(IntegerDomain other) {
-		IntervalSet newSet = new IntervalSet(set);
-		newSet.removeAll(other.set);
-		return new IntegerDomain(newSet);
+		return new IntegerDomain(normalize(removeAll(intervals, other.intervals)));
 	}
 
 	@Override
-	public UniqueValueIterator<Domain<IntervalSet>> getUniqueValues() {
-		return new IntegerValueEnumerator(set);
+	public UniqueValueIterator<Domain<Integer>> getUniqueValues() {
+		return new IntegerValueEnumerator(intervals.iterator());
 	}
 
 	public int getMinimum() {
-		return set.getMinimum();
+		return intervals.get(0).getLowerBound();
 	}
 
 	public int getMaximum() {
-		return set.getMaximum();
+		return intervals.get(intervals.size() - 1).getUpperBound();
 	}
 
-	private class IntegerValueEnumerator implements UniqueValueIterator<Domain<IntervalSet>>
+	private class IntegerValueEnumerator implements UniqueValueIterator<Domain<Integer>>
 	{
 		private Iterator<Interval> iterator;
 		private Interval current;
 		private int value = 0;
 
-		public IntegerValueEnumerator(IntervalSet set) {
-			// TODO - make immutable
-			this.iterator = new IntervalSet(set).iterator();
+		public IntegerValueEnumerator(Iterator<Interval> iterator) {
+			this.iterator = iterator;
 
 			if (iterator.hasNext()) {
 				current = iterator.next();
@@ -116,9 +119,7 @@ public class IntegerDomain implements Domain<IntervalSet>
 				value = current.getLowerBound();
 			}
 
-			IntervalSet set = new IntervalSet();
-			set.add(new Interval(value, value++));
-			return new IntegerDomain(set);
+			return new IntegerDomain(new Interval(value, value++));
 		}
 	}
 
@@ -127,6 +128,131 @@ public class IntegerDomain implements Domain<IntervalSet>
 			return false;
 		}
 
-		return set.equals(((IntegerDomain) o).set);
+		return intervals.equals(((IntegerDomain) o).intervals);
+	}
+
+	//
+	// Interval Implementation
+
+	private List<Interval> remove(List<Interval> intervals, Interval interval) {
+		List<Interval> newIntervals = new ArrayList<>();
+
+		for (int i = 0; i < intervals.size(); i++) {
+			Interval i1 = intervals.get(i);
+			Interval i2 = interval;
+
+			if (i1.getUpperBound() < i2.getLowerBound() || i2.getUpperBound() < i1.getLowerBound()) {
+				// non-intersecting case
+
+				newIntervals.add(i1);
+				continue;
+			}
+
+			// [i1]  --
+			// [i2] ----
+			// skip entire interval
+
+			if (i2.getLowerBound() <= i1.getLowerBound() && i1.getUpperBound() <= i2.getUpperBound()) {
+				continue;
+			}
+
+			// [i1] ----
+			// [i2]  --
+			// // will make 2 parts
+
+			if (i1.getLowerBound() <= i2.getLowerBound() && i2.getUpperBound() <= i1.getUpperBound()) {
+				newIntervals.add(new Interval(i1.getLowerBound(), i2.getLowerBound() - 1));
+				newIntervals.add(new Interval(i2.getUpperBound() + 1, i1.getUpperBound()));
+				continue;
+			}
+
+			// [i1] ----
+			// [i2]   ----
+			// will make left part
+
+			if (i1.getLowerBound() <= i2.getLowerBound() && i1.getUpperBound() <= i2.getUpperBound()) {
+				newIntervals.add(new Interval(i1.getLowerBound(), i2.getLowerBound() - 1));
+				continue;
+			}
+
+			// [i1]   ----
+			// [i2] ----
+			// will make right part
+
+			if (i2.getLowerBound() <= i1.getLowerBound() && i2.getUpperBound() <= i1.getUpperBound()) {
+				newIntervals.add(new Interval(i2.getUpperBound() + 1, i1.getUpperBound()));
+				continue;
+			}
+		}
+
+		return newIntervals;
+	}
+
+	private List<Interval> retainAll(List<Interval> intervals1, List<Interval> intervals2) {
+		List<Interval> newIntervals = new ArrayList<>();
+
+		for (Interval interval1 : intervals) {
+			for (Interval interval2 : intervals2) {
+				int lower = Math.max(interval1.getLowerBound(), interval2.getLowerBound());
+				int upper = Math.min(interval1.getUpperBound(), interval2.getUpperBound());
+
+				if (lower <= upper) {
+					newIntervals.add(new Interval(lower, upper));
+				}
+			}
+		}
+
+		return newIntervals;
+	}
+
+	private List<Interval> removeAll(List<Interval> intervals1, List<Interval> intervals2) {
+		for (Interval interval : intervals2) {
+			intervals1 = remove(intervals1, interval);
+		}
+
+		return intervals1;
+	}
+
+	private List<Interval> normalize(List<Interval> intervals) {
+		Iterator<Interval> itr = intervals.iterator();
+
+		while (itr.hasNext()) {
+			if (itr.next().isEmpty()) {
+				itr.remove();
+			}
+		}
+
+		intervals.sort(new Comparator<Interval>()
+		{
+			@Override
+			public int compare(Interval o1, Interval o2) {
+				Integer l1 = o1.getLowerBound();
+				Integer l2 = o2.getLowerBound();
+
+				return l1.compareTo(l2);
+			}
+		});
+
+		List<Interval> newIntervals = new ArrayList<>();
+
+		if (intervals.size() > 0) {
+			Interval last = intervals.get(0);
+
+			for (int i = 1; i < intervals.size(); i++) {
+				Interval i1 = last;
+				Interval i2 = intervals.get(i);
+
+				if (i2.getLowerBound() <= i1.getUpperBound()) {
+					last = new Interval(i1.getLowerBound(), i2.getUpperBound());
+				} else {
+					newIntervals.add(last);
+					last = i2;
+				}
+			}
+
+			newIntervals.add(last);
+		}
+
+		return newIntervals;
 	}
 }
