@@ -39,28 +39,20 @@ public class Interval
 			throw new RuntimeException("Interval exceeds minimum or maximum bounds.");
 		}
 
+		if (lowerBound > upperBound) {
+			throw new RuntimeException("Interval is empty.");
+		}
+
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
 	}
 
-	public int getLowerBound() {
+	public int getLower() {
 		return lowerBound;
 	}
 
-	public int getUpperBound() {
+	public int getUpper() {
 		return upperBound;
-	}
-
-	public int getRange() {
-		return upperBound - lowerBound;
-	}
-
-	public boolean isUnique() {
-		return lowerBound == upperBound;
-	}
-
-	public boolean isEmpty() {
-		return lowerBound > upperBound;
 	}
 
 	public boolean equals(Object o) {
