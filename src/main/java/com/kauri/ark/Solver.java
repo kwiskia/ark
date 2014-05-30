@@ -88,7 +88,13 @@ public class Solver
 		while (!values.isEmpty()) {
 			if (values.lastElement().advance()) {
 				if (values.size() >= variables.size()) {
-					if (!handler.handle()) {
+					Solution solution = new Solution();
+
+					for (Variable variable : variables) {
+						solution.add(variable);
+					}
+
+					if (!handler.handle(solution)) {
 						break;
 					}
 				} else {

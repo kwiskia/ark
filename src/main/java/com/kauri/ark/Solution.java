@@ -21,12 +21,27 @@
 
 package com.kauri.ark;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * SolutionHandler
+ * Solution
  *
  * @author Eric Fritz
  */
-public interface SolutionHandler
+public class Solution
 {
-	public boolean handle(Solution solution);
+	private Map<Variable, Object> assignment = new HashMap<>();
+
+	public <T extends Domain> void add(Variable<T> variable) {
+		assignment.put(variable, variable.getDomain().getUniqueValue());
+	}
+
+	public <R> R get(Variable<? extends Domain<R>> variable) {
+		if (!assignment.containsKey(variable)) {
+			throw new RuntimeException("Variable not present in assignment.");
+		}
+
+		return (R) assignment.get(variable);
+	}
 }
