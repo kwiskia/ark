@@ -28,10 +28,17 @@ package com.kauri.ark.integer;
  */
 public class Interval
 {
+	public static final int MIN_VALUE = -10000000;
+	public static final int MAX_VALUE = +10000000;
+
 	private int lowerBound;
 	private int upperBound;
 
 	public Interval(int lowerBound, int upperBound) {
+		if (lowerBound < MIN_VALUE || upperBound > MAX_VALUE) {
+			throw new RuntimeException("Interval exceeds minimum or maximum bounds.");
+		}
+
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
 	}

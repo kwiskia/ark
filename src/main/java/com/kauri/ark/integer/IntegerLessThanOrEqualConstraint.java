@@ -47,10 +47,10 @@ public class IntegerLessThanOrEqualConstraint implements Constraint<Variable<Int
 
 		if (variable == var1) {
 			// remove everything greater than the largest integer in other
-			domain = domain.remove(new Interval(other.getDomain().getMaximum() + 1, Integer.MAX_VALUE));
+			domain = domain.remove(new Interval(other.getDomain().getMaximum() + 1, Interval.MAX_VALUE));
 		} else {
 			// remove everything smaller than the smallest integer in other
-			domain = domain.remove(new Interval(Integer.MIN_VALUE, other.getDomain().getMinimum() - 1));
+			domain = domain.remove(new Interval(Interval.MIN_VALUE, other.getDomain().getMinimum() - 1));
 		}
 
 		return variable.trySetValue(domain);
