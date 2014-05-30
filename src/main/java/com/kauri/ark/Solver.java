@@ -39,7 +39,6 @@ public class Solver
 	private List<Variable<?>> variables = new ArrayList<>();
 	private Map<Constraint, List<Arc>> arcs = new HashMap<>();
 	private Map<Variable, List<Constraint>> edges = new HashMap<>();
-	private Map<Variable, Object> assignments = new HashMap<>();
 
 	private Queue<Arc> worklist = new LinkedList<>();
 	private Stack<VarState<?>> stack = new Stack<>();
@@ -48,7 +47,6 @@ public class Solver
 	public void addVariable(Variable variable) {
 		variables.add(variable);
 		edges.put(variable, new ArrayList<Constraint>());
-		assignments.put(variable, variable.getAllowableValues());
 	}
 
 	public <T> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
@@ -81,9 +79,9 @@ public class Solver
 			throw new RuntimeException("Setting assignment on non-registered variable.");
 		}
 
-		if (!assignments.get(variable).equals(value)) {
-			saveValue(variable, (T) assignments.get(variable));
-			assignments.put(variable, value);
+		if (!variable.getCurrentAllowableValues().equals(value)) {
+			saveValue(variable, variable.getCurrentAllowableValues());
+			variable.setValue(value);
 
 			if (variable.isEmpty()) {
 				return false;
@@ -93,14 +91,6 @@ public class Solver
 		}
 
 		return true;
-	}
-
-	public <T> T getAssignment(Variable<T> variable) {
-		if (!variables.contains(variable)) {
-			throw new RuntimeException("Getting assignment on non-registered variable.");
-		}
-
-		return (T) assignments.get(variable);
 	}
 
 	public void solve(SolutionHandler handler) {
@@ -228,7 +218,7 @@ public class Solver
 		}
 
 		public void restore() {
-			assignments.put(variable, allowableValues);
+			variable.setValue(allowableValues);
 		}
 	}
 }

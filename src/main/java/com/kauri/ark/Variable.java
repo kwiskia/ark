@@ -30,10 +30,12 @@ abstract public class Variable<T>
 {
 	private Solver solver;
 	private T allowableValues;
+	private T currentAllowableValues;
 
 	public Variable(Solver solver, T allowableValues) {
 		this.solver = solver;
 		this.allowableValues = allowableValues;
+		this.currentAllowableValues = allowableValues;
 	}
 
 	public Solver getSolver() {
@@ -45,7 +47,11 @@ abstract public class Variable<T>
 	}
 
 	public T getCurrentAllowableValues() {
-		return solver.getAssignment(this);
+		return currentAllowableValues;
+	}
+
+	public void setValue(T value) {
+		currentAllowableValues = value;
 	}
 
 	public boolean trySetValue(T value) {
