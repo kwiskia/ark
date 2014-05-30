@@ -42,17 +42,20 @@ public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerVaria
 	public boolean update(IntegerVariable variable) {
 		IntegerVariable other = variable == var1 ? var2 : var1;
 
-		int lower = variable.getCurrentAllowableValues().getLowerBound();
-		int upper = variable.getCurrentAllowableValues().getUpperBound();
+		int lower = variable.getCurrentAllowableValues().getMinimum();
+		int upper = variable.getCurrentAllowableValues().getMaximum();
 
 		if (variable == var1) {
 			// remove everything greater than the largest bit in other
-			upper = Math.min(upper, other.getCurrentAllowableValues().getUpperBound());
+			upper = Math.min(upper, other.getCurrentAllowableValues().getMaximum());
 		} else {
 			// remove everything smaller than the smallest bit in other
-			lower = Math.max(lower, other.getCurrentAllowableValues().getLowerBound());
+			lower = Math.max(lower, other.getCurrentAllowableValues().getMinimum());
 		}
 
-		return variable.trySetValue(new Interval(lower, upper));
+		IntervalSet set = new IntervalSet();
+		set.add(new Interval(lower, upper));
+
+		return variable.trySetValue(set);
 	}
 }

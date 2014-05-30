@@ -24,16 +24,24 @@ package com.kauri.ark.integer;
 import com.kauri.ark.Solver;
 import com.kauri.ark.ValueEnumerator;
 import com.kauri.ark.Variable;
+import java.util.Iterator;
 
 /**
  * IntervalVariable
  *
  * @author Eric Fritz
  */
-public class IntegerVariable extends Variable<Interval>
+public class IntegerVariable extends Variable<IntervalSet>
 {
-	public IntegerVariable(Solver solver, int low, int high) {
-		super(solver, new Interval(low, high));
+	public static IntegerVariable create(Solver solver, int lower, int upper) {
+		IntervalSet set = new IntervalSet();
+		set.add(new Interval(lower, upper));
+
+		return new IntegerVariable(solver, set);
+	}
+
+	public IntegerVariable(Solver solver, IntervalSet set) {
+		super(solver, set);
 	}
 
 	@Override
@@ -51,7 +59,7 @@ public class IntegerVariable extends Variable<Interval>
 			throw new RuntimeException("Assignment not unique.");
 		}
 
-		return getCurrentAllowableValues().getLowerBound();
+		return getCurrentAllowableValues().getMinimum();
 	}
 
 	@Override
@@ -59,23 +67,39 @@ public class IntegerVariable extends Variable<Interval>
 		return new IntegerValueEnumerator(this.getCurrentAllowableValues());
 	}
 
-	private class IntegerValueEnumerator implements ValueEnumerator<Interval>
+	private class IntegerValueEnumerator implements ValueEnumerator<IntervalSet>
 	{
-		private int lower;
-		private int upper;
+		private Iterator<Interval> iterator;
+		private Interval current;
+		private int value = 0;
 
-		public IntegerValueEnumerator(Interval interval) {
-			lower = interval.getLowerBound();
-			upper = interval.getUpperBound();
+		public IntegerValueEnumerator(IntervalSet set) {
+			this.iterator = new IntervalSet(set).iterator();
+
+			if (iterator.hasNext()) {
+				current = iterator.next();
+				value = current.getLowerBound();
+			}
 		}
 
 		@Override
-		public Interval next() {
-			if (lower <= upper) {
-				return new Interval(lower, lower++);
+		public IntervalSet next() {
+			if (current == null) {
+				return null;
 			}
 
-			return null;
+			if (value > current.getUpperBound()) {
+				if (!iterator.hasNext()) {
+					return null;
+				}
+
+				current = iterator.next();
+				value = current.getLowerBound();
+			}
+
+			IntervalSet set = new IntervalSet();
+			set.add(new Interval(value, value++));
+			return set;
 		}
 	}
 }

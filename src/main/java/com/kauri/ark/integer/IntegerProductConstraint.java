@@ -42,12 +42,12 @@ public class IntegerProductConstraint implements Constraint<IntegerVariable>
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		int aLower = a.getCurrentAllowableValues().getLowerBound();
-		int aUpper = a.getCurrentAllowableValues().getUpperBound();
-		int bLower = b.getCurrentAllowableValues().getLowerBound();
-		int bUpper = b.getCurrentAllowableValues().getUpperBound();
-		int cLower = c.getCurrentAllowableValues().getLowerBound();
-		int cUpper = c.getCurrentAllowableValues().getUpperBound();
+		int aLower = a.getCurrentAllowableValues().getMinimum();
+		int aUpper = a.getCurrentAllowableValues().getMaximum();
+		int bLower = b.getCurrentAllowableValues().getMinimum();
+		int bUpper = b.getCurrentAllowableValues().getMaximum();
+		int cLower = c.getCurrentAllowableValues().getMinimum();
+		int cUpper = c.getCurrentAllowableValues().getMaximum();
 
 		int lower;
 		int upper;
@@ -56,7 +56,7 @@ public class IntegerProductConstraint implements Constraint<IntegerVariable>
 			// c / b
 			if (bLower == 0 || bUpper == 0) {
 				if (a.isUnique() && c.isUnique()) {
-					return c.getCurrentAllowableValues().getLowerBound() == 0;
+					return c.getCurrentAllowableValues().getMinimum() == 0;
 				}
 
 				return true;
@@ -68,7 +68,7 @@ public class IntegerProductConstraint implements Constraint<IntegerVariable>
 			// c / a
 			if (aLower == 0 || aUpper == 0) {
 				if (b.isUnique() && c.isUnique()) {
-					return c.getCurrentAllowableValues().getLowerBound() == 0;
+					return c.getCurrentAllowableValues().getMinimum() == 0;
 				}
 
 				return true;
@@ -84,10 +84,13 @@ public class IntegerProductConstraint implements Constraint<IntegerVariable>
 			throw new RuntimeException("Unreachable.");
 		}
 
-		lower = Math.max(variable.getCurrentAllowableValues().getLowerBound(), lower);
-		upper = Math.min(variable.getCurrentAllowableValues().getUpperBound(), upper);
+		lower = Math.max(variable.getCurrentAllowableValues().getMinimum(), lower);
+		upper = Math.min(variable.getCurrentAllowableValues().getMaximum(), upper);
 
-		return variable.trySetValue(new Interval(lower, upper));
+		IntervalSet set = new IntervalSet();
+		set.add(new Interval(lower, upper));
+
+		return variable.trySetValue(set);
 	}
 
 	private int min(int a, int b, int c, int d) {
