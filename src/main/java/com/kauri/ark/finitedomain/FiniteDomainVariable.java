@@ -66,4 +66,27 @@ public class FiniteDomainVariable<T> extends Variable<BitSet>
 	public ValueEnumerator getValueEnumerator() {
 		return new FiniteDomainValueEnumerator(this.getCurrentAllowableValues());
 	}
+
+	private class FiniteDomainValueEnumerator implements ValueEnumerator<BitSet>
+	{
+		private BitSet bitset;
+		private int k = -1;
+
+		public FiniteDomainValueEnumerator(BitSet bitset) {
+			this.bitset = bitset;
+		}
+
+		@Override
+		public BitSet next() {
+			k = bitset.nextSetBit(k + 1);
+
+			if (k == -1) {
+				return null;
+			}
+
+			BitSet bs = new BitSet(bitset.size());
+			bs.set(k);
+			return bs;
+		}
+	}
 }

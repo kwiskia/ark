@@ -58,4 +58,24 @@ public class IntegerVariable extends Variable<Interval>
 	public ValueEnumerator getValueEnumerator() {
 		return new IntegerValueEnumerator(this.getCurrentAllowableValues());
 	}
+
+	private class IntegerValueEnumerator implements ValueEnumerator<Interval>
+	{
+		private int lower;
+		private int upper;
+
+		public IntegerValueEnumerator(Interval interval) {
+			lower = interval.getLowerBound();
+			upper = interval.getUpperBound();
+		}
+
+		@Override
+		public Interval next() {
+			if (lower <= upper) {
+				return new Interval(lower, lower++);
+			}
+
+			return null;
+		}
+	}
 }
