@@ -38,20 +38,14 @@ public class IntegerEqualityConstraint implements Constraint<IntegerVariable>
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-
-		int lower = variable.getCurrentAllowableValues().getMinimum();
-		int upper = variable.getCurrentAllowableValues().getMaximum();
+		IntervalSet bs = new IntervalSet(variable.getCurrentAllowableValues());
 
 		for (IntegerVariable v : variables) {
 			if (v != variable) {
-				lower = Math.max(lower, v.getCurrentAllowableValues().getMinimum());
-				upper = Math.min(upper, v.getCurrentAllowableValues().getMaximum());
+				bs.retainAll(v.getCurrentAllowableValues());
 			}
 		}
 
-		IntervalSet set = new IntervalSet();
-		set.add(new Interval(lower, upper));
-
-		return variable.trySetValue(set);
+		return variable.trySetValue(bs);
 	}
 }

@@ -38,14 +38,14 @@ public class IntegerInequalityConstraint implements Constraint<IntegerVariable>
 
 	@Override
 	public boolean update(IntegerVariable variable) {
-		if (variable.isUnique()) {
-			for (IntegerVariable v : variables) {
-				if (v != variable && v.isUnique() && v.getAssignment() == variable.getAssignment()) {
-					return false;
-				}
+		IntervalSet set = new IntervalSet(variable.getCurrentAllowableValues());
+
+		for (IntegerVariable v : variables) {
+			if (v != variable && v.isUnique()) {
+				set.removeAll(v.getCurrentAllowableValues());
 			}
 		}
 
-		return true;
+		return variable.trySetValue(set);
 	}
 }
