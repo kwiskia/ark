@@ -26,7 +26,7 @@ package com.kauri.ark;
  *
  * @author Eric Fritz
  */
-public interface Constraint<T extends Variable<?>>
+public interface Constraint<T extends Variable>
 {
 	boolean update(T variable);
 }
