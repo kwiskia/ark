@@ -175,6 +175,11 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 
 			return elements.get(indices[k++]);
 		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	private class FiniteDomainValueEnumerator implements UniqueValueIterator<Domain<T>>
