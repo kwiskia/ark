@@ -56,7 +56,16 @@ public class IntegerDomain implements Domain<Integer>
 	}
 
 	public IntegerDomain retain(Interval interval) {
-		return new IntegerDomain(retain(intervals, interval));
+		List<Interval> newIntervals = new ArrayList<>();
+
+		for (Interval interval1 : intervals) {
+			Interval intersection = interval1.intersection(interval);
+
+			if (intersection != null) {
+				newIntervals.add(intersection);
+			}
+		}
+		return new IntegerDomain(newIntervals);
 	}
 
 	public IntegerDomain remove(Interval interval) {
@@ -64,7 +73,19 @@ public class IntegerDomain implements Domain<Integer>
 	}
 
 	public IntegerDomain retainAll(IntegerDomain other) {
-		return new IntegerDomain(retainAll(intervals, other.intervals));
+		List<Interval> newIntervals = new ArrayList<>();
+
+		for (Interval interval1 : intervals) {
+			for (Interval interval2 : other.intervals) {
+				Interval intersection = interval1.intersection(interval2);
+
+				if (intersection != null) {
+					newIntervals.add(intersection);
+				}
+			}
+		}
+
+		return new IntegerDomain(newIntervals);
 	}
 
 	public IntegerDomain removeAll(IntegerDomain other) {
@@ -137,20 +158,6 @@ public class IntegerDomain implements Domain<Integer>
 	//
 	// Interval Implementation
 
-	private List<Interval> retain(List<Interval> intervals, Interval interval) {
-		List<Interval> newIntervals = new ArrayList<>();
-
-		for (Interval interval1 : intervals) {
-			Interval intersection = interval1.intersection(interval);
-
-			if (intersection != null) {
-				newIntervals.add(intersection);
-			}
-		}
-
-		return newIntervals;
-	}
-
 	private List<Interval> remove(List<Interval> intervals, Interval interval) {
 		List<Interval> newIntervals = new ArrayList<>();
 
@@ -169,22 +176,6 @@ public class IntegerDomain implements Domain<Integer>
 
 				if (l1 <= h1) newIntervals.add(new Interval(l1, h1));
 				if (l2 <= h2) newIntervals.add(new Interval(l2, h2));
-			}
-		}
-
-		return newIntervals;
-	}
-
-	private List<Interval> retainAll(List<Interval> intervals1, List<Interval> intervals2) {
-		List<Interval> newIntervals = new ArrayList<>();
-
-		for (Interval interval1 : intervals1) {
-			for (Interval interval2 : intervals2) {
-				Interval intersection = interval1.intersection(interval2);
-
-				if (intersection != null) {
-					newIntervals.add(intersection);
-				}
 			}
 		}
 
