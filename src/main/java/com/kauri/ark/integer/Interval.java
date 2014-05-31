@@ -55,6 +55,17 @@ public class Interval
 		return upperBound;
 	}
 
+	public Interval intersection(Interval other) {
+		int lower = Math.max(this.getLower(), other.getLower());
+		int upper = Math.min(this.getUpper(), other.getUpper());
+
+		if (lower <= upper) {
+			return new Interval(lower, upper);
+		}
+
+		return null;
+	}
+
 	public boolean equals(Object o) {
 		if (o == null || !(o instanceof Interval)) {
 			return false;

@@ -141,11 +141,10 @@ public class IntegerDomain implements Domain<Integer>
 		List<Interval> newIntervals = new ArrayList<>();
 
 		for (Interval interval1 : intervals) {
-			int lower = Math.max(interval1.getLower(), interval.getLower());
-			int upper = Math.min(interval1.getUpper(), interval.getUpper());
+			Interval intersection = interval1.intersection(interval);
 
-			if (lower <= upper) {
-				newIntervals.add(new Interval(lower, upper));
+			if (intersection != null) {
+				newIntervals.add(intersection);
 			}
 		}
 
@@ -181,11 +180,10 @@ public class IntegerDomain implements Domain<Integer>
 
 		for (Interval interval1 : intervals1) {
 			for (Interval interval2 : intervals2) {
-				int lower = Math.max(interval1.getLower(), interval2.getLower());
-				int upper = Math.min(interval1.getUpper(), interval2.getUpper());
+				Interval intersection = interval1.intersection(interval2);
 
-				if (lower <= upper) {
-					newIntervals.add(new Interval(lower, upper));
+				if (intersection != null) {
+					newIntervals.add(intersection);
 				}
 			}
 		}
