@@ -69,7 +69,16 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<Variable
 		}
 
 		if (possible == min) {
-			// TODO
+			for (Variable<FiniteDomain<T>> v : variables) {
+				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
+					FiniteDomain<T> domain = v.getDomain();
+					domain = domain.retain(value);
+
+					if (!v.trySetValue(domain)) {
+						return false;
+					}
+				}
+			}
 		}
 
 		if (definite == max) {
