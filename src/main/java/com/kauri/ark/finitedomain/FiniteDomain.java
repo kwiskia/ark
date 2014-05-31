@@ -24,14 +24,16 @@ package com.kauri.ark.finitedomain;
 import com.kauri.ark.Domain;
 import com.kauri.ark.UniqueValueIterator;
 import java.util.BitSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * TempFiniteDomain
  *
  * @author Eric Fritz
  */
-public class FiniteDomain<T> implements Domain<T>
+public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 {
 	private List<T> elements;
 	private BitSet bitset;
@@ -58,6 +60,26 @@ public class FiniteDomain<T> implements Domain<T>
 	@Override
 	public boolean isUnique() {
 		return bitset.cardinality() == 1;
+	}
+
+	public <T2> FiniteDomain<T> mapForward(FiniteDomain<T2> domain, Mapping<T2, T> mapping) {
+		BitSet newSet = new BitSet();
+
+		for (T2 element : domain) {
+			newSet.set(elements.indexOf(mapping.getForwardMapping(element)));
+		}
+
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	public <T2> FiniteDomain<T> mapReverse(FiniteDomain<T2> domain, Mapping<T, T2> mapping) {
+		BitSet newSet = new BitSet();
+
+		for (T2 element : domain) {
+			newSet.set(elements.indexOf(mapping.getReverseMapping(element)));
+		}
+
+		return new FiniteDomain<>(elements, newSet);
 	}
 
 	public boolean contains(T element) {
@@ -119,6 +141,40 @@ public class FiniteDomain<T> implements Domain<T>
 	@Override
 	public UniqueValueIterator<Domain<T>> getUniqueValues() {
 		return new FiniteDomainValueEnumerator(bitset);
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		return new ValueIterator();
+	}
+
+	private class ValueIterator implements Iterator<T>
+	{
+		private int k = 0;
+		private int[] indices;
+
+		public ValueIterator() {
+			indices = new int[bitset.cardinality()];
+
+			int j = 0;
+			for (int i = bitset.nextSetBit(0); i >= 0; i = bitset.nextSetBit(i + 1)) {
+				indices[j++] = i;
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return k < indices.length;
+		}
+
+		@Override
+		public T next() {
+			if (k >= indices.length) {
+				throw new NoSuchElementException();
+			}
+
+			return elements.get(indices[k++]);
+		}
 	}
 
 	private class FiniteDomainValueEnumerator implements UniqueValueIterator<Domain<T>>
