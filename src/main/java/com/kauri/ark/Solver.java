@@ -37,29 +37,29 @@ import java.util.Stack;
 public class Solver
 {
 	private List<Variable<?>> variables = new ArrayList<>();
-	private Map<Constraint, List<Arc>> arcs = new HashMap<>();
-	private Map<Variable, List<Constraint>> edges = new HashMap<>();
+	private Map<Variable, List<Arc>> neighbors = new HashMap<>();
 
 	private Queue<Arc> worklist = new LinkedList<>();
 	private boolean solving = false;
 
 	private Trail trail = new Trail();
 
-	public void addVariable(Variable variable) {
+	public <T extends Variable> void addVariable(T variable) {
 		variables.add(variable);
-		edges.put(variable, new ArrayList<Constraint>());
+		neighbors.put(variable, new ArrayList<Arc>());
 	}
 
-	public <T extends Domain> void addConstraint(Constraint<?> constraint, Variable<T>... variables) {
-		arcs.put(constraint, new ArrayList<Arc>());
-
-		for (Variable<T> variable : variables) {
-			if (!this.variables.contains(variable)) {
+	public <T extends Variable> void addConstraint(Constraint<T> constraint, T... variables) {
+		for (T variable1 : variables) {
+			if (!this.variables.contains(variable1)) {
 				throw new RuntimeException("Adding constraint on non-registered variable.");
 			}
 
-			edges.get(variable).add(constraint);
-			arcs.get(constraint).add(new Arc(variable, constraint));
+			for (T variable2 : variables) {
+				if (variable1 != variable2) {
+					neighbors.get(variable1).add(new Arc(variable2, constraint));
+				}
+			}
 		}
 	}
 
@@ -127,16 +127,10 @@ public class Solver
 		return true;
 	}
 
-	private <T extends Domain> void queueNeighboringArcs(Variable<T> variable) {
-		for (Constraint constraint : edges.get(variable)) {
-			for (Arc arc : arcs.get(constraint)) {
-				if (arc.variable == variable) {
-					continue;
-				}
-
-				if (!worklist.contains(arc)) {
-					worklist.add(arc);
-				}
+	private <T extends Variable> void queueNeighboringArcs(T variable) {
+		for (Arc<T> arc : neighbors.get(variable)) {
+			if (!worklist.contains(arc)) {
+				worklist.add(arc);
 			}
 		}
 	}
@@ -145,24 +139,13 @@ public class Solver
 		while (!worklist.isEmpty()) {
 			Arc arc = worklist.poll();
 
-			if (!arc.constraint.update(arc.variable)) {
+			if (!arc.getConstraint().update(arc.getVariable())) {
 				worklist.clear();
 				return false;
 			}
 		}
 
 		return true;
-	}
-
-	private class Arc<T extends Variable<?>>
-	{
-		private T variable;
-		private Constraint constraint;
-
-		public Arc(T variable, Constraint constraint) {
-			this.variable = variable;
-			this.constraint = constraint;
-		}
 	}
 
 	private class ValueAdvancer<T extends Domain>
