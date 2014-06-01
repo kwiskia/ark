@@ -22,26 +22,25 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
-import com.kauri.ark.Variable;
 
 /**
  * EqualityConstraint
  *
  * @author Eric Fritz
  */
-public class FiniteDomainEqualityConstraint<T> implements Constraint<Variable<FiniteDomain<T>>>
+public class FiniteDomainEqualityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
 {
-	private Variable<FiniteDomain<T>>[] variables;
+	private FiniteDomainVariable<T>[] variables;
 
-	public FiniteDomainEqualityConstraint(Variable<FiniteDomain<T>>... variables) {
+	public FiniteDomainEqualityConstraint(FiniteDomainVariable<T>... variables) {
 		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(Variable<FiniteDomain<T>> variable) {
+	public boolean update(FiniteDomainVariable<T> variable) {
 		FiniteDomain<T> domain = variable.getDomain();
 
-		for (Variable<FiniteDomain<T>> v : variables) {
+		for (FiniteDomainVariable<T> v : variables) {
 			if (v != variable) {
 				domain = domain.retainAll(v.getDomain());
 			}

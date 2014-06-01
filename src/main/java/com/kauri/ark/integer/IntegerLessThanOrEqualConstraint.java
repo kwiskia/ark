@@ -29,19 +29,19 @@ import com.kauri.ark.Variable;
  *
  * @author Eric Fritz
  */
-public class IntegerLessThanOrEqualConstraint implements Constraint<Variable<IntegerDomain>>
+public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerVariable>
 {
-	private Variable<IntegerDomain> var1;
-	private Variable<IntegerDomain> var2;
+	private IntegerVariable var1;
+	private IntegerVariable var2;
 
-	public IntegerLessThanOrEqualConstraint(Variable<IntegerDomain> var1, Variable<IntegerDomain> var2) {
+	public IntegerLessThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
-		Variable<IntegerDomain> other = variable == var1 ? var2 : var1;
+	public boolean update(IntegerVariable variable) {
+		IntegerVariable other = variable == var1 ? var2 : var1;
 
 		IntegerDomain domain = variable.getDomain();
 

@@ -22,23 +22,22 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
-import com.kauri.ark.Variable;
 
 /**
  * DifferenceConstraint
  *
  * @author Eric Fritz
  */
-public class IntegerDifferenceConstraint implements Constraint<Variable<IntegerDomain>>
+public class IntegerDifferenceConstraint implements Constraint<IntegerVariable>
 {
-	private Constraint<Variable<IntegerDomain>> constraint;
+	private Constraint<IntegerVariable> constraint;
 
-	public IntegerDifferenceConstraint(Variable<IntegerDomain> a, Variable<IntegerDomain> b, Variable<IntegerDomain> c) {
+	public IntegerDifferenceConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		this.constraint = new IntegerSumConstraint(b, c, a);
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
+	public boolean update(IntegerVariable variable) {
 		return constraint.update(variable);
 	}
 }

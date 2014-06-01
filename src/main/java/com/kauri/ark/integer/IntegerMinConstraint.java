@@ -29,21 +29,21 @@ import com.kauri.ark.Variable;
  *
  * @author Eric Fritz
  */
-public class IntegerMinConstraint implements Constraint<Variable<IntegerDomain>>
+public class IntegerMinConstraint implements Constraint<IntegerVariable>
 {
-	private Variable<IntegerDomain> min;
-	private Variable<IntegerDomain>[] variables;
+	private IntegerVariable min;
+	private IntegerVariable[] variables;
 
-	public IntegerMinConstraint(Variable<IntegerDomain> min, Variable<IntegerDomain>... variables) {
+	public IntegerMinConstraint(IntegerVariable min, IntegerVariable... variables) {
 		this.min = min;
 		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
+	public boolean update(IntegerVariable variable) {
 		if (variable == min) {
 			int val = Interval.MAX_VALUE;
-			for (Variable<IntegerDomain> v : variables) {
+			for (IntegerVariable v : variables) {
 				val = Math.min(val, v.getDomain().getMinimum());
 			}
 

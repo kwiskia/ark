@@ -22,14 +22,13 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
-import com.kauri.ark.Variable;
 
 /**
  * FiniteDomainMappingConstraint
  *
  * @author Eric Fritz
  */
-public class FiniteDomainMappingConstraint<T1, T2> implements Constraint<Variable>
+public class FiniteDomainMappingConstraint<T1, T2> implements Constraint<FiniteDomainVariable<?>>
 {
 	private FiniteDomainVariable<T1> var1;
 	private FiniteDomainVariable<T2> var2;
@@ -42,7 +41,7 @@ public class FiniteDomainMappingConstraint<T1, T2> implements Constraint<Variabl
 	}
 
 	@Override
-	public boolean update(Variable variable) {
+	public boolean update(FiniteDomainVariable<?> variable) {
 		if (variable == var1) {
 			return var1.trySetValue(var1.getDomain().mapReverse(var2.getDomain(), mapping));
 		} else if (variable == var2) {

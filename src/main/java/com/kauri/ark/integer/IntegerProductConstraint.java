@@ -22,27 +22,26 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
-import com.kauri.ark.Variable;
 
 /**
  * ProductConstraint
  *
  * @author Eric Fritz
  */
-public class IntegerProductConstraint implements Constraint<Variable<IntegerDomain>>
+public class IntegerProductConstraint implements Constraint<IntegerVariable>
 {
-	private Variable<IntegerDomain> a;
-	private Variable<IntegerDomain> b;
-	private Variable<IntegerDomain> c;
+	private IntegerVariable a;
+	private IntegerVariable b;
+	private IntegerVariable c;
 
-	public IntegerProductConstraint(Variable<IntegerDomain> a, Variable<IntegerDomain> b, Variable<IntegerDomain> c) {
+	public IntegerProductConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
+	public boolean update(IntegerVariable variable) {
 		int aLower = a.getDomain().getMinimum();
 		int aUpper = a.getDomain().getMaximum();
 		int bLower = b.getDomain().getMinimum();
