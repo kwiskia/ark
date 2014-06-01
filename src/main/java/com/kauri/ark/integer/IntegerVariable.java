@@ -51,61 +51,41 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	// Variable factories
 
 	public IntegerVariable add(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return add(v);
+		return add(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable add(IntegerVariable variable) {
 		IntegerVariable v = new IntegerVariable(getSolver());
-		getSolver().addVariable(v);
-
 		getSolver().addConstraint(new IntegerSumConstraint(this, variable, v), this, variable, v);
 		return v;
 	}
 
 	public IntegerVariable sub(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return sub(v);
+		return sub(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable sub(IntegerVariable variable) {
 		IntegerVariable v = new IntegerVariable(getSolver());
-		getSolver().addVariable(v);
-
 		getSolver().addConstraint(new IntegerDifferenceConstraint(this, variable, v), this, variable, v);
 		return v;
 	}
 
 	public IntegerVariable mul(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return mul(v);
+		return mul(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable mul(IntegerVariable variable) {
 		IntegerVariable v = new IntegerVariable(getSolver());
-		getSolver().addVariable(v);
-
 		getSolver().addConstraint(new IntegerProductConstraint(this, variable, v), this, variable, v);
 		return v;
 	}
 
 	public IntegerVariable div(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return div(v);
+		return div(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable div(IntegerVariable variable) {
 		IntegerVariable v = new IntegerVariable(getSolver());
-		getSolver().addVariable(v);
-
 		getSolver().addConstraint(new IntegerQuotientConstraint(this, variable, v), this, variable, v);
 		return v;
 	}
@@ -123,7 +103,6 @@ public class IntegerVariable extends Variable<IntegerDomain>
 
 	public static IntegerVariable min(IntegerVariable... variables) {
 		IntegerVariable v = new IntegerVariable(variables[0].getSolver());
-		variables[0].getSolver().addVariable(v);
 
 		IntegerVariable[] vars = new IntegerVariable[variables.length + 1];
 
@@ -138,7 +117,6 @@ public class IntegerVariable extends Variable<IntegerDomain>
 
 	public static IntegerVariable max(IntegerVariable... variables) {
 		IntegerVariable v = new IntegerVariable(variables[0].getSolver());
-		variables[0].getSolver().addVariable(v);
 
 		IntegerVariable[] vars = new IntegerVariable[variables.length + 1];
 
@@ -155,10 +133,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	// Constraint helpers
 
 	public IntegerVariable eq(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return eq(v);
+		return eq(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable eq(IntegerVariable variable) {
@@ -167,10 +142,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable ne(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return ne(v);
+		return ne(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable ne(IntegerVariable variable) {
@@ -179,10 +151,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable lt(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return lt(v);
+		return lt(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable lt(IntegerVariable variable) {
@@ -191,10 +160,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable le(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return le(v);
+		return le(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable le(IntegerVariable variable) {
@@ -203,10 +169,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable gt(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return gt(v);
+		return gt(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable gt(IntegerVariable variable) {
@@ -215,10 +178,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable ge(int value) {
-		IntegerVariable v = new IntegerVariable(getSolver(), value);
-		getSolver().addVariable(v);
-
-		return ge(v);
+		return ge(new IntegerVariable(getSolver(), value));
 	}
 
 	public IntegerVariable ge(IntegerVariable variable) {

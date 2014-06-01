@@ -72,10 +72,7 @@ public class FiniteDomainVariable<T> extends Variable<FiniteDomain<T>>
 	// Constraint helpers
 
 	public FiniteDomainVariable<T> eq(T value) {
-		FiniteDomainVariable<T> v = new FiniteDomainVariable<>(getSolver(), getDomain().retain(value));
-		getSolver().addVariable(v);
-
-		return eq(v);
+		return eq(new FiniteDomainVariable<>(getSolver(), getDomain().retain(value)));
 	}
 
 	public FiniteDomainVariable<T> eq(FiniteDomainVariable<T> variable) {
@@ -84,10 +81,7 @@ public class FiniteDomainVariable<T> extends Variable<FiniteDomain<T>>
 	}
 
 	public FiniteDomainVariable<T> ne(T value) {
-		FiniteDomainVariable<T> v = new FiniteDomainVariable<>(getSolver(), getDomain().remove(value));
-		getSolver().addVariable(v);
-
-		return ne(v);
+		return ne(new FiniteDomainVariable<>(getSolver(), getDomain().remove(value)));
 	}
 
 	public FiniteDomainVariable<T> ne(FiniteDomainVariable<T> variable) {

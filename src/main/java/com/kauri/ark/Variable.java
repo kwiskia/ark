@@ -34,6 +34,8 @@ public class Variable<T extends Domain>
 	public Variable(Solver solver, T domain) {
 		this.solver = solver;
 		this.domain = domain;
+
+		solver.addVariable(this);
 	}
 
 	public Solver getSolver() {
