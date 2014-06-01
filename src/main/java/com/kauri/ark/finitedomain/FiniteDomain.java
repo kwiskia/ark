@@ -37,6 +37,7 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 {
 	private List<T> elements;
 	private BitSet bitset;
+	private int size;
 
 	public FiniteDomain(List<T> elements) {
 		this(elements, null);
@@ -50,21 +51,22 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 
 		this.elements = elements;
 		this.bitset = bitset;
+		this.size = bitset.cardinality();
 	}
 
 	@Override
 	public int size() {
-		return bitset.cardinality();
+		return size;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return size()== 0;
+		return size == 0;
 	}
 
 	@Override
 	public boolean isUnique() {
-		return size() == 1;
+		return size == 1;
 	}
 
 	public <T2> FiniteDomain<T> mapForward(FiniteDomain<T2> domain, Mapping<T2, T> mapping) {

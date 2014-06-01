@@ -36,6 +36,7 @@ import java.util.List;
 public class IntegerDomain implements Domain<Integer>
 {
 	private List<Interval> intervals = new ArrayList<>();
+	private int size;
 
 	public IntegerDomain(Interval interval) {
 		this(Arrays.asList(interval));
@@ -43,26 +44,28 @@ public class IntegerDomain implements Domain<Integer>
 
 	public IntegerDomain(List<Interval> intervals) {
 		this.intervals = intervals;
-	}
 
-	@Override
-	public int size() {
 		int size = 0;
 		for (Interval interval : intervals) {
 			size += interval.getUpper() - interval.getLower() + 1;
 		}
 
+		this.size = size;
+	}
+
+	@Override
+	public int size() {
 		return size;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return intervals.isEmpty();
+		return size == 0;
 	}
 
 	@Override
 	public boolean isUnique() {
-		return intervals.size() == 1 && intervals.get(0).getLower() == intervals.get(0).getUpper();
+		return size == 1;
 	}
 
 	public IntegerDomain retain(Interval interval) {
