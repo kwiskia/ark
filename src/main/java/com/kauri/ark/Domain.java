@@ -28,6 +28,8 @@ package com.kauri.ark;
  */
 public interface Domain<T>
 {
+	int size();
+
 	boolean isEmpty();
 
 	boolean isUnique();

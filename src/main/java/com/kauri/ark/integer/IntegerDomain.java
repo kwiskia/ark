@@ -46,6 +46,16 @@ public class IntegerDomain implements Domain<Integer>
 	}
 
 	@Override
+	public int size() {
+		int size = 0;
+		for (Interval interval : intervals) {
+			size += interval.getUpper() - interval.getLower() + 1;
+		}
+
+		return size;
+	}
+
+	@Override
 	public boolean isEmpty() {
 		return intervals.isEmpty();
 	}

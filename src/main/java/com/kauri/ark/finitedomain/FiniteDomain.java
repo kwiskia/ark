@@ -53,13 +53,18 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 	}
 
 	@Override
+	public int size() {
+		return bitset.cardinality();
+	}
+
+	@Override
 	public boolean isEmpty() {
-		return bitset.cardinality() == 0;
+		return size()== 0;
 	}
 
 	@Override
 	public boolean isUnique() {
-		return bitset.cardinality() == 1;
+		return size() == 1;
 	}
 
 	public <T2> FiniteDomain<T> mapForward(FiniteDomain<T2> domain, Mapping<T2, T> mapping) {
