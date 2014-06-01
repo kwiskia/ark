@@ -36,11 +36,7 @@ public class Arc<T extends Variable>
 		this.constraint = constraint;
 	}
 
-	public T getVariable() {
-		return variable;
-	}
-
-	public Constraint<T> getConstraint() {
-		return constraint;
+	public boolean update() {
+		return constraint.update(variable);
 	}
 }

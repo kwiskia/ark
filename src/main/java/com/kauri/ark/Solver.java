@@ -139,7 +139,7 @@ public class Solver
 		while (!worklist.isEmpty()) {
 			Arc arc = worklist.poll();
 
-			if (!arc.getConstraint().update(arc.getVariable())) {
+			if (!arc.update()){
 				worklist.clear();
 				return false;
 			}
