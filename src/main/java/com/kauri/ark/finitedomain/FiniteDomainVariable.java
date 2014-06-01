@@ -44,4 +44,54 @@ public class FiniteDomainVariable<T> extends Variable<FiniteDomain<T>>
 	public FiniteDomainVariable(Solver solver, FiniteDomain<T> domain) {
 		super(solver, domain);
 	}
+
+	//
+	// Static constraint helpers
+
+	public static <T> void allSame(FiniteDomainVariable<T>... variables) {
+		variables[0].getSolver().addConstraint(new FiniteDomainEqualityConstraint<>(variables), variables);
+	}
+
+	public static <T> void allDiff(FiniteDomainVariable<T>... variables) {
+		variables[0].getSolver().addConstraint(new FiniteDomainInequalityConstraint<>(variables), variables);
+	}
+
+	public static <T> void atLeast(T value, int lower, FiniteDomainVariable<T>... variables) {
+		variables[0].getSolver().addConstraint(new FiniteDomainCardinalityConstraint<>(value, lower, variables.length, variables), variables);
+	}
+
+	public static <T> void atMost(T value, int upper, FiniteDomainVariable<T>... variables) {
+		variables[0].getSolver().addConstraint(new FiniteDomainCardinalityConstraint<>(value, 0, upper, variables), variables);
+	}
+
+	public static <T> void between(T value, int lower, int upper, FiniteDomainVariable<T>... variables) {
+		variables[0].getSolver().addConstraint(new FiniteDomainCardinalityConstraint<>(value, lower, upper, variables), variables);
+	}
+
+	//
+	// Constraint helpers
+
+	public FiniteDomainVariable<T> eq(T value) {
+		FiniteDomainVariable<T> v = new FiniteDomainVariable<>(getSolver(), getDomain().retain(value));
+		getSolver().addVariable(v);
+
+		return eq(v);
+	}
+
+	public FiniteDomainVariable<T> eq(FiniteDomainVariable<T> variable) {
+		getSolver().addConstraint(new FiniteDomainEqualityConstraint<>(this, variable), this, variable);
+		return this;
+	}
+
+	public FiniteDomainVariable<T> ne(T value) {
+		FiniteDomainVariable<T> v = new FiniteDomainVariable<>(getSolver(), getDomain().remove(value));
+		getSolver().addVariable(v);
+
+		return ne(v);
+	}
+
+	public FiniteDomainVariable<T> ne(FiniteDomainVariable<T> variable) {
+		getSolver().addConstraint(new FiniteDomainInequalityConstraint<>(this, variable), this, variable);
+		return this;
+	}
 }
