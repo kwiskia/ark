@@ -23,8 +23,6 @@ package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * CardinalityConstraint
@@ -36,16 +34,13 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDo
 	private int min;
 	private int max;
 	private T value;
-
-	private List<Variable<FiniteDomain<T>>> variables;
+	private Variable<FiniteDomain<T>>[] variables;
 
 	public FiniteDomainCardinalityConstraint(T value, int min, int max, Variable<FiniteDomain<T>>... variables) {
-		this.variables = Arrays.asList(variables);
-
 		this.min = min;
 		this.max = max;
-
 		this.value = value;
+		this.variables = variables;
 	}
 
 	@Override
