@@ -43,16 +43,21 @@ public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerDomai
 	public boolean update(Variable<IntegerDomain> variable) {
 		Variable<IntegerDomain> other = variable == var1 ? var2 : var1;
 
-		IntegerDomain domain = variable.getDomain();
+		int lower = Interval.MIN_VALUE;
+		int upper = Interval.MAX_VALUE;
 
 		if (variable == var1) {
 			// remove everything greater than the largest integer in other
-			domain = domain.remove(new Interval(other.getDomain().getMaximum() + 1, Interval.MAX_VALUE));
+			lower = other.getDomain().getMaximum() + 1;
 		} else {
 			// remove everything smaller than the smallest integer in other
-			domain = domain.remove(new Interval(Interval.MIN_VALUE, other.getDomain().getMinimum() - 1));
+			upper = other.getDomain().getMaximum() - 1;
 		}
 
-		return variable.trySetValue(domain);
+		if (lower > upper) {
+			return false;
+		}
+
+		return variable.trySetValue(variable.getDomain().remove(new Interval(lower, upper)));
 	}
 }
