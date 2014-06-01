@@ -83,31 +83,27 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 	}
 
 	public boolean contains(T element) {
-		if (!elements.contains(element)) {
-			throw new RuntimeException("Element does not belong to finite domain.");
-		}
-
-		return bitset.get(elements.indexOf(element));
+		return bitset.get(indexOf(element));
 	}
 
 	public FiniteDomain<T> retain(T element) {
-		if (!elements.contains(element)) {
-			throw new RuntimeException("Element does not belong to finite domain.");
-		}
-
 		BitSet newSet = new BitSet(bitset.size());
-		newSet.set(elements.indexOf(element));
+		newSet.set(indexOf(element));
 		return new FiniteDomain<>(elements, newSet);
 	}
 
 	public FiniteDomain<T> remove(T element) {
+		BitSet newSet = bitset.get(0, bitset.size());
+		newSet.clear(indexOf(element));
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	private int indexOf(T element) {
 		if (!elements.contains(element)) {
 			throw new RuntimeException("Element does not belong to finite domain.");
 		}
 
-		BitSet newSet = bitset.get(0, bitset.size());
-		newSet.clear(elements.indexOf(element));
-		return new FiniteDomain<>(elements, newSet);
+		return elements.indexOf(element);
 	}
 
 	public FiniteDomain<T> retainAll(FiniteDomain<T> other) {
