@@ -51,7 +51,7 @@ public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerDomai
 			lower = other.getDomain().getMaximum() + 1;
 		} else {
 			// remove everything smaller than the smallest integer in other
-			upper = other.getDomain().getMaximum() - 1;
+			upper = other.getDomain().getMinimum() - 1;
 		}
 
 		if (lower > upper) {
