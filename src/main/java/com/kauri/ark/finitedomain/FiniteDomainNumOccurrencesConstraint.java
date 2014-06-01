@@ -61,11 +61,25 @@ public class FiniteDomainNumOccurrencesConstraint<T> implements Constraint
 		if (variable == counter) {
 			return counter.trySetValue(counter.getDomain().retain(new Interval(definite, possible)));
 		} else {
-			if (counter.getDomain().isUnique()) {
-				int target = counter.getDomain().getUniqueValue();
+			if (possible < counter.getDomain().getMinimum() || definite > counter.getDomain().getMaximum()) {
+				return false;
+			}
 
-				if (possible < target || definite > target) {
-					return false;
+			Variable<FiniteDomain<T>> v = variable;
+
+			if (possible == counter.getDomain().getMinimum()) {
+				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
+					if (!v.trySetValue(v.getDomain().retain(value))) {
+						return false;
+					}
+				}
+			}
+
+			if (definite == counter.getDomain().getMaximum()) {
+				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
+					if (!v.trySetValue(v.getDomain().remove(value))) {
+						return false;
+					}
 				}
 			}
 

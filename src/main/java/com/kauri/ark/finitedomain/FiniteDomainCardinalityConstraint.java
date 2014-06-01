@@ -62,32 +62,18 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDo
 			return false;
 		}
 
-		//
-		// TODO - should we be influencing variables other than the one we're updating?
-		//
-
 		if (possible == min) {
-			for (Variable<FiniteDomain<T>> v : variables) {
-				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
-					FiniteDomain<T> domain = v.getDomain();
-					domain = domain.retain(value);
-
-					if (!v.trySetValue(domain)) {
-						return false;
-					}
+			if (variable.getDomain().contains(value) && !variable.getDomain().isUnique()) {
+				if (!variable.trySetValue(variable.getDomain().retain(value))) {
+					return false;
 				}
 			}
 		}
 
 		if (definite == max) {
-			for (Variable<FiniteDomain<T>> v : variables) {
-				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
-					FiniteDomain<T> domain = v.getDomain();
-					domain = domain.remove(value);
-
-					if (!v.trySetValue(domain)) {
-						return false;
-					}
+			if (variable.getDomain().contains(value) && !variable.getDomain().isUnique()) {
+				if (!variable.trySetValue(variable.getDomain().remove(value))) {
+					return false;
 				}
 			}
 		}
