@@ -44,22 +44,22 @@ public class Solver
 
 	private Trail trail = new Trail();
 
-	public <T extends Variable> void addVariable(T variable) {
+	public <T extends Domain> void addVariable(Variable<T> variable) {
 		variables.add(variable);
 		neighbors.put(variable, new ArrayList<Arc>());
 	}
 
-	public <T extends Variable> void addConstraint(Constraint<T> constraint, T... variables) {
-		for (T variable1 : variables) {
+	public <T extends Domain> void addConstraint(Constraint<T> constraint, Variable<T>... variables) {
+		for (Variable<T> variable1 : variables) {
 			if (!this.variables.contains(variable1)) {
 				throw new RuntimeException("Adding constraint on non-registered variable.");
 			}
 		}
 
-		for (T variable1 : variables) {
+		for (Variable<T> variable1 : variables) {
 			Arc<T> arc = new Arc(variable1, constraint);
 
-			for (T variable2 : variables) {
+			for (Variable<T> variable2 : variables) {
 				if (variable1 != variable2) {
 					neighbors.get(variable2).add(arc);
 				}
@@ -131,7 +131,7 @@ public class Solver
 		return true;
 	}
 
-	private <T extends Variable> void queueNeighboringArcs(T variable) {
+	private <T extends Domain> void queueNeighboringArcs(Variable<T> variable) {
 		for (Arc<T> arc : neighbors.get(variable)) {
 			if (!worklist.contains(arc)) {
 				worklist.add(arc);

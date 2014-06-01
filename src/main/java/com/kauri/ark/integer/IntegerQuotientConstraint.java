@@ -22,24 +22,25 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
+import com.kauri.ark.Variable;
 
 /**
  * QuotientConstraint
  *
  * @author Eric Fritz
  */
-public class IntegerQuotientConstraint implements Constraint<IntegerVariable>
+public class IntegerQuotientConstraint implements Constraint<IntegerDomain>
 {
-	private Constraint<IntegerVariable> constraint;
-	private IntegerVariable b;
+	private Constraint<IntegerDomain> constraint;
+	private Variable<IntegerDomain> b;
 
-	public IntegerQuotientConstraint(IntegerVariable a, IntegerVariable b, IntegerVariable c) {
+	public IntegerQuotientConstraint(Variable<IntegerDomain> a, Variable<IntegerDomain> b, Variable<IntegerDomain> c) {
 		this.constraint = new IntegerProductConstraint(b, c, a);
 		this.b = b;
 	}
 
 	@Override
-	public boolean update(IntegerVariable variable) {
+	public boolean update(Variable<IntegerDomain> variable) {
 		if (b.getDomain().isUnique() && b.getDomain().getMinimum() == 0) {
 			return false;
 		}

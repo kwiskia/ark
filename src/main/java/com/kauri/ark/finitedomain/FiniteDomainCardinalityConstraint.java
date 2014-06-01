@@ -22,6 +22,7 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
+import com.kauri.ark.Variable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,16 +31,15 @@ import java.util.List;
  *
  * @author Eric Fritz
  */
-public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDomainVariable<T>>
+public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDomain<T>>
 {
-	private List<FiniteDomainVariable<T>> variables;
-
 	private int min;
 	private int max;
-
 	private T value;
 
-	public FiniteDomainCardinalityConstraint(T value, int min, int max, FiniteDomainVariable<T>... variables) {
+	private List<Variable<FiniteDomain<T>>> variables;
+
+	public FiniteDomainCardinalityConstraint(T value, int min, int max, Variable<FiniteDomain<T>>... variables) {
 		this.variables = Arrays.asList(variables);
 
 		this.min = min;
@@ -49,11 +49,11 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDo
 	}
 
 	@Override
-	public boolean update(FiniteDomainVariable<T> variable) {
+	public boolean update(Variable<FiniteDomain<T>> variable) {
 		int possible = 0;
 		int definite = 0;
 
-		for (FiniteDomainVariable<T> v : variables) {
+		for (Variable<FiniteDomain<T>> v : variables) {
 			if (v.getDomain().contains(value)) {
 				possible++;
 
@@ -68,7 +68,7 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDo
 		}
 
 		if (possible == min) {
-			for (FiniteDomainVariable<T> v : variables) {
+			for (Variable<FiniteDomain<T>> v : variables) {
 				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
 					FiniteDomain<T> domain = v.getDomain();
 					domain = domain.retain(value);
@@ -81,7 +81,7 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDo
 		}
 
 		if (definite == max) {
-			for (FiniteDomainVariable<T> v : variables) {
+			for (Variable<FiniteDomain<T>> v : variables) {
 				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
 					FiniteDomain<T> domain = v.getDomain();
 					domain = domain.remove(value);

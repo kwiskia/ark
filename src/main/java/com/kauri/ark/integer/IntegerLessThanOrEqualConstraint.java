@@ -22,25 +22,26 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
+import com.kauri.ark.Variable;
 
 /**
  * IntervalLessThanOrEqualConstraint
  *
  * @author Eric Fritz
  */
-public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerVariable>
+public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerDomain>
 {
-	private IntegerVariable var1;
-	private IntegerVariable var2;
+	private Variable<IntegerDomain> var1;
+	private Variable<IntegerDomain> var2;
 
-	public IntegerLessThanOrEqualConstraint(IntegerVariable var1, IntegerVariable var2) {
+	public IntegerLessThanOrEqualConstraint(Variable<IntegerDomain> var1, Variable<IntegerDomain> var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(IntegerVariable variable) {
-		IntegerVariable other = variable == var1 ? var2 : var1;
+	public boolean update(Variable<IntegerDomain> variable) {
+		Variable<IntegerDomain> other = variable == var1 ? var2 : var1;
 
 		IntegerDomain domain = variable.getDomain();
 

@@ -105,6 +105,7 @@ public class IntegerDomain implements Domain<Integer>
 		return intervals.get(intervals.size() - 1).getUpper();
 	}
 
+	@Override
 	public Integer getUniqueValue() {
 		if (!isUnique()) {
 			throw new RuntimeException("Domain has not been narrowed to a unique value.");

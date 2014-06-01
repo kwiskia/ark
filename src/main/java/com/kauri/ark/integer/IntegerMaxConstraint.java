@@ -22,27 +22,28 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
+import com.kauri.ark.Variable;
 
 /**
  * IntegerMaxConstraint
  *
  * @author Eric Fritz
  */
-public class IntegerMaxConstraint implements Constraint<IntegerVariable>
+public class IntegerMaxConstraint implements Constraint<IntegerDomain>
 {
-	private IntegerVariable max;
-	private IntegerVariable[] variables;
+	private Variable<IntegerDomain> max;
+	private Variable<IntegerDomain>[] variables;
 
-	public IntegerMaxConstraint(IntegerVariable max, IntegerVariable... variables) {
+	public IntegerMaxConstraint(Variable<IntegerDomain> max, Variable<IntegerDomain>... variables) {
 		this.max = max;
 		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(IntegerVariable variable) {
+	public boolean update(Variable<IntegerDomain> variable) {
 		if (variable == max) {
 			int val = Interval.MIN_VALUE;
-			for (IntegerVariable v : variables) {
+			for (Variable<IntegerDomain> v : variables) {
 				val = Math.max(val, v.getDomain().getMaximum());
 			}
 

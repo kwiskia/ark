@@ -126,6 +126,7 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 		return new FiniteDomain<>(elements, newSet);
 	}
 
+	@Override
 	public T getUniqueValue() {
 		if (!isUnique()) {
 			throw new RuntimeException("Domain has not been narrowed to a unique value.");

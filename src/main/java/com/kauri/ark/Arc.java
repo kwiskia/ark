@@ -26,12 +26,12 @@ package com.kauri.ark;
  *
  * @author Eric Fritz
  */
-public class Arc<T extends Variable>
+public class Arc<T extends Domain>
 {
-	private T variable;
+	private Variable<T> variable;
 	private Constraint<T> constraint;
 
-	public Arc(T variable, Constraint<T> constraint) {
+	public Arc(Variable<T> variable, Constraint<T> constraint) {
 		this.variable = variable;
 		this.constraint = constraint;
 	}
