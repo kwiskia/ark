@@ -23,6 +23,7 @@ package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Solver;
 import com.kauri.ark.Variable;
+import com.kauri.ark.integer.IntegerVariable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,16 +57,32 @@ public class FiniteDomainVariable<T> extends Variable<FiniteDomain<T>>
 		variables[0].getSolver().addConstraint(new FiniteDomainInequalityConstraint<>(variables), variables);
 	}
 
+	public static <T>IntegerVariable cardinality(T value, FiniteDomainVariable<T>... variables) {
+		IntegerVariable v = new IntegerVariable(variables[0].getSolver());
+
+		Variable[] vars = new Variable[variables.length + 1];
+
+		vars[vars.length - 1] = v;
+		for (int i = 0; i < variables.length; i++) {
+			vars[i] = variables[i];
+		}
+
+		variables[0].getSolver().addConstraint(new FiniteDomainCardinalityConstraint<>(value, v, variables), vars);
+		return v;
+	}
+
 	public static <T> void atLeast(T value, int lower, FiniteDomainVariable<T>... variables) {
-		variables[0].getSolver().addConstraint(new FiniteDomainCardinalityConstraint<>(value, lower, variables.length, variables), variables);
+		cardinality(value, variables).ge(lower);
 	}
 
 	public static <T> void atMost(T value, int upper, FiniteDomainVariable<T>... variables) {
-		variables[0].getSolver().addConstraint(new FiniteDomainCardinalityConstraint<>(value, 0, upper, variables), variables);
+		cardinality(value, variables).le(upper);
 	}
 
 	public static <T> void between(T value, int lower, int upper, FiniteDomainVariable<T>... variables) {
-		variables[0].getSolver().addConstraint(new FiniteDomainCardinalityConstraint<>(value, lower, upper, variables), variables);
+		IntegerVariable v = cardinality(value, variables);
+		v.ge(lower);
+		v.le(upper);
 	}
 
 	//

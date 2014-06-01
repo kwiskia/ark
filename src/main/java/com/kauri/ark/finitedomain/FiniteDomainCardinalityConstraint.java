@@ -23,28 +23,28 @@ package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
+import com.kauri.ark.integer.IntegerVariable;
+import com.kauri.ark.integer.Interval;
 
 /**
- * CardinalityConstraint
+ * FiniteDomainNumOccurrencesConstraint
  *
  * @author Eric Fritz
  */
-public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDomain<T>>
+public class FiniteDomainCardinalityConstraint<T> implements Constraint
 {
-	private int min;
-	private int max;
 	private T value;
+	private IntegerVariable counter;
 	private Variable<FiniteDomain<T>>[] variables;
 
-	public FiniteDomainCardinalityConstraint(T value, int min, int max, Variable<FiniteDomain<T>>... variables) {
-		this.min = min;
-		this.max = max;
+	public FiniteDomainCardinalityConstraint(T value, IntegerVariable counter, Variable<FiniteDomain<T>>... variables) {
 		this.value = value;
+		this.counter = counter;
 		this.variables = variables;
 	}
 
 	@Override
-	public boolean update(Variable<FiniteDomain<T>> variable) {
+	public boolean update(Variable variable) {
 		int possible = 0;
 		int definite = 0;
 
@@ -58,26 +58,32 @@ public class FiniteDomainCardinalityConstraint<T> implements Constraint<FiniteDo
 			}
 		}
 
-		if (possible < min || definite > max) {
-			return false;
-		}
+		if (variable == counter) {
+			return counter.trySetValue(counter.getDomain().retain(new Interval(definite, possible)));
+		} else {
+			if (possible < counter.getDomain().getMinimum() || definite > counter.getDomain().getMaximum()) {
+				return false;
+			}
 
-		if (possible == min) {
-			if (variable.getDomain().contains(value) && !variable.getDomain().isUnique()) {
-				if (!variable.trySetValue(variable.getDomain().retain(value))) {
-					return false;
+			Variable<FiniteDomain<T>> v = variable;
+
+			if (possible == counter.getDomain().getMinimum()) {
+				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
+					if (!v.trySetValue(v.getDomain().retain(value))) {
+						return false;
+					}
 				}
 			}
-		}
 
-		if (definite == max) {
-			if (variable.getDomain().contains(value) && !variable.getDomain().isUnique()) {
-				if (!variable.trySetValue(variable.getDomain().remove(value))) {
-					return false;
+			if (definite == counter.getDomain().getMaximum()) {
+				if (v.getDomain().contains(value) && !v.getDomain().isUnique()) {
+					if (!v.trySetValue(v.getDomain().remove(value))) {
+						return false;
+					}
 				}
 			}
-		}
 
-		return true;
+			return true;
+		}
 	}
 }
