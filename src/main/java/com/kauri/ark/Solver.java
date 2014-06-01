@@ -84,9 +84,12 @@ public class Solver
 
 		solving = true;
 
+		Stack<Variable> selected = new Stack<>();
 		Stack<ValueAdvancer> values = new Stack<>();
 
-		Variable v = variables.get(0);
+		Variable v = getMostConstrainedVariable(variables, selected);
+
+		selected.push(v);
 		values.push(new ValueAdvancer(v, trail.size()));
 
 		while (!values.isEmpty()) {
@@ -102,15 +105,34 @@ public class Solver
 						break;
 					}
 				} else {
-					v = variables.get(values.size());
+					v = getMostConstrainedVariable(variables, selected);
+
+					selected.push(v);
 					values.push(new ValueAdvancer(v, trail.size()));
 				}
 			} else {
+				selected.pop();
 				values.pop();
 			}
 		}
 
 		solving = false;
+	}
+
+	private Variable getMostConstrainedVariable(List<Variable<?>> variables, Stack<Variable> selected) {
+		Variable v1 = null;
+
+		for (Variable v2 : variables) {
+			if (selected.contains(v2)) {
+				continue;
+			}
+
+			if (v1 == null || v2.getDomain().size() < v1.getDomain().size()) {
+				v1 = v2;
+			}
+		}
+
+		return v1;
 	}
 
 	public <T extends Domain> boolean trySetValue(Variable<T> variable, T domain) {
