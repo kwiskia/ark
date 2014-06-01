@@ -58,7 +58,7 @@ public class Solver
 
 		for (T variable1 : variables) {
 			Arc<T> arc = new Arc(variable1, constraint);
-			
+
 			for (T variable2 : variables) {
 				if (variable1 != variable2) {
 					neighbors.get(variable2).add(arc);
@@ -141,9 +141,7 @@ public class Solver
 
 	private boolean resolveConstraints() {
 		while (!worklist.isEmpty()) {
-			Arc arc = worklist.poll();
-
-			if (!arc.update()) {
+			if (!worklist.poll().update()) {
 				worklist.clear();
 				return false;
 			}
