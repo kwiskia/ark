@@ -36,7 +36,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable(Solver solver, int value) {
-		this(solver,value, value);
+		this(solver, value, value);
 	}
 
 	public IntegerVariable(Solver solver, int lower, int upper) {

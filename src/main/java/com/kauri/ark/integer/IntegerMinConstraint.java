@@ -22,7 +22,6 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
-import com.kauri.ark.Variable;
 
 /**
  * IntegerMinConstraint
