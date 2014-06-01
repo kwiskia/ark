@@ -42,13 +42,17 @@ public class IntegerMinConstraint implements Constraint<IntegerDomain>
 	@Override
 	public boolean update(Variable<IntegerDomain> variable) {
 		if (variable == min) {
-			int val = Interval.MAX_VALUE;
+			int lower = Interval.MAX_VALUE;
+			int upper = Interval.MIN_VALUE;
 			for (Variable<IntegerDomain> v : variables) {
-				val = Math.min(val, v.getDomain().getMinimum());
+				lower = Math.min(lower, v.getDomain().getMinimum());
+				upper = Math.max(upper, v.getDomain().getMaximum());
 			}
 
-			return variable.trySetValue(variable.getDomain().retain(new Interval(val, Interval.MAX_VALUE)));
+			// can restrain upper further
+			return variable.trySetValue(variable.getDomain().retain(new Interval(lower, upper)));
 		} else {
+			// TODO - restrain more
 			return variable.trySetValue(variable.getDomain().retain(new Interval(min.getDomain().getMinimum(), Interval.MAX_VALUE)));
 		}
 	}
