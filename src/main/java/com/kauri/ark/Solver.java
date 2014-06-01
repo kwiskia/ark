@@ -175,7 +175,7 @@ public class Solver
 					return false;
 				}
 
-				if (variable.trySetValue(value) && Solver.this.resolveConstraints()) {
+				if (trySetValue(variable, value) && resolveConstraints()) {
 					hasAdvanced = true;
 					return true;
 				}
