@@ -29,7 +29,7 @@ import com.kauri.ark.Variable;
  *
  * @author Eric Fritz
  */
-public class FiniteDomainMappingConstraint<T1, T2> implements Constraint<FiniteDomain<?>>
+public class FiniteDomainMappingConstraint<T1, T2> implements Constraint
 {
 	private Variable<FiniteDomain<T1>> var1;
 	private Variable<FiniteDomain<T2>> var2;
@@ -42,7 +42,7 @@ public class FiniteDomainMappingConstraint<T1, T2> implements Constraint<FiniteD
 	}
 
 	@Override
-	public boolean update(Variable<FiniteDomain<?>> variable) {
+	public boolean update(Variable variable) {
 		Variable v = variable;
 
 		if (v == var1) {
