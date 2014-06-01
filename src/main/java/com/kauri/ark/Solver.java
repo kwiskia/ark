@@ -164,8 +164,6 @@ public class Solver
 		public boolean advance() {
 			if (hasAdvanced) {
 				trail.restore(mark);
-				// TODO - is clear necessary?
-				worklist.clear();
 			}
 
 			while (true) {
@@ -181,8 +179,6 @@ public class Solver
 				}
 
 				trail.restore(mark);
-				// TODO - is clear necessary?
-				worklist.clear();
 			}
 		}
 	}
