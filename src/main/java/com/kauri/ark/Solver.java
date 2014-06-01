@@ -54,10 +54,14 @@ public class Solver
 			if (!this.variables.contains(variable1)) {
 				throw new RuntimeException("Adding constraint on non-registered variable.");
 			}
+		}
 
+		for (T variable1 : variables) {
+			Arc<T> arc = new Arc(variable1, constraint);
+			
 			for (T variable2 : variables) {
 				if (variable1 != variable2) {
-					neighbors.get(variable1).add(new Arc(variable2, constraint));
+					neighbors.get(variable2).add(arc);
 				}
 			}
 		}
@@ -139,7 +143,7 @@ public class Solver
 		while (!worklist.isEmpty()) {
 			Arc arc = worklist.poll();
 
-			if (!arc.update()){
+			if (!arc.update()) {
 				worklist.clear();
 				return false;
 			}
