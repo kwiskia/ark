@@ -48,16 +48,16 @@ public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerDomai
 
 		if (variable == var1) {
 			// remove everything greater than the largest integer in other
-			lower = other.getDomain().getMaximum() + 1;
+			upper = other.getDomain().getMaximum();
 		} else {
 			// remove everything smaller than the smallest integer in other
-			upper = other.getDomain().getMinimum() - 1;
+			lower = other.getDomain().getMinimum();
 		}
 
 		if (lower > upper) {
 			return false;
 		}
 
-		return variable.trySetValue(variable.getDomain().remove(new Interval(lower, upper)));
+		return variable.trySetValue(variable.getDomain().retain(new Interval(lower, upper)));
 	}
 }
