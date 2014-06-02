@@ -28,8 +28,8 @@ package com.kauri.ark.integer;
  */
 public class Interval
 {
-	public static final int MIN_VALUE = -10000000;
-	public static final int MAX_VALUE = +10000000;
+	public static final int MIN_VALUE = -1000000;
+	public static final int MAX_VALUE = +1000000;
 
 	private int lowerBound;
 	private int upperBound;
