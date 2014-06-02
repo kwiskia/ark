@@ -111,7 +111,7 @@ public class Solver
 		selected.add(v);
 		DomainIterator<? extends Domain> iterator = v.getDomain().getUniqueValues();
 
-		while (iterator.hasNext()) {
+		while (iterator.hasNext() && solving) {
 			Domain value = iterator.next();
 
 			if (trySetValue(v, value) && resolveConstraints()) {
