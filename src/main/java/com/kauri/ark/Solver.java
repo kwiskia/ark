@@ -83,43 +83,52 @@ public class Solver
 		}
 
 		solving = true;
-
-		Stack<Variable> selected = new Stack<>();
-		Stack<ValueAdvancer> values = new Stack<>();
-
-		Variable v = getMostConstrainedVariable(variables, selected);
-
-		selected.push(v);
-		values.push(new ValueAdvancer(v, trail.size()));
-
-		while (!values.isEmpty()) {
-			if (values.lastElement().advance()) {
-				if (values.size() >= variables.size()) {
-					Solution solution = new Solution();
-
-					for (Variable variable : variables) {
-						solution.add(variable);
-					}
-
-					if (!handler.handle(solution)) {
-						break;
-					}
-				} else {
-					v = getMostConstrainedVariable(variables, selected);
-
-					selected.push(v);
-					values.push(new ValueAdvancer(v, trail.size()));
-				}
-			} else {
-				selected.pop();
-				values.pop();
-			}
-		}
-
+		solveRecursive(handler, new Stack<Variable>());
 		solving = false;
 	}
 
-	private Variable getMostConstrainedVariable(List<Variable<?>> variables, Stack<Variable> selected) {
+	private void solveRecursive(SolutionHandler handler, Stack<Variable> selected) {
+		if (!solving) {
+			return;
+		}
+
+		if (selected.size() == variables.size()) {
+			Solution solution = new Solution();
+
+			for (Variable variable : variables) {
+				solution.add(variable);
+			}
+
+			if (!handler.handle(solution)) {
+				solving = false;
+			}
+
+			return;
+		}
+
+		int mark = trail.size();
+		Variable v = getMostConstrainedVariable(selected);
+		selected.add(v);
+		UniqueValueIterator iterator = v.getDomain().getUniqueValues();
+
+		while (solving) {
+			Domain value = iterator.next();
+
+			if (value == null) {
+				break;
+			}
+
+			if (trySetValue(v, value) && resolveConstraints()) {
+				solveRecursive(handler, selected);
+			}
+
+			trail.restore(mark);
+		}
+
+		selected.remove(v);
+	}
+
+	private Variable getMostConstrainedVariable(Stack<Variable> selected) {
 		Variable v1 = null;
 
 		for (Variable v2 : variables) {
@@ -170,40 +179,5 @@ public class Solver
 		}
 
 		return true;
-	}
-
-	private class ValueAdvancer<T extends Domain>
-	{
-		private Variable<T> variable;
-		private UniqueValueIterator<T> enumerator;
-		private boolean hasAdvanced = false;
-		private int mark;
-
-		public ValueAdvancer(Variable<T> variable, int mark) {
-			this.variable = variable;
-			this.enumerator = variable.getDomain().getUniqueValues();
-			this.mark = mark;
-		}
-
-		public boolean advance() {
-			if (hasAdvanced) {
-				trail.restore(mark);
-			}
-
-			while (true) {
-				T value = enumerator.next();
-
-				if (value == null) {
-					return false;
-				}
-
-				if (trySetValue(variable, value) && resolveConstraints()) {
-					hasAdvanced = true;
-					return true;
-				}
-
-				trail.restore(mark);
-			}
-		}
 	}
 }
