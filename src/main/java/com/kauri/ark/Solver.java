@@ -108,7 +108,7 @@ public class Solver
 
 		int mark = trail.size();
 		Variable v = getMostConstrainedVariable(selected);
-		selected.add(v);
+		selected.push(v);
 		DomainIterator<? extends Domain> iterator = v.getDomain().getUniqueValues();
 
 		while (iterator.hasNext() && solving) {
@@ -125,7 +125,7 @@ public class Solver
 			trail.restore(mark);
 		}
 
-		selected.remove(v);
+		selected.pop();
 	}
 
 	private Variable getMostConstrainedVariable(Stack<Variable> selected) {
