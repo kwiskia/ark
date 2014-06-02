@@ -36,7 +36,7 @@ public class Trail
 		return stack.size();
 	}
 
-	public <T extends Domain> void save(Variable<T> variable, Domain<T> domain) {
+	public <T extends Domain> void save(Variable<T> variable, T domain) {
 		stack.push(new VarState(variable, domain));
 	}
 
