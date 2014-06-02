@@ -80,6 +80,7 @@ public class IntegerDomain implements Domain<Integer>
 				newIntervals.add(intersection);
 			}
 		}
+
 		return new IntegerDomain(newIntervals);
 	}
 
