@@ -43,11 +43,9 @@ public class FiniteDomainMappingConstraint<T1, T2> implements Constraint
 
 	@Override
 	public boolean update(Variable variable) {
-		Variable v = variable;
-
-		if (v == var1) {
+		if (variable == var1) {
 			return var1.trySetValue(var1.getDomain().mapReverse(var2.getDomain(), mapping));
-		} else if (v == var2) {
+		} else if (variable == var2) {
 			return var2.trySetValue(var2.getDomain().mapForward(var1.getDomain(), mapping));
 		}
 
