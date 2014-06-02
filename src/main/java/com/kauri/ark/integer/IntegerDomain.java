@@ -105,7 +105,17 @@ public class IntegerDomain implements Domain<Integer>
 	}
 
 	public IntegerDomain removeAll(IntegerDomain other) {
-		return new IntegerDomain(removeAll(intervals, other.intervals));
+		//
+		// TODO - can do in single pass?
+		//
+
+		List<Interval> newIntervals = intervals;
+
+		for (Interval interval : other.intervals) {
+			newIntervals = remove(newIntervals, interval);
+		}
+
+		return new IntegerDomain(newIntervals);
 	}
 
 	@Override
@@ -223,17 +233,5 @@ public class IntegerDomain implements Domain<Integer>
 		}
 
 		return newIntervals;
-	}
-
-	private List<Interval> removeAll(List<Interval> intervals1, List<Interval> intervals2) {
-		//
-		// TODO - can do in single pass?
-		//
-
-		for (Interval interval : intervals2) {
-			intervals1 = remove(intervals1, interval);
-		}
-
-		return intervals1;
 	}
 }
