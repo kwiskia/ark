@@ -223,7 +223,7 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 		}
 
 		@Override
-		public void lastDomainValid( ) {
+		public void lastDomainValid() {
 			// last domain was singleton, nothing to narrow
 		}
 	}
