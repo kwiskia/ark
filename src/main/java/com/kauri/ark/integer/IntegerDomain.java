@@ -188,16 +188,16 @@ public class IntegerDomain implements Domain<Integer>
 		}
 	}
 
-	public String toString() {
-		return intervals.toString();
-	}
-
 	public boolean equals(Object o) {
 		if (o == null || !(o instanceof IntegerDomain)) {
 			return false;
 		}
 
 		return intervals.equals(((IntegerDomain) o).intervals);
+	}
+
+	public String toString() {
+		return intervals.toString();
 	}
 
 	//

@@ -23,6 +23,7 @@ package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Domain;
 import com.kauri.ark.DomainIterator;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
@@ -233,5 +234,15 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 		}
 
 		return elements.equals(((FiniteDomain) o).elements) && bitset.equals(((FiniteDomain) o).bitset);
+	}
+
+	public String toString() {
+		List<T> present = new ArrayList<>();
+
+		for (int i = bitset.nextSetBit(0); i >= 0; i = bitset.nextSetBit(i + 1)) {
+			present.add(elements.get(i));
+		}
+
+		return present.toString();
 	}
 }
