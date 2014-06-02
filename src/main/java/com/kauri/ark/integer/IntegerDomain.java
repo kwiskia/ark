@@ -25,9 +25,10 @@ import com.kauri.ark.Domain;
 import com.kauri.ark.DomainIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Stack;
+import java.util.Queue;
 
 /**
  * TempIntegerDomain
@@ -130,15 +131,11 @@ public class IntegerDomain implements Domain<Integer>
 
 	private class IntegerDomainIterator implements DomainIterator<Integer>
 	{
-		private Stack<Interval> candidates;
+		private Queue<Interval> candidates;
 		private Interval last;
 
 		public IntegerDomainIterator() {
-			candidates = new Stack<>();
-
-			for (Interval interval : intervals) {
-				candidates.push(interval);
-			}
+			candidates = new LinkedList<>(intervals);
 		}
 
 		@Override
@@ -152,7 +149,7 @@ public class IntegerDomain implements Domain<Integer>
 				throw new NoSuchElementException();
 			}
 
-			last = candidates.pop();
+			last = candidates.poll();
 			return new IntegerDomain(last);
 		}
 
