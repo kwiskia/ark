@@ -22,6 +22,7 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Domain;
+import com.kauri.ark.DomainIterator;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
@@ -142,8 +143,8 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 	}
 
 	@Override
-	public Iterator<Domain<T>> getUniqueValues() {
-		return new DomainIterator();
+	public DomainIterator<T> getUniqueValues() {
+		return new FiniteDomainIterator();
 	}
 
 	@Override
@@ -185,12 +186,12 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 		}
 	}
 
-	private class DomainIterator implements Iterator<Domain<T>>
+	private class FiniteDomainIterator implements DomainIterator<T>
 	{
 		private int k = 0;
 		private int[] indices;
 
-		public DomainIterator() {
+		public FiniteDomainIterator() {
 			indices = new int[bitset.cardinality()];
 
 			int j = 0;
@@ -218,6 +219,11 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void lastDomainValid( ) {
+			// last domain was singleton, nothing to narrow
 		}
 	}
 

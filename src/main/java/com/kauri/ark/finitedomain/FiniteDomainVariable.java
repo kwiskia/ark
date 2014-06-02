@@ -57,7 +57,7 @@ public class FiniteDomainVariable<T> extends Variable<FiniteDomain<T>>
 		variables[0].getSolver().addConstraint(new FiniteDomainInequalityConstraint<>(variables), variables);
 	}
 
-	public static <T>IntegerVariable cardinality(T value, FiniteDomainVariable<T>... variables) {
+	public static <T> IntegerVariable cardinality(T value, FiniteDomainVariable<T>... variables) {
 		IntegerVariable v = new IntegerVariable(variables[0].getSolver());
 
 		Variable[] vars = new Variable[variables.length + 1];

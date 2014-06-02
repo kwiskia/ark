@@ -23,7 +23,6 @@ package com.kauri.ark;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -110,13 +109,17 @@ public class Solver
 		int mark = trail.size();
 		Variable v = getMostConstrainedVariable(selected);
 		selected.add(v);
-		Iterator<Domain> iterator = v.getDomain().getUniqueValues();
+		DomainIterator<? extends Domain> iterator = v.getDomain().getUniqueValues();
 
 		while (iterator.hasNext()) {
 			Domain value = iterator.next();
 
 			if (trySetValue(v, value) && resolveConstraints()) {
-				solveRecursive(handler, selected);
+				iterator.lastDomainValid();
+
+				if (value.isUnique()) {
+					solveRecursive(handler, selected);
+				}
 			}
 
 			trail.restore(mark);

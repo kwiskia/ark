@@ -22,10 +22,12 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Domain;
+import com.kauri.ark.DomainIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Stack;
 
 /**
  * TempIntegerDomain
@@ -105,8 +107,8 @@ public class IntegerDomain implements Domain<Integer>
 	}
 
 	@Override
-	public Iterator<Domain<Integer>> getUniqueValues() {
-		return new DomainIterator(intervals.iterator());
+	public DomainIterator<Integer> getUniqueValues() {
+		return new IntegerDomainIterator();
 	}
 
 	public int getMinimum() {
@@ -126,29 +128,32 @@ public class IntegerDomain implements Domain<Integer>
 		return getMinimum();
 	}
 
-	private class DomainIterator implements Iterator<Domain<Integer>>
+	private class IntegerDomainIterator implements DomainIterator<Integer>
 	{
-		private Iterator<Interval> iterator;
-		private Interval current;
-		private int value = 0;
-		private boolean hasNext;
+		private Stack<Interval> candidates;
+		private Interval last;
 
-		public DomainIterator(Iterator<Interval> iterator) {
-			this.iterator = iterator;
+		public IntegerDomainIterator() {
+			candidates = new Stack<>();
 
-			getNext();
+			for (Interval interval : intervals) {
+				candidates.push(interval);
+			}
 		}
 
 		@Override
 		public boolean hasNext() {
-			return hasNext;
+			return !candidates.isEmpty();
 		}
 
 		@Override
 		public IntegerDomain next() {
-			Interval interval = new Interval(value, value);
-			getNext();
-			return new IntegerDomain(interval);
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+
+			last = candidates.pop();
+			return new IntegerDomain(last);
 		}
 
 		@Override
@@ -156,30 +161,35 @@ public class IntegerDomain implements Domain<Integer>
 			throw new UnsupportedOperationException();
 		}
 
-		private void getNext() {
-			if (current == null) {
-				if (iterator.hasNext()) {
-					current = iterator.next();
-					value = current.getLower();
-					hasNext = true;
-				} else {
-					hasNext = false;
-				}
+		@Override
+		public void lastDomainValid() {
+			int center = last.getLower() + (last.getUpper() - last.getLower()) / 2;
+
+			int lower1 = last.getLower();
+			int upper1;
+			int lower2;
+			int upper2 = last.getUpper();
+
+			if (center == last.getUpper()) {
+				upper1 = center - 1;
+				lower2 = center;
 			} else {
-				value++;
-				if (value > current.getUpper()) {
-					if (iterator.hasNext()) {
-						current = iterator.next();
-						value = current.getLower();
-						hasNext = true;
-					} else {
-						hasNext = false;
-					}
-				} else {
-					hasNext = true;
-				}
+				upper1 = center;
+				lower2 = center + 1;
+			}
+
+			if (lower1 <= upper1 && (lower1 != last.getLower() || upper1 != last.getUpper())) {
+				candidates.add(new Interval(lower1, upper1));
+			}
+
+			if (lower2 <= upper2 && (lower2 != last.getLower() || upper2 != last.getUpper())) {
+				candidates.add(new Interval(lower2, upper2));
 			}
 		}
+	}
+
+	public String toString() {
+		return intervals.toString();
 	}
 
 	public boolean equals(Object o) {

@@ -21,20 +21,14 @@
 
 package com.kauri.ark;
 
+import java.util.Iterator;
+
 /**
- * Domain
+ * DomainIterator
  *
  * @author Eric Fritz
  */
-public interface Domain<T>
+public interface DomainIterator<T> extends Iterator<Domain<T>>
 {
-	int size();
-
-	boolean isEmpty();
-
-	boolean isUnique();
-
-	T getUniqueValue();
-
-	DomainIterator<T> getUniqueValues();
+	public void lastDomainValid();
 }
