@@ -105,4 +105,9 @@ public class FiniteDomainVariable<T> extends Variable<FiniteDomain<T>>
 		getSolver().addConstraint(new FiniteDomainInequalityConstraint<>(this, variable), this, variable);
 		return this;
 	}
+
+	public <T2> FiniteDomainVariable<T> map(FiniteDomainVariable<T2> variable, Mapping<T, T2> mapping) {
+		getSolver().addConstraint(new FiniteDomainMappingConstraint<>(this, variable, mapping), (Variable) this, variable);
+		return this;
+	}
 }
