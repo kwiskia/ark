@@ -22,7 +22,6 @@
 package com.kauri.ark.finitedomain;
 
 import com.kauri.ark.Domain;
-import com.kauri.ark.UniqueValueIterator;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
@@ -143,8 +142,8 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 	}
 
 	@Override
-	public UniqueValueIterator<Domain<T>> getUniqueValues() {
-		return new FiniteDomainValueEnumerator(bitset);
+	public Iterator<Domain<T>> getUniqueValues() {
+		return new DomainIterator();
 	}
 
 	@Override
@@ -186,26 +185,39 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 		}
 	}
 
-	private class FiniteDomainValueEnumerator implements UniqueValueIterator<Domain<T>>
+	private class DomainIterator implements Iterator<Domain<T>>
 	{
-		private BitSet bitset;
-		private int k = -1;
+		private int k = 0;
+		private int[] indices;
 
-		public FiniteDomainValueEnumerator(BitSet bitset) {
-			this.bitset = bitset;
+		public DomainIterator() {
+			indices = new int[bitset.cardinality()];
+
+			int j = 0;
+			for (int i = bitset.nextSetBit(0); i >= 0; i = bitset.nextSetBit(i + 1)) {
+				indices[j++] = i;
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return k < indices.length;
 		}
 
 		@Override
 		public FiniteDomain<T> next() {
-			k = bitset.nextSetBit(k + 1);
-
-			if (k == -1) {
-				return null;
+			if (k >= indices.length) {
+				throw new NoSuchElementException();
 			}
 
 			BitSet bs = new BitSet(bitset.size());
-			bs.set(k);
+			bs.set(indices[k++]);
 			return new FiniteDomain<>(elements, bs);
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
 		}
 	}
 

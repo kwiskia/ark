@@ -21,6 +21,8 @@
 
 package com.kauri.ark;
 
+import java.util.Iterator;
+
 /**
  * Domain
  *
@@ -36,5 +38,5 @@ public interface Domain<T>
 
 	T getUniqueValue();
 
-	UniqueValueIterator<Domain<T>> getUniqueValues();
+	Iterator<Domain<T>> getUniqueValues();
 }

@@ -22,7 +22,6 @@
 package com.kauri.ark.integer;
 
 import com.kauri.ark.Domain;
-import com.kauri.ark.UniqueValueIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -106,8 +105,8 @@ public class IntegerDomain implements Domain<Integer>
 	}
 
 	@Override
-	public UniqueValueIterator<Domain<Integer>> getUniqueValues() {
-		return new IntegerValueEnumerator(intervals.iterator());
+	public Iterator<Domain<Integer>> getUniqueValues() {
+		return new DomainIterator(intervals.iterator());
 	}
 
 	public int getMinimum() {
@@ -127,37 +126,59 @@ public class IntegerDomain implements Domain<Integer>
 		return getMinimum();
 	}
 
-	private class IntegerValueEnumerator implements UniqueValueIterator<Domain<Integer>>
+	private class DomainIterator implements Iterator<Domain<Integer>>
 	{
 		private Iterator<Interval> iterator;
 		private Interval current;
 		private int value = 0;
+		private boolean hasNext;
 
-		public IntegerValueEnumerator(Iterator<Interval> iterator) {
+		public DomainIterator(Iterator<Interval> iterator) {
 			this.iterator = iterator;
 
-			if (iterator.hasNext()) {
-				current = iterator.next();
-				value = current.getLower();
-			}
+			getNext();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return hasNext;
 		}
 
 		@Override
 		public IntegerDomain next() {
+			Interval interval = new Interval(value, value);
+			getNext();
+			return new IntegerDomain(interval);
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		private void getNext() {
 			if (current == null) {
-				return null;
-			}
-
-			if (value > current.getUpper()) {
-				if (!iterator.hasNext()) {
-					return null;
+				if (iterator.hasNext()) {
+					current = iterator.next();
+					value = current.getLower();
+					hasNext = true;
+				} else {
+					hasNext = false;
 				}
-
-				current = iterator.next();
-				value = current.getLower();
+			} else {
+				value++;
+				if (value > current.getUpper()) {
+					if (iterator.hasNext()) {
+						current = iterator.next();
+						value = current.getLower();
+						hasNext = true;
+					} else {
+						hasNext = false;
+					}
+				} else {
+					hasNext = true;
+				}
 			}
-
-			return new IntegerDomain(new Interval(value, value++));
 		}
 	}
 
