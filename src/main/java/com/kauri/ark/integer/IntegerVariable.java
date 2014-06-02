@@ -185,4 +185,14 @@ public class IntegerVariable extends Variable<IntegerDomain>
 		getSolver().addConstraint(new IntegerGreaterThanOrEqualConstraint(this, variable), this, variable);
 		return this;
 	}
+
+	public IntegerVariable between(int lower, int upper) {
+		return between(new IntegerVariable(getSolver(), lower), new IntegerVariable(getSolver(), upper));
+	}
+
+	public IntegerVariable between(IntegerVariable lower, IntegerVariable upper) {
+		ge(lower);
+		le(upper);
+		return this;
+	}
 }
