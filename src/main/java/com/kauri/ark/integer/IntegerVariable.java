@@ -90,6 +90,33 @@ public class IntegerVariable extends Variable<IntegerDomain>
 		return v;
 	}
 
+	public IntegerVariable abs() {
+		return abs(new IntegerVariable(getSolver()));
+	}
+
+	public IntegerVariable abs(IntegerVariable variable) {
+		getSolver().addConstraint(new IntegerAbsoluteValueConstraint(this, variable), this, variable);
+		return variable;
+	}
+
+	public IntegerVariable sign() {
+		return sign(new IntegerVariable(getSolver()));
+	}
+
+	public IntegerVariable sign(IntegerVariable variable) {
+		getSolver().addConstraint(new IntegerSignConstraint(this, variable), this, variable);
+		return variable;
+	}
+
+	public IntegerVariable neg() {
+		return neg(new IntegerVariable(getSolver()));
+	}
+
+	public IntegerVariable neg(IntegerVariable variable) {
+		getSolver().addConstraint(new IntegerNegationConstraint(this, variable), this, variable);
+		return variable;
+	}
+
 	//
 	// Static constraint helpers
 

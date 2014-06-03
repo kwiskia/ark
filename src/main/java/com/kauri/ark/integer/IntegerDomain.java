@@ -25,10 +25,13 @@ import com.kauri.ark.Domain;
 import com.kauri.ark.DomainIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.Stack;
 
 /**
  * TempIntegerDomain
@@ -68,6 +71,54 @@ public class IntegerDomain implements Domain<Integer>
 	@Override
 	public boolean isUnique() {
 		return size == 1;
+	}
+
+	public IntegerDomain concat(IntegerDomain other) {
+		List<Interval> newIntervals = new ArrayList<>();
+		newIntervals.addAll(intervals);
+		newIntervals.addAll(other.intervals);
+
+		Collections.sort(newIntervals, new Comparator<Interval>(){
+			@Override
+			public int compare(Interval o1, Interval o2) {
+				return new Integer(o1.getLower()).compareTo(o2.getLower());
+			}
+		});
+
+		// TODO - both domains already sorted
+		//      - is there a way to merge them without pre-sorting?
+
+		Stack<Interval> stack = new Stack<>();
+
+		if (newIntervals.size() > 0) {
+			stack.push(newIntervals.get(0));
+
+			for (int i = 0; i < newIntervals.size(); i++) {
+				Interval top = stack.peek();
+				Interval now = newIntervals.get(i);
+
+				if (now.getLower() > top.getUpper()) {
+					stack.push(now);
+				} else {
+					if (now.getUpper() > top.getUpper()) {
+						stack.pop();
+						stack.push(new Interval(top.getLower(), now.getUpper()));
+					}
+				}
+			}
+		}
+
+		return new IntegerDomain(stack);
+	}
+
+	public IntegerDomain negate() {
+		List<Interval> newIntervals = new ArrayList<>();
+
+		for (Interval interval : intervals) {
+			newIntervals.add(new Interval(-interval.getUpper(), -interval.getLower()));
+		}
+
+		return new IntegerDomain(newIntervals);
 	}
 
 	public IntegerDomain retain(Interval interval) {
