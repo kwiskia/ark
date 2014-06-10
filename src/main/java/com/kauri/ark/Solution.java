@@ -37,7 +37,7 @@ public class Solution
 		assignment.put(variable, variable.getDomain().getUniqueValue());
 	}
 
-	public <R> R get(Variable<? extends Domain<R>> variable) {
+	public <T extends Domain<R>, R> R get(Variable<T> variable) {
 		if (!assignment.containsKey(variable)) {
 			throw new RuntimeException("Variable not present in assignment.");
 		}
