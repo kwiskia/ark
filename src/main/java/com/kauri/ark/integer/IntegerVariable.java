@@ -86,7 +86,8 @@ public class IntegerVariable extends Variable<IntegerDomain>
 
 	public IntegerVariable div(IntegerVariable variable) {
 		IntegerVariable v = new IntegerVariable(getSolver());
-		getSolver().addConstraint(new IntegerQuotientConstraint(this, variable, v), this, variable, v);
+		variable.ne(0);
+		getSolver().addConstraint(new IntegerProductConstraint(v, variable, this), v, variable, this);
 		return v;
 	}
 
@@ -182,7 +183,8 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable lt(IntegerVariable variable) {
-		getSolver().addConstraint(new IntegerLessThanConstraint(this, variable), this, variable);
+		getSolver().addConstraint(new IntegerInequalityConstraint(this, variable), this, variable);
+		getSolver().addConstraint(new IntegerLessThanOrEqualConstraint(this, variable), this, variable);
 		return this;
 	}
 
@@ -200,7 +202,8 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable gt(IntegerVariable variable) {
-		getSolver().addConstraint(new IntegerGreaterThanConstraint(this, variable), this, variable);
+		getSolver().addConstraint(new IntegerInequalityConstraint(variable, this), variable, this);
+		getSolver().addConstraint(new IntegerLessThanOrEqualConstraint(variable, this), variable, this);
 		return this;
 	}
 
@@ -209,7 +212,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 	}
 
 	public IntegerVariable ge(IntegerVariable variable) {
-		getSolver().addConstraint(new IntegerGreaterThanOrEqualConstraint(this, variable), this, variable);
+		getSolver().addConstraint(new IntegerLessThanOrEqualConstraint(variable, this), variable, this);
 		return this;
 	}
 
