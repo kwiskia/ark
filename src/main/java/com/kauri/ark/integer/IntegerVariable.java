@@ -66,7 +66,7 @@ public class IntegerVariable extends Variable<IntegerDomain>
 
 	public IntegerVariable sub(IntegerVariable variable) {
 		IntegerVariable v = new IntegerVariable(getSolver());
-		getSolver().addConstraint(new IntegerDifferenceConstraint(this, variable, v), this, variable, v);
+		getSolver().addConstraint(new IntegerSumConstraint(v, variable, this), v, variable, this);
 		return v;
 	}
 
