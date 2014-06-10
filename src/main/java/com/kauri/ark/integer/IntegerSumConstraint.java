@@ -54,23 +54,21 @@ public class IntegerSumConstraint implements Constraint<IntegerDomain>
 		int upper;
 
 		if (variable == a) {
-			// c - b
+			// a = c - b
 			lower = cLower - bUpper;
 			upper = cUpper - bLower;
 		} else if (variable == b) {
-			// c - a
+			// b = c - a
 			lower = cLower - aUpper;
 			upper = cUpper - aLower;
-		} else if (variable == c) {
-			// a + b
+		} else {
+			// c = a + b
 			lower = aLower + bLower;
 			upper = aUpper + bUpper;
-		} else {
-			throw new RuntimeException("Unreachable.");
 		}
 
-		lower = Math.max(variable.getDomain().getMinimum(), lower);
-		upper = Math.min(variable.getDomain().getMaximum(), upper);
+		lower = Math.max(Interval.MIN_VALUE, lower);
+		upper = Math.min(Interval.MAX_VALUE, upper);
 
 		if (upper < lower) {
 			return false;
