@@ -55,6 +55,10 @@ public class Interval
 		return upperBound;
 	}
 
+	public boolean contains(int number) {
+		return lowerBound <= number && number <= upperBound;
+	}
+
 	public Interval intersection(Interval other) {
 		int lower = Math.max(this.getLower(), other.getLower());
 		int upper = Math.min(this.getUpper(), other.getUpper());
