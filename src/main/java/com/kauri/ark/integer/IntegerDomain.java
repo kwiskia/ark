@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,10 +39,14 @@ import java.util.Stack;
  *
  * @author Eric Fritz
  */
-public class IntegerDomain implements Domain<Integer>
+public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 {
 	private List<Interval> intervals = new ArrayList<>();
 	private int size;
+
+	public IntegerDomain() {
+		this(new ArrayList<Interval>());
+	}
 
 	public IntegerDomain(Interval interval) {
 		this(Arrays.asList(interval));
@@ -56,6 +61,10 @@ public class IntegerDomain implements Domain<Integer>
 		}
 
 		this.size = size;
+	}
+
+	public Iterator<Interval> iterator() {
+		return intervals.iterator();
 	}
 
 	@Override
@@ -74,19 +83,21 @@ public class IntegerDomain implements Domain<Integer>
 	}
 
 	public IntegerDomain concat(IntegerDomain other) {
+		return concat(other.intervals);
+	}
+
+	public IntegerDomain concat(List<Interval> otherIntervals) {
 		List<Interval> newIntervals = new ArrayList<>();
 		newIntervals.addAll(intervals);
-		newIntervals.addAll(other.intervals);
+		newIntervals.addAll(otherIntervals);
 
-		Collections.sort(newIntervals, new Comparator<Interval>(){
+		Collections.sort(newIntervals, new Comparator<Interval>()
+		{
 			@Override
 			public int compare(Interval o1, Interval o2) {
 				return new Integer(o1.getLower()).compareTo(o2.getLower());
 			}
 		});
-
-		// TODO - both domains already sorted
-		//      - is there a way to merge them without pre-sorting?
 
 		Stack<Interval> stack = new Stack<>();
 
