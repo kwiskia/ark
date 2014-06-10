@@ -23,6 +23,8 @@ package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ProductConstraint
@@ -43,56 +45,77 @@ public class IntegerProductConstraint implements Constraint<IntegerDomain>
 
 	@Override
 	public boolean update(Variable<IntegerDomain> variable) {
-		int aLower = a.getDomain().getMinimum();
-		int aUpper = a.getDomain().getMaximum();
-		int bLower = b.getDomain().getMinimum();
-		int bUpper = b.getDomain().getMaximum();
-		int cLower = c.getDomain().getMinimum();
-		int cUpper = c.getDomain().getMaximum();
-
-		int lower;
-		int upper;
+		List<Interval> intervals = new ArrayList<>();
 
 		if (variable == a) {
-			// c / b
-			if (bLower == 0 || bUpper == 0) {
-				if (a.getDomain().isUnique() && c.getDomain().isUnique()) {
-					return c.getDomain().getMinimum() == 0;
+			// a = c / b
+			for (Interval interval2 : b.getDomain()) {
+				for (Interval interval3 : c.getDomain()) {
+					if (interval2.contains(0) && interval3.contains(0)) {
+						return true;
+					}
+
+					addQuotient(intervals, interval3, interval2);
 				}
-
-				return true;
 			}
-
-			lower = min(cLower / bLower, cLower / bUpper, cUpper / bLower, cUpper / bUpper);
-			upper = max(cLower / bLower, cLower / bUpper, cUpper / bLower, cUpper / bUpper);
 		} else if (variable == b) {
-			// c / a
-			if (aLower == 0 || aUpper == 0) {
-				if (b.getDomain().isUnique() && c.getDomain().isUnique()) {
-					return c.getDomain().getMinimum() == 0;
+			// b = c / a
+			for (Interval interval1 : a.getDomain()) {
+				for (Interval interval3 : c.getDomain()) {
+					if (interval1.contains(0) && interval3.contains(0)) {
+						return true;
+					}
+
+					addQuotient(intervals, interval3, interval1);
 				}
-
-				return true;
 			}
-
-			lower = min(cLower / aLower, cLower / aUpper, cUpper / aLower, cUpper / aUpper);
-			upper = max(cLower / aLower, cLower / aUpper, cUpper / aLower, cUpper / aUpper);
-		} else if (variable == c) {
-			// a * b
-			lower = min(aLower * bLower, aLower * bUpper, aUpper * bLower, aUpper * bUpper);
-			upper = max(aLower * bLower, aLower * bUpper, aUpper * bLower, aUpper * bUpper);
 		} else {
-			throw new RuntimeException("Unreachable.");
+			// c = a * b
+			for (Interval interval1 : a.getDomain()) {
+				for (Interval interval2 : b.getDomain()) {
+					addProduct(intervals, interval1, interval2);
+				}
+			}
 		}
 
-		lower = Math.max(variable.getDomain().getMinimum(), lower);
-		upper = Math.min(variable.getDomain().getMaximum(), upper);
+		return variable.trySetValue(variable.getDomain().retainAll(new IntegerDomain().concat(intervals)));
+	}
 
-		if (upper < lower) {
-			return false;
+	private void addProduct(List<Interval> intervals, Interval interval1, Interval interval2) {
+		int a = interval1.getLower();
+		int b = interval1.getUpper();
+		int c = interval2.getLower();
+		int d = interval2.getUpper();
+
+		addProduct(intervals, a, b, c, d);
+	}
+
+	private void addQuotient(List<Interval> intervals, Interval interval1, Interval interval2) {
+		int a = interval1.getLower();
+		int b = interval1.getUpper();
+		int c = interval2.getLower();
+		int d = interval2.getUpper();
+
+		if (interval2.getLower() <= 0 && 0 <= interval2.getUpper()) {
+			if (c <= -1) addQuotient(intervals, a, b, c, -1);
+			if (d >= +1) addQuotient(intervals, a, b, +1, d);
+		} else {
+			addQuotient(intervals, a, b, c, d);
 		}
+	}
 
-		return variable.trySetValue(variable.getDomain().retain(new Interval(lower, upper)));
+	private void addProduct(List<Interval> intervals, int a, int b, int c, int d) {
+		int lower = Math.max(Interval.MIN_VALUE, min(a * c, a * d, b * c, b * d));
+		int upper = Math.min(Interval.MAX_VALUE, max(a * c, a * d, b * c, b * d));
+
+		intervals.add(new Interval(lower, upper));
+	}
+
+	private void addQuotient(List<Interval> intervals, int a, int b, int c, int d) {
+		int lower = min(a / c, a / d, b / c, b / d);
+		int upper = max(a / c, a / d, b / c, b / d);
+
+		intervals.add(new Interval(lower, upper));
 	}
 
 	private int min(int a, int b, int c, int d) {
