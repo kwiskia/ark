@@ -23,6 +23,8 @@ package com.kauri.ark.integer;
 
 import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * SumConstraint
@@ -43,37 +45,63 @@ public class IntegerSumConstraint implements Constraint<IntegerDomain>
 
 	@Override
 	public boolean update(Variable<IntegerDomain> variable) {
-		int aLower = a.getDomain().getMinimum();
-		int aUpper = a.getDomain().getMaximum();
-		int bLower = b.getDomain().getMinimum();
-		int bUpper = b.getDomain().getMaximum();
-		int cLower = c.getDomain().getMinimum();
-		int cUpper = c.getDomain().getMaximum();
-
-		int lower;
-		int upper;
+		List<Interval> intervals = new ArrayList<>();
 
 		if (variable == a) {
 			// a = c - b
-			lower = cLower - bUpper;
-			upper = cUpper - bLower;
+			for (Interval interval2 : b.getDomain()) {
+				for (Interval interval3 : c.getDomain()) {
+					addDifference(intervals, interval3, interval2);
+				}
+			}
 		} else if (variable == b) {
 			// b = c - a
-			lower = cLower - aUpper;
-			upper = cUpper - aLower;
+			for (Interval interval1 : a.getDomain()) {
+				for (Interval interval3 : c.getDomain()) {
+					addDifference(intervals, interval3, interval1);
+				}
+			}
 		} else {
 			// c = a + b
-			lower = aLower + bLower;
-			upper = aUpper + bUpper;
+			for (Interval interval1 : a.getDomain()) {
+				for (Interval interval2 : b.getDomain()) {
+					addSum(intervals, interval1, interval2);
+				}
+			}
 		}
 
-		lower = Math.max(Interval.MIN_VALUE, lower);
-		upper = Math.min(Interval.MAX_VALUE, upper);
+		return variable.trySetValue(variable.getDomain().retainAll(new IntegerDomain().concat(intervals)));
+	}
 
-		if (upper < lower) {
-			return false;
-		}
+	private void addDifference(List<Interval> intervals, Interval interval1, Interval interval2) {
+		int a = interval1.getLower();
+		int b = interval1.getUpper();
+		int c = interval2.getLower();
+		int d = interval2.getUpper();
 
-		return variable.trySetValue(variable.getDomain().retain(new Interval(lower, upper)));
+		addDifference(intervals, a, b, c, d);
+	}
+
+	private void addSum(List<Interval> intervals, Interval interval1, Interval interval2) {
+		int a = interval1.getLower();
+		int b = interval1.getUpper();
+		int c = interval2.getLower();
+		int d = interval2.getUpper();
+
+		addSum(intervals, a, b, c, d);
+	}
+
+	private void addDifference(List<Interval> intervals, int a, int b, int c, int d) {
+		int lower = Math.max(Interval.MIN_VALUE, a - d);
+		int upper = Math.min(Interval.MAX_VALUE, b - c);
+
+		intervals.add(new Interval(lower, upper));
+	}
+
+	private void addSum(List<Interval> intervals, int a, int b, int c, int d) {
+		int lower = Math.max(Interval.MIN_VALUE, a + c);
+		int upper = Math.min(Interval.MAX_VALUE, b + d);
+
+		intervals.add(new Interval(lower, upper));
 	}
 }
