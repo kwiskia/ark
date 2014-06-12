@@ -24,38 +24,77 @@ package com.kauri.ark;
 import java.util.Stack;
 
 /**
- * Trail
+ * A backtracking stack of domain values mapped to variables.
  *
  * @author Eric Fritz
  */
-public class Trail
+final class Trail
 {
+	/**
+	 * The stack of domain values.
+	 */
 	private Stack<VarState> stack = new Stack<>();
 
+	/**
+	 * Returns the size of the current stack.
+	 * <p/>
+	 * This method is meant to be used in conjunction with <tt>restore</tt>.
+	 *
+	 * @return The size of the current stack.
+	 */
 	public int size() {
 		return stack.size();
 	}
 
-	public <T extends Domain> void save(Variable<T> variable, T domain) {
-		stack.push(new VarState(variable, domain));
+	/**
+	 * Saves the current domain of a variable on the stack.
+	 *
+	 * @param variable The variable.
+	 */
+	public <T extends Domain> void save(Variable<T> variable) {
+		stack.push(new VarState(variable, variable.getDomain()));
 	}
 
+	/**
+	 * Unwinds the stack, restoring all changes to domains since <tt>mark</tt>.
+	 *
+	 * @param mark The number of times to unwind the stack.
+	 */
 	public void restore(int mark) {
 		while (stack.size() > mark) {
 			stack.pop().restore();
 		}
 	}
 
+	/**
+	 * A variable/domain pair.
+	 */
 	private class VarState<T extends Domain>
 	{
+		/**
+		 * The variable.
+		 */
 		private Variable<T> variable;
+
+		/**
+		 * The domain.
+		 */
 		private T domain;
 
+		/**
+		 * Creates a new VarState.
+		 *
+		 * @param variable The variable.
+		 * @param domain   The domain.
+		 */
 		public VarState(Variable<T> variable, T domain) {
 			this.variable = variable;
 			this.domain = domain;
 		}
 
+		/**
+		 * Restores the variable's old domain value.
+		 */
 		public void restore() {
 			variable.setDomain(domain);
 		}

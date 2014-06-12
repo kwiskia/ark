@@ -25,28 +25,46 @@ import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
 
 /**
- * IntervalInequalityConstraint
+ * A constraint which forces an integer variable to be distinct from another integer variable.
  *
  * @author Eric Fritz
  */
 public class IntegerInequalityConstraint implements Constraint<IntegerDomain>
 {
-	private Variable<IntegerDomain>[] variables;
+	/**
+	 * The first variable.
+	 */
+	private Variable<IntegerDomain> var1;
 
-	public IntegerInequalityConstraint(Variable<IntegerDomain>... variables) {
-		this.variables = variables;
+	/**
+	 * The second variable.
+	 */
+	private Variable<IntegerDomain> var2;
+
+	/**
+	 * Creates a new IntegerInequalityConstraint.
+	 *
+	 * @param var1 The first variable.
+	 * @param var2 The second variable.
+	 */
+	public IntegerInequalityConstraint(Variable<IntegerDomain> var1, Variable<IntegerDomain> var2) {
+		this.var1 = var1;
+		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
-		IntegerDomain domain = variable.getDomain();
+	public boolean narrow(Variable<IntegerDomain> variable) {
+		// Narrow the domain of the argument variable to remove the unique element of the other domain. If the other
+		// domain has not been narrowed to a unique value, we cannot narrow the argument domain without pruning some
+		// valid assignment.
 
-		for (Variable<IntegerDomain> v : variables) {
-			if (v != variable && v.getDomain().isUnique()) {
-				domain = domain.removeAll(v.getDomain());
-			}
+		IntegerDomain domain1 = variable == var1 ? var1.getDomain() : var2.getDomain();
+		IntegerDomain domain2 = variable == var1 ? var2.getDomain() : var1.getDomain();
+
+		if (!domain2.isUnique()) {
+			return true;
 		}
 
-		return variable.trySetValue(domain);
+		return variable.trySetValue(domain1.removeAll(domain2));
 	}
 }

@@ -22,19 +22,44 @@
 package com.kauri.ark;
 
 /**
- * Domain
+ * Represents a set of values parameterized by <tt>T</tt>.
  *
  * @author Eric Fritz
  */
 public interface Domain<T>
 {
+	/**
+	 * Returns the number of values in the set.
+	 *
+	 * @return The number of values in the set.
+	 */
 	int size();
 
+	/**
+	 * Returns <tt>true</tt> if the domain is empty, <tt>false</tt> otherwise.
+	 *
+	 * @return <tt>true</tt> if the domain is empty, <tt>false</tt> otherwise.
+	 */
 	boolean isEmpty();
 
+	/**
+	 * Returns <tt>true</tt> if the domain has a single value, <tt>false</tt> otherwise.
+	 *
+	 * @return <tt>true</tt> if the domain has a single value, <tt>false</tt> otherwise.
+	 */
 	boolean isUnique();
 
+	/**
+	 * Returns the unique value of the domain.
+	 *
+	 * @return The unique value of the domain.
+	 */
 	T getUniqueValue();
 
+	/**
+	 * Returns a special kind of iterator over the unique values of the domain.
+	 *
+	 * @return A special kind of iterator over the unique values of the domain.
+	 */
 	DomainIterator<T> getUniqueValues();
 }

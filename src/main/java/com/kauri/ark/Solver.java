@@ -30,25 +30,61 @@ import java.util.Queue;
 import java.util.Stack;
 
 /**
- * Solver
+ * The constraint network solver.
  *
  * @author Eric Fritz
  */
-public class Solver
+final public class Solver
 {
-	private List<Variable<?>> variables = new ArrayList<>();
+	/**
+	 * A list of registered variables.
+	 */
+	private List<Variable> variables = new ArrayList<>();
+
+	/**
+	 * A map of variables to their relevant constraint arcs.
+	 */
 	private Map<Variable, List<Arc>> neighbors = new HashMap<>();
 
+	/**
+	 * A queue of arcs which should be updated.
+	 */
 	private Queue<Arc> worklist = new LinkedList<>();
+
+	/**
+	 * Whether the solver is currently looking for solutions.
+	 */
 	private boolean solving = false;
 
+	/**
+	 * The backtracking stack.
+	 */
 	private Trail trail = new Trail();
 
+	/**
+	 * Register a variable with the constraint network.
+	 *
+	 * @param variable The variable.
+	 *
+	 * @throws RuntimeException If the variable is already registered.
+	 */
 	public <T extends Domain> void addVariable(Variable<T> variable) {
+		if (variables.contains(variable)) {
+			throw new RuntimeException("Variable already registered.");
+		}
+
 		variables.add(variable);
 		neighbors.put(variable, new ArrayList<Arc>());
 	}
 
+	/**
+	 * Registers a constraint with the constraint network.
+	 *
+	 * @param constraint The constraint.
+	 * @param variables  The set of constrained variables.
+	 *
+	 * @throws RuntimeException If one of the constrained variables has not been registered.
+	 */
 	public <T extends Domain> void addConstraint(Constraint<T> constraint, Variable<T>... variables) {
 		for (Variable<T> variable1 : variables) {
 			if (!this.variables.contains(variable1)) {
@@ -67,6 +103,41 @@ public class Solver
 		}
 	}
 
+	/**
+	 * Updates the current domain of a variable if the assignment is consistent with the network.
+	 *
+	 * @param variable The variable.
+	 * @param domain   The domain.
+	 *
+	 * @return <tt>true</tt> if the domain is immediately consistent (non-empty), <tt>false</tt> otherwise.
+	 *
+	 * @throws RuntimeException If the variable has not been registered.
+	 */
+	public <T extends Domain> boolean trySetValue(Variable<T> variable, T domain) {
+		if (!variables.contains(variable)) {
+			throw new RuntimeException("Setting assignment on non-registered variable.");
+		}
+
+		if (domain.isEmpty()) {
+			return false;
+		}
+
+		if (!variable.getDomain().equals(domain)) {
+			trail.save(variable);
+			variable.setDomain(domain);
+			queueNeighboringArcs(variable);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Begins solving the constraint network.
+	 *
+	 * @param handler The solution handler.
+	 *
+	 * @throws RuntimeException If the solver is already looking for solutions.
+	 */
 	public void solve(SolutionHandler handler) {
 		if (variables.isEmpty()) {
 			return;
@@ -84,9 +155,21 @@ public class Solver
 
 		solving = true;
 		solveRecursive(handler, new Stack<Variable>());
+
+		trail.restore(trail.size());
 		solving = false;
 	}
 
+	/**
+	 * The main solver routine. If all variables have a unique assignment, then the <tt>handler</tt> is called.
+	 * Otherwise, a unassigned variable is chosen, and for each unique value in its current domain, the domain
+	 * is assigned that value and the rest of the network is solved recursively.
+	 * <p/>
+	 * If the handler returns <tt>false</tt>, we immediately stop solving and rewind the stack.
+	 *
+	 * @param handler  The solution handler.
+	 * @param selected The variables which are already assigned.
+	 */
 	private void solveRecursive(SolutionHandler handler, Stack<Variable> selected) {
 		if (!solving) {
 			return;
@@ -128,6 +211,13 @@ public class Solver
 		selected.pop();
 	}
 
+	/**
+	 * Selects a variable which is not in <tt>selected</tt> with the fewest elements in its current domain.
+	 *
+	 * @param selected The variables which are already assigned.
+	 *
+	 * @return The most constrained variable.
+	 */
 	private Variable getMostConstrainedVariable(Stack<Variable> selected) {
 		Variable v1 = null;
 
@@ -144,24 +234,11 @@ public class Solver
 		return v1;
 	}
 
-	public <T extends Domain> boolean trySetValue(Variable<T> variable, T domain) {
-		if (!variables.contains(variable)) {
-			throw new RuntimeException("Setting assignment on non-registered variable.");
-		}
-
-		if (domain.isEmpty()) {
-			return false;
-		}
-
-		if (!variable.getDomain().equals(domain)) {
-			trail.save(variable, variable.getDomain());
-			variable.setDomain(domain);
-			queueNeighboringArcs(variable);
-		}
-
-		return true;
-	}
-
+	/**
+	 * Adds all the arcs neighboring <tt>variable</tt> to <tt>worklist</tt>.
+	 *
+	 * @param variable The variable.
+	 */
 	private <T extends Domain> void queueNeighboringArcs(Variable<T> variable) {
 		for (Arc<T> arc : neighbors.get(variable)) {
 			if (!worklist.contains(arc)) {
@@ -170,6 +247,11 @@ public class Solver
 		}
 	}
 
+	/**
+	 * Iterates the worklist, updating each arc.
+	 *
+	 * @return <tt>true</tt> if the network is consistent, <tt>false</tt> otherwise.
+	 */
 	private boolean resolveConstraints() {
 		while (!worklist.isEmpty()) {
 			if (!worklist.poll().update()) {

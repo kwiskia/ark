@@ -35,24 +35,46 @@ import java.util.Queue;
 import java.util.Stack;
 
 /**
- * TempIntegerDomain
+ * An integer domain represents a finite set of integers.
  *
  * @author Eric Fritz
  */
 public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 {
+	/**
+	 * A list of disjoint intervals.
+	 */
 	private List<Interval> intervals = new ArrayList<>();
+
+	/**
+	 * The total number of unique integers in the domain.
+	 */
 	private int size;
 
+	/**
+	 * Creates a new IntegerDomain with no values.
+	 */
 	public IntegerDomain() {
 		this(new ArrayList<Interval>());
 	}
 
+	/**
+	 * Creates a new IntegerDomain from an interval.
+	 *
+	 * @param interval The interval.
+	 */
 	public IntegerDomain(Interval interval) {
 		this(Arrays.asList(interval));
 	}
 
-	public IntegerDomain(List<Interval> intervals) {
+	/**
+	 * Creates a new IntegerDomain from a list of intervals.
+	 * <p/>
+	 * The intervals are assumed to be sorted and disjoint.
+	 *
+	 * @param intervals The list of intervals.
+	 */
+	private IntegerDomain(List<Interval> intervals) {
 		this.intervals = intervals;
 
 		int size = 0;
@@ -61,10 +83,6 @@ public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 		}
 
 		this.size = size;
-	}
-
-	public Iterator<Interval> iterator() {
-		return intervals.iterator();
 	}
 
 	@Override
@@ -82,10 +100,67 @@ public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 		return size == 1;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @return The unique value of the domain.
+	 *
+	 * @throws RuntimeException If the domain is not unique.
+	 */
+	@Override
+	public Integer getUniqueValue() {
+		if (!isUnique()) {
+			throw new RuntimeException("Domain has not been narrowed to a unique value.");
+		}
+
+		return getMinimum();
+	}
+
+	@Override
+	public DomainIterator<Integer> getUniqueValues() {
+		return new IntegerDomainIterator();
+	}
+
+	@Override
+	public Iterator<Interval> iterator() {
+		return intervals.iterator();
+	}
+
+	/**
+	 * Returns <tt>true</tt> if this domain contains <tt>value</tt>.
+	 *
+	 * @param value The value.
+	 *
+	 * @return <tt>true</tt> if this domain contains <tt>value</tt>.
+	 */
+	public boolean contains(int value) {
+		for (Interval i : this) {
+			if (i.contains(value)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns a new IntegerDomain constructed by the union of this domain and <tt>other</tt>.
+	 *
+	 * @param other Another IntegerDomain.
+	 *
+	 * @return A new IntegerDomain.
+	 */
 	public IntegerDomain concat(IntegerDomain other) {
 		return concat(other.intervals);
 	}
 
+	/**
+	 * Returns a new IntegerDomain constructed by the union of this domain and <tt>intervals</tt>.
+	 *
+	 * @param otherIntervals A list of intervals.
+	 *
+	 * @return A new IntegerDomain.
+	 */
 	public IntegerDomain concat(List<Interval> otherIntervals) {
 		List<Interval> newIntervals = new ArrayList<>();
 		newIntervals.addAll(intervals);
@@ -122,6 +197,11 @@ public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 		return new IntegerDomain(stack);
 	}
 
+	/**
+	 * Returns a new IntegerDomain constructed by negating each value in this domain.
+	 *
+	 * @return A new IntegerDomain.
+	 */
 	public IntegerDomain negate() {
 		List<Interval> newIntervals = new ArrayList<>();
 
@@ -132,6 +212,15 @@ public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 		return new IntegerDomain(newIntervals);
 	}
 
+	/**
+	 * Returns a new IntegerDomain constructed by retaining only the interval <tt>interval</tt>.
+	 *
+	 * @param interval The interval.
+	 *
+	 * @return A new IntegerDomain constructed by retaining only the interval <tt>interval</tt>.
+	 *
+	 * @throws RuntimeException If the element is not part of the domain.
+	 */
 	public IntegerDomain retain(Interval interval) {
 		List<Interval> newIntervals = new ArrayList<>();
 
@@ -146,10 +235,28 @@ public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 		return new IntegerDomain(newIntervals);
 	}
 
+	/**
+	 * Returns a new IntegerDomain constructed by removing only the interval <tt>interval</tt>.
+	 *
+	 * @param interval The interval.
+	 *
+	 * @return A new IntegerDomain constructed by removing only the interval <tt>interval</tt>.
+	 *
+	 * @throws RuntimeException If the element is not part of the domain.
+	 */
 	public IntegerDomain remove(Interval interval) {
 		return new IntegerDomain(remove(intervals, interval));
 	}
 
+	/**
+	 * Returns a new IntegerDomain constructed by retaining the elements in <tt>other</tt>.
+	 *
+	 * @param other Another IntegerDomain.
+	 *
+	 * @return A new IntegerDomain constructed by retaining the elements in <tt>other</tt>.
+	 *
+	 * @throws RuntimeException If the finite domains do not match.
+	 */
 	public IntegerDomain retainAll(IntegerDomain other) {
 		List<Interval> newIntervals = new ArrayList<>();
 
@@ -166,6 +273,15 @@ public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 		return new IntegerDomain(newIntervals);
 	}
 
+	/**
+	 * Returns a new IntegerDomain constructed by removing the elements in <tt>other</tt>.
+	 *
+	 * @param other Another IntegerDomain.
+	 *
+	 * @return A new IntegerDomain constructed by removing the elements in <tt>other</tt>.
+	 *
+	 * @throws RuntimeException If the finite domains do not match.
+	 */
 	public IntegerDomain removeAll(IntegerDomain other) {
 		//
 		// TODO - can do in single pass?
@@ -180,27 +296,41 @@ public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 		return new IntegerDomain(newIntervals);
 	}
 
-	@Override
-	public DomainIterator<Integer> getUniqueValues() {
-		return new IntegerDomainIterator();
-	}
-
+	/**
+	 * Returns the minimum value in this domain.
+	 *
+	 * @return The minimum value in this domain.
+	 */
 	public int getMinimum() {
 		return intervals.get(0).getLower();
 	}
 
+	/**
+	 * Returns the maximum value in this domain.
+	 *
+	 * @return The maximum value in this domain.
+	 */
 	public int getMaximum() {
 		return intervals.get(intervals.size() - 1).getUpper();
 	}
 
 	@Override
-	public Integer getUniqueValue() {
-		if (!isUnique()) {
-			throw new RuntimeException("Domain has not been narrowed to a unique value.");
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof IntegerDomain)) {
+			return false;
 		}
 
-		return getMinimum();
+		return intervals.equals(((IntegerDomain) o).intervals);
 	}
+
+	@Override
+	public String toString() {
+		return intervals.toString();
+	}
+
+	//
+	// TODO - document
+	//
 
 	private class IntegerDomainIterator implements DomainIterator<Integer>
 	{
@@ -257,21 +387,6 @@ public class IntegerDomain implements Domain<Integer>, Iterable<Interval>
 			}
 		}
 	}
-
-	public boolean equals(Object o) {
-		if (o == null || !(o instanceof IntegerDomain)) {
-			return false;
-		}
-
-		return intervals.equals(((IntegerDomain) o).intervals);
-	}
-
-	public String toString() {
-		return intervals.toString();
-	}
-
-	//
-	// Interval Implementation
 
 	private List<Interval> remove(List<Interval> intervals, Interval interval) {
 		List<Interval> newIntervals = new ArrayList<>();

@@ -25,18 +25,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Solution
+ * A unique solution for the constraint network.
  *
  * @author Eric Fritz
  */
-public class Solution
+final public class Solution
 {
+	/**
+	 * A map of variables to their unique assignment.
+	 */
 	private Map<Variable, Object> assignment = new HashMap<>();
 
+	/**
+	 * Adds a variable and its assignment to the solution.
+	 *
+	 * @param variable The variable.
+	 */
 	public <T extends Domain> void add(Variable<T> variable) {
 		assignment.put(variable, variable.getDomain().getUniqueValue());
 	}
 
+	/**
+	 * Retrieves the assignment of a variable.
+	 *
+	 * @param variable The variable.
+	 *
+	 * @return The variable's assignment.
+	 */
 	public <T extends Domain<R>, R> R get(Variable<T> variable) {
 		if (!assignment.containsKey(variable)) {
 			throw new RuntimeException("Variable not present in assignment.");

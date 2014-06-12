@@ -25,28 +25,46 @@ import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
 
 /**
- * InequalityConstraint
+ * A constraint which forces a finite domain variable to be distinct from another finite domain variable.
  *
  * @author Eric Fritz
  */
 public class FiniteDomainInequalityConstraint<T> implements Constraint<FiniteDomain<T>>
 {
-	private Variable<FiniteDomain<T>>[] variables;
+	/**
+	 * The first variable.
+	 */
+	private Variable<FiniteDomain<T>> var1;
 
-	public FiniteDomainInequalityConstraint(Variable<FiniteDomain<T>>... variables) {
-		this.variables = variables;
+	/**
+	 * The second variable.
+	 */
+	private Variable<FiniteDomain<T>> var2;
+
+	/**
+	 * Creates a new FiniteDomainInequalityConstraint.
+	 *
+	 * @param var1 The first variable.
+	 * @param var2 The second variable.
+	 */
+	public FiniteDomainInequalityConstraint(Variable<FiniteDomain<T>> var1, Variable<FiniteDomain<T>> var2) {
+		this.var1 = var1;
+		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(Variable<FiniteDomain<T>> variable) {
-		FiniteDomain<T> domain = variable.getDomain();
+	public boolean narrow(Variable<FiniteDomain<T>> variable) {
+		// Narrow the domain of the argument variable to remove the unique element of the other domain. If the other
+		// domain has not been narrowed to a unique value, we cannot narrow the argument domain without pruning some
+		// valid assignment.
 
-		for (Variable<FiniteDomain<T>> v : variables) {
-			if (v != variable && v.getDomain().isUnique()) {
-				domain = domain.removeAll(v.getDomain());
-			}
+		FiniteDomain<T> domain1 = variable == var1 ? var1.getDomain() : var2.getDomain();
+		FiniteDomain<T> domain2 = variable == var1 ? var2.getDomain() : var1.getDomain();
+
+		if (!domain2.isUnique()) {
+			return true;
 		}
 
-		return variable.trySetValue(domain);
+		return variable.trySetValue(domain1.removeAll(domain2));
 	}
 }

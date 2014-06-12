@@ -22,11 +22,18 @@
 package com.kauri.ark;
 
 /**
- * SolutionHandler
+ * A handler which is used to receive solutions to a constraint network.
  *
  * @author Eric Fritz
  */
 public interface SolutionHandler
 {
+	/**
+	 * Called when a solver produces a solution.
+	 *
+	 * @param solution The solution.
+	 *
+	 * @return <tt>false</tt> to stop solving, <tt>true</tt> otherwise.
+	 */
 	public boolean handle(Solution solution);
 }

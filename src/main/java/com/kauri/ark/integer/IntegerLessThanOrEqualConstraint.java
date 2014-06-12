@@ -25,39 +25,45 @@ import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
 
 /**
- * IntervalLessThanOrEqualConstraint
+ * A constraint which forces an integer variable to be less than or equal to another integer variable.
  *
  * @author Eric Fritz
  */
 public class IntegerLessThanOrEqualConstraint implements Constraint<IntegerDomain>
 {
+	/**
+	 * The smaller variable.
+	 */
 	private Variable<IntegerDomain> var1;
+
+	/**
+	 * The larger variable.
+	 */
 	private Variable<IntegerDomain> var2;
 
+	/**
+	 * Creates a new IntegerLessThanOrEqualConstraint.
+	 *
+	 * @param var1 The smaller variable.
+	 * @param var2 The larger variable.
+	 */
 	public IntegerLessThanOrEqualConstraint(Variable<IntegerDomain> var1, Variable<IntegerDomain> var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
-		Variable<IntegerDomain> other = variable == var1 ? var2 : var1;
+	public boolean narrow(Variable<IntegerDomain> variable) {
+		// Narrow the domain of the argument variable to retain only consistent (valid) values:
+		//   1) when updating var1 variable, [..., max(var2)] is are valid, and
+		//   2) when updating var2 variable, [min(var1), ...] is are valid.
 
-		int lower = Interval.MIN_VALUE;
-		int upper = Interval.MAX_VALUE;
+		IntegerDomain domain1 = variable == var1 ? var1.getDomain() : var2.getDomain();
+		IntegerDomain domain2 = variable == var1 ? var2.getDomain() : var1.getDomain();
 
-		if (variable == var1) {
-			// remove everything greater than the largest integer in other
-			upper = other.getDomain().getMaximum();
-		} else {
-			// remove everything smaller than the smallest integer in other
-			lower = other.getDomain().getMinimum();
-		}
+		int lower = variable == var2 ? domain2.getMinimum() : Interval.MIN_VALUE;
+		int upper = variable == var1 ? domain2.getMaximum() : Interval.MAX_VALUE;
 
-		if (lower > upper) {
-			return false;
-		}
-
-		return variable.trySetValue(variable.getDomain().retain(new Interval(lower, upper)));
+		return variable.trySetValue(domain1.retain(new Interval(lower, upper)));
 	}
 }

@@ -25,15 +25,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Mapping
+ * A bijective mapping from one element type to another element type.
  *
  * @author Eric Fritz
  */
 public class Mapping<T1, T2>
 {
+	/**
+	 * The forward map.
+	 */
 	private Map<T1, T2> map1 = new HashMap<>();
+
+	/**
+	 * The inverse map.
+	 */
 	private Map<T2, T1> map2 = new HashMap<>();
 
+	/**
+	 * Add a new relation to the mapping.
+	 *
+	 * @param element1 The element from the left domain.
+	 * @param element2 The element from the right domain.
+	 *
+	 * @throws RuntimeException If the map already contains <tt>element1</tt> or <tt>element2</tt>.
+	 */
 	public void map(T1 element1, T2 element2) {
 		if (map1.containsKey(element1) || map2.containsKey(element2)) {
 			throw new RuntimeException("Element already mapped.");
@@ -43,6 +58,15 @@ public class Mapping<T1, T2>
 		map2.put(element2, element1);
 	}
 
+	/**
+	 * Returns the element mapped to by <tt>element</tt>.
+	 *
+	 * @param element The element in the domain.
+	 *
+	 * @return The element mapped to by <tt>element</tt>.
+	 *
+	 * @throws RuntimeException If there is not a registered mapping from <tt>element</tt> to another value.
+	 */
 	public T2 getForwardMapping(T1 element) {
 		if (!map1.containsKey(element)) {
 			throw new RuntimeException("Element is not in map.");
@@ -51,6 +75,15 @@ public class Mapping<T1, T2>
 		return map1.get(element);
 	}
 
+	/**
+	 * Returns the element mapped to by <tt>element</tt>.
+	 *
+	 * @param element The element in the codomain.
+	 *
+	 * @return The element mapped to by <tt>element</tt>.
+	 *
+	 * @throws RuntimeException If there is not a registered mapping from <tt>element</tt> to another value.
+	 */
 	public T1 getReverseMapping(T2 element) {
 		if (!map2.containsKey(element)) {
 			throw new RuntimeException("Element is not in map.");

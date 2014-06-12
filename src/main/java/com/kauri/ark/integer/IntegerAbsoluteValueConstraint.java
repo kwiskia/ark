@@ -25,43 +25,49 @@ import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
 
 /**
- * IntegerAbsoluteValueConstraint
+ * A constraint which forces an integer variable to be the absolute value of another integer variable.
  *
  * @author Eric Fritz
  */
 public class IntegerAbsoluteValueConstraint implements Constraint<IntegerDomain>
 {
+	/**
+	 * The unconstrainted variable.
+	 */
 	private Variable<IntegerDomain> var1;
+
+	/**
+	 * The absolute value variable.
+	 */
 	private Variable<IntegerDomain> var2;
 
+	/**
+	 * Creates a new IntegerAbsoluteValueConstraint.
+	 *
+	 * @param var1 The unconstrainted variable.
+	 * @param var2 The absolute value variable.
+	 */
 	public IntegerAbsoluteValueConstraint(Variable<IntegerDomain> var1, Variable<IntegerDomain> var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
-		Variable<IntegerDomain> other = variable == var1 ? var2 : var1;
+	public boolean narrow(Variable<IntegerDomain> variable) {
+		// Narrow the domain of the argument variable to retain only consistent (valid) values.
+		//   1) when updating var1, non-negative values in var2 and negated non-negative values in var2 are valid, and
+		//   2) when updating var2, non-negative values in var1 and negated     negative values in var1 are valid.
 
-		IntegerDomain d;
+		IntegerDomain domain1 = variable == var1 ? var1.getDomain() : var2.getDomain();
+		IntegerDomain domain2 = variable == var1 ? var2.getDomain() : var1.getDomain();
+
+		IntegerDomain pos = domain2.retain(new Interval(+0, Interval.MAX_VALUE));
+		IntegerDomain neg = domain2.retain(new Interval(Interval.MIN_VALUE, -1));
 
 		if (variable == var1) {
-			// var1 = |var2|
-			// var2 has changed
-			// reduce var1's domain to include only var2 + [-i for i in var2]
-
-			IntegerDomain pos = other.getDomain().retain(new Interval(+0, Interval.MAX_VALUE));
-			d = pos.concat(pos.negate());
+			return variable.trySetValue(domain1.retainAll(pos.concat(pos.negate())));
 		} else {
-			// var1 = |var2|
-			// var1 has changed
-			// reduce var2's domain to include only [i for i in var1 where i > 0] + [+i for i in var1 where i <= 0]
-
-			IntegerDomain pos = other.getDomain().retain(new Interval(+0, Interval.MAX_VALUE));
-			IntegerDomain neg = other.getDomain().retain(new Interval(Interval.MIN_VALUE, -1));
-			d = pos.concat(neg.negate());
+			return variable.trySetValue(domain1.retainAll(pos.concat(neg.negate())));
 		}
-
-		return variable.trySetValue(variable.getDomain().retainAll(d));
 	}
 }

@@ -27,16 +27,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SumConstraint
+ * A constraint which forces an integer variable to be the sum of two other integer variables.
  *
  * @author Eric Fritz
  */
 public class IntegerSumConstraint implements Constraint<IntegerDomain>
 {
+	/**
+	 * The augend variable.
+	 */
 	private Variable<IntegerDomain> a;
+
+	/**
+	 * The addend variable.
+	 */
 	private Variable<IntegerDomain> b;
+
+	/**
+	 * The sum variable.
+	 */
 	private Variable<IntegerDomain> c;
 
+	/**
+	 * Creates a new IntegerSumConstraint.
+	 *
+	 * @param a The augend variable.
+	 * @param b The addend variable.
+	 * @param c The sum variable.
+	 */
 	public IntegerSumConstraint(Variable<IntegerDomain> a, Variable<IntegerDomain> b, Variable<IntegerDomain> c) {
 		this.a = a;
 		this.b = b;
@@ -44,28 +62,30 @@ public class IntegerSumConstraint implements Constraint<IntegerDomain>
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
+	public boolean narrow(Variable<IntegerDomain> variable) {
+		// Narrow the domain of the argument variable to include (at most) the intervals satisfying:
+		//   [when variable == a]: ci - bj for each interval ci in c and bj in b,
+		//   [when variable == b]: ci - aj for each interval ci in c and aj in a,
+		//   [when variable == c]: ai + bj for each interval ai in a and bj in b.
+
 		List<Interval> intervals = new ArrayList<>();
 
 		if (variable == a) {
-			// a = c - b
-			for (Interval interval2 : b.getDomain()) {
-				for (Interval interval3 : c.getDomain()) {
-					addDifference(intervals, interval3, interval2);
+			for (Interval ci : c.getDomain()) {
+				for (Interval bj : b.getDomain()) {
+					addDifference(intervals, ci, bj);
 				}
 			}
 		} else if (variable == b) {
-			// b = c - a
-			for (Interval interval1 : a.getDomain()) {
-				for (Interval interval3 : c.getDomain()) {
-					addDifference(intervals, interval3, interval1);
+			for (Interval ci : c.getDomain()) {
+				for (Interval aj : a.getDomain()) {
+					addDifference(intervals, ci, aj);
 				}
 			}
 		} else {
-			// c = a + b
-			for (Interval interval1 : a.getDomain()) {
-				for (Interval interval2 : b.getDomain()) {
-					addSum(intervals, interval1, interval2);
+			for (Interval ai : a.getDomain()) {
+				for (Interval bj : b.getDomain()) {
+					addSum(intervals, ai, bj);
 				}
 			}
 		}
@@ -73,34 +93,40 @@ public class IntegerSumConstraint implements Constraint<IntegerDomain>
 		return variable.trySetValue(variable.getDomain().retainAll(new IntegerDomain().concat(intervals)));
 	}
 
-	private void addDifference(List<Interval> intervals, Interval interval1, Interval interval2) {
-		int a = interval1.getLower();
-		int b = interval1.getUpper();
-		int c = interval2.getLower();
-		int d = interval2.getUpper();
-
-		addDifference(intervals, a, b, c, d);
-	}
-
+	/**
+	 * Calculate `[a, b] + [c, d]' and add it to the list <tt>intervals</tt>.
+	 *
+	 * @param intervals The interval list.
+	 * @param interval1 The interval [a, b].
+	 * @param interval2 The interval [c, d].
+	 */
 	private void addSum(List<Interval> intervals, Interval interval1, Interval interval2) {
 		int a = interval1.getLower();
 		int b = interval1.getUpper();
 		int c = interval2.getLower();
 		int d = interval2.getUpper();
 
-		addSum(intervals, a, b, c, d);
-	}
-
-	private void addDifference(List<Interval> intervals, int a, int b, int c, int d) {
-		int lower = Math.max(Interval.MIN_VALUE, a - d);
-		int upper = Math.min(Interval.MAX_VALUE, b - c);
+		int lower = Math.max(Interval.MIN_VALUE, a + c);
+		int upper = Math.min(Interval.MAX_VALUE, b + d);
 
 		intervals.add(new Interval(lower, upper));
 	}
 
-	private void addSum(List<Interval> intervals, int a, int b, int c, int d) {
-		int lower = Math.max(Interval.MIN_VALUE, a + c);
-		int upper = Math.min(Interval.MAX_VALUE, b + d);
+	/**
+	 * Calculate `[a, b] - [c, d]' and add it to the list <tt>intervals</tt>.
+	 *
+	 * @param intervals The interval list.
+	 * @param interval1 The interval [a, b].
+	 * @param interval2 The interval [c, d].
+	 */
+	private void addDifference(List<Interval> intervals, Interval interval1, Interval interval2) {
+		int a = interval1.getLower();
+		int b = interval1.getUpper();
+		int c = interval2.getLower();
+		int d = interval2.getUpper();
+
+		int lower = Math.max(Interval.MIN_VALUE, a - d);
+		int upper = Math.min(Interval.MAX_VALUE, b - c);
 
 		intervals.add(new Interval(lower, upper));
 	}

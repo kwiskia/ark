@@ -25,23 +25,41 @@ import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
 
 /**
- * IntegerNegationConstraint
+ * A constraint which forces an integer variable to be the negation of another integer variable.
  *
  * @author Eric Fritz
  */
 public class IntegerNegationConstraint implements Constraint<IntegerDomain>
 {
+	/**
+	 * The unconstrained variable.
+	 */
 	private Variable<IntegerDomain> var1;
+
+	/**
+	 * The negated variable.
+	 */
 	private Variable<IntegerDomain> var2;
 
+	/**
+	 * Creates a new IntegerNegationConstraint.
+	 *
+	 * @param var1 The unconstrained variable.
+	 * @param var2 The negated variable.
+	 */
 	public IntegerNegationConstraint(Variable<IntegerDomain> var1, Variable<IntegerDomain> var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
-		Variable<IntegerDomain> other = variable == var1 ? var2 : var1;
-		return variable.trySetValue(variable.getDomain().retainAll(other.getDomain().negate()));
+	public boolean narrow(Variable<IntegerDomain> variable) {
+		// Narrow the domain of the argument variable to include (at most) the negated elements of the other domain.
+		// Notice that retainAll on a negated domain is not a transitive operation (signs will reverse). Careful --.
+
+		IntegerDomain domain1 = variable == var1 ? var1.getDomain() : var2.getDomain();
+		IntegerDomain domain2 = variable == var1 ? var2.getDomain() : var1.getDomain();
+
+		return variable.trySetValue(domain1.retainAll(domain2.negate()));
 	}
 }

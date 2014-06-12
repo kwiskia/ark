@@ -30,20 +30,42 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * TempFiniteDomain
+ * A finite domain represents an ordered set of elements of type <tt>T</tt>.
  *
  * @author Eric Fritz
  */
 public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 {
+	/**
+	 * The elements which form the finite domain.
+	 */
 	private List<T> elements;
+
+	/**
+	 * A bitset indicating which elements are currently in the domain.
+	 */
 	private BitSet bitset;
+
+	/**
+	 * The number of elements currently in the domain.
+	 */
 	private int size;
 
+	/**
+	 * Creates a new FiniteDomain.
+	 *
+	 * @param elements The elements which form the finite domain.
+	 */
 	public FiniteDomain(List<T> elements) {
 		this(elements, null);
 	}
 
+	/**
+	 * Creates a new FiniteDomain.
+	 *
+	 * @param elements The elements which form the finite domain.
+	 * @param bitset   A bitset indicating which elements are currently in the domain.
+	 */
 	public FiniteDomain(List<T> elements, BitSet bitset) {
 		if (bitset == null) {
 			bitset = new BitSet(elements.size());
@@ -70,70 +92,13 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 		return size == 1;
 	}
 
-	public <T2> FiniteDomain<T> mapForward(FiniteDomain<T2> domain, Mapping<T2, T> mapping) {
-		BitSet newSet = new BitSet();
-
-		for (T2 element : domain) {
-			newSet.set(elements.indexOf(mapping.getForwardMapping(element)));
-		}
-
-		return new FiniteDomain<>(elements, newSet);
-	}
-
-	public <T2> FiniteDomain<T> mapReverse(FiniteDomain<T2> domain, Mapping<T, T2> mapping) {
-		BitSet newSet = new BitSet();
-
-		for (T2 element : domain) {
-			newSet.set(elements.indexOf(mapping.getReverseMapping(element)));
-		}
-
-		return new FiniteDomain<>(elements, newSet);
-	}
-
-	public boolean contains(T element) {
-		return bitset.get(indexOf(element));
-	}
-
-	public FiniteDomain<T> retain(T element) {
-		BitSet newSet = new BitSet(bitset.size());
-		newSet.set(indexOf(element));
-		return new FiniteDomain<>(elements, newSet);
-	}
-
-	public FiniteDomain<T> remove(T element) {
-		BitSet newSet = bitset.get(0, bitset.size());
-		newSet.clear(indexOf(element));
-		return new FiniteDomain<>(elements, newSet);
-	}
-
-	private int indexOf(T element) {
-		if (!elements.contains(element)) {
-			throw new RuntimeException("Element does not belong to finite domain.");
-		}
-
-		return elements.indexOf(element);
-	}
-
-	public FiniteDomain<T> retainAll(FiniteDomain<T> other) {
-		if (!elements.equals(other.elements)) {
-			throw new RuntimeException("Finite domains do not match.");
-		}
-
-		BitSet newSet = bitset.get(0, bitset.size());
-		newSet.and(other.bitset);
-		return new FiniteDomain<>(elements, newSet);
-	}
-
-	public FiniteDomain<T> removeAll(FiniteDomain<T> other) {
-		if (!elements.equals(other.elements)) {
-			throw new RuntimeException("Finite domains do not match.");
-		}
-
-		BitSet newSet = bitset.get(0, bitset.size());
-		newSet.andNot(other.bitset);
-		return new FiniteDomain<>(elements, newSet);
-	}
-
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @return The unique value of the domain.
+	 *
+	 * @throws RuntimeException If the domain is not unique.
+	 */
 	@Override
 	public T getUniqueValue() {
 		if (!isUnique()) {
@@ -152,6 +117,164 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 	public Iterator<T> iterator() {
 		return new ValueIterator();
 	}
+
+	/**
+	 * Returns a new FiniteDomain constructed by mapping each element in <tt>domain</tt> to this finite domain
+	 * through the mapping <tt>mapping</tt>.
+	 *
+	 * @param domain  The domain.
+	 * @param mapping The mapping.
+	 *
+	 * @return A new FiniteDomain.
+	 */
+	public <T2> FiniteDomain<T> mapForward(FiniteDomain<T2> domain, Mapping<T2, T> mapping) {
+		BitSet newSet = new BitSet();
+
+		for (T2 element : domain) {
+			newSet.set(elements.indexOf(mapping.getForwardMapping(element)));
+		}
+
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	/**
+	 * Returns a new FiniteDomain constructed by mapping each element in <tt>domain</tt> to this finite domain
+	 * through the mapping <tt>mapping</tt>.
+	 *
+	 * @param domain  The domain.
+	 * @param mapping The mapping.
+	 *
+	 * @return A new FiniteDomain.
+	 */
+	public <T2> FiniteDomain<T> mapReverse(FiniteDomain<T2> domain, Mapping<T, T2> mapping) {
+		BitSet newSet = new BitSet();
+
+		for (T2 element : domain) {
+			newSet.set(elements.indexOf(mapping.getReverseMapping(element)));
+		}
+
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	/**
+	 * Returns <tt>true</tt> if this domain currently contains <tt>element</tt>.
+	 *
+	 * @param element The element.
+	 *
+	 * @return <tt>true</tt> if this domain currently contains <tt>element</tt>.
+	 */
+	public boolean contains(T element) {
+		return bitset.get(indexOf(element));
+	}
+
+	/**
+	 * Returns a new FiniteDomain constructed by retaining only the element <tt>element</tt>.
+	 *
+	 * @param element The element.
+	 *
+	 * @return A new FiniteDomain constructed by retaining only the element <tt>element</tt>.
+	 *
+	 * @throws RuntimeException If the element is not part of the domain.
+	 */
+	public FiniteDomain<T> retain(T element) {
+		BitSet newSet = new BitSet(bitset.size());
+		newSet.set(indexOf(element));
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	/**
+	 * Returns a new FiniteDomain constructed by removing only the element <tt>element</tt>.
+	 *
+	 * @param element The element.
+	 *
+	 * @return A new FiniteDomain constructed by removing only the element <tt>element</tt>.
+	 *
+	 * @throws RuntimeException If the element is not part of the domain.
+	 */
+	public FiniteDomain<T> remove(T element) {
+		BitSet newSet = bitset.get(0, bitset.size());
+		newSet.clear(indexOf(element));
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	/**
+	 * Returns a new FiniteDomain constructed by retaining the elements in <tt>other</tt>.
+	 *
+	 * @param other Another FiniteDomain.
+	 *
+	 * @return A new FiniteDomain constructed by retaining the elements in <tt>other</tt>.
+	 *
+	 * @throws RuntimeException If the finite domains do not match.
+	 */
+	public FiniteDomain<T> retainAll(FiniteDomain<T> other) {
+		if (!elements.equals(other.elements)) {
+			throw new RuntimeException("Finite domains do not match.");
+		}
+
+		BitSet newSet = bitset.get(0, bitset.size());
+		newSet.and(other.bitset);
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	/**
+	 * Returns a new FiniteDomain constructed by removing the elements in <tt>other</tt>.
+	 *
+	 * @param other Another FiniteDomain.
+	 *
+	 * @return A new FiniteDomain constructed by removing the elements in <tt>other</tt>.
+	 *
+	 * @throws RuntimeException If the finite domains do not match.
+	 */
+	public FiniteDomain<T> removeAll(FiniteDomain<T> other) {
+		if (!elements.equals(other.elements)) {
+			throw new RuntimeException("Finite domains do not match.");
+		}
+
+		BitSet newSet = bitset.get(0, bitset.size());
+		newSet.andNot(other.bitset);
+		return new FiniteDomain<>(elements, newSet);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof FiniteDomain)) {
+			return false;
+		}
+
+		return elements.equals(((FiniteDomain) o).elements) && bitset.equals(((FiniteDomain) o).bitset);
+	}
+
+	@Override
+	public String toString() {
+		List<T> present = new ArrayList<>();
+
+		for (int i = bitset.nextSetBit(0); i >= 0; i = bitset.nextSetBit(i + 1)) {
+			present.add(elements.get(i));
+		}
+
+		return present.toString();
+	}
+
+	/**
+	 * Returns the bit index which represents the element.
+	 *
+	 * @param element The element.
+	 *
+	 * @return The bit index which represents the element.
+	 *
+	 * @throws RuntimeException If the element is not part of the domain.
+	 */
+	private int indexOf(T element) {
+		if (!elements.contains(element)) {
+			throw new RuntimeException("Element does not belong to finite domain.");
+		}
+
+		return elements.indexOf(element);
+	}
+
+	//
+	// TODO - document
+	//
 
 	private class ValueIterator implements Iterator<T>
 	{
@@ -226,23 +349,5 @@ public class FiniteDomain<T> implements Domain<T>, Iterable<T>
 		public void lastDomainValid() {
 			// last domain was singleton, nothing to narrow
 		}
-	}
-
-	public boolean equals(Object o) {
-		if (o == null || !(o instanceof FiniteDomain)) {
-			return false;
-		}
-
-		return elements.equals(((FiniteDomain) o).elements) && bitset.equals(((FiniteDomain) o).bitset);
-	}
-
-	public String toString() {
-		List<T> present = new ArrayList<>();
-
-		for (int i = bitset.nextSetBit(0); i >= 0; i = bitset.nextSetBit(i + 1)) {
-			present.add(elements.get(i));
-		}
-
-		return present.toString();
 	}
 }

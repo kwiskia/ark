@@ -24,11 +24,22 @@ package com.kauri.ark;
 import java.util.Iterator;
 
 /**
- * DomainIterator
+ * An iterator over a domain parameterized by <tt>T</tt>.
+ * <p/>
+ * This iterator is expected to iterate over (eventually) unique values of the domain. However, the iterator may return
+ * a (proper) subset of the entire domain. If that subset of the domain is consistent with the constraint network, then
+ * the consumer should call the <tt>lastDomainValid</tt> method to inform the iterator.
+ * <p/>
+ * If the <tt>lastDomainValid</tt> method is called, the iterator must iterate over values of the most recently returned
+ * domain before iteration completes. If the <tt>lastDomainValid</tt> method is not called, the iterator is not expected
+ * to iterate over any value in that subset (as none of them will be a valid assignment).
  *
  * @author Eric Fritz
  */
 public interface DomainIterator<T> extends Iterator<Domain<T>>
 {
+	/**
+	 * Signals to the iterator that the last domain was consistent with the constraint network.
+	 */
 	public void lastDomainValid();
 }

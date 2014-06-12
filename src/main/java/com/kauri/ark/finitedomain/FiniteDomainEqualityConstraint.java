@@ -25,28 +25,38 @@ import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
 
 /**
- * EqualityConstraint
+ * A constraint which forces a finite domain variable to be equivalent to another finite domain variable.
  *
  * @author Eric Fritz
  */
 public class FiniteDomainEqualityConstraint<T> implements Constraint<FiniteDomain<T>>
 {
-	private Variable<FiniteDomain<T>>[] variables;
+	/**
+	 * The first variable.
+	 */
+	private Variable<FiniteDomain<T>> var1;
 
-	public FiniteDomainEqualityConstraint(Variable<FiniteDomain<T>>... variables) {
-		this.variables = variables;
+	/**
+	 * The second variable.
+	 */
+	private Variable<FiniteDomain<T>> var2;
+
+	/**
+	 * Creates a new FiniteDomainEqualityConstraint.
+	 *
+	 * @param var1 The first variable.
+	 * @param var2 The second variable.
+	 */
+	public FiniteDomainEqualityConstraint(Variable<FiniteDomain<T>> var1, Variable<FiniteDomain<T>> var2) {
+		this.var1 = var1;
+		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(Variable<FiniteDomain<T>> variable) {
-		FiniteDomain<T> domain = variable.getDomain();
+	public boolean narrow(Variable<FiniteDomain<T>> variable) {
+		// Narrow the domain of the argument variable to include (at most) the elements of the other domain. Notice
+		// that retainAll performs an intersection on two domains, which is a transitive operation.
 
-		for (Variable<FiniteDomain<T>> v : variables) {
-			if (v != variable) {
-				domain = domain.retainAll(v.getDomain());
-			}
-		}
-
-		return variable.trySetValue(domain);
+		return variable.trySetValue(var1.getDomain().retainAll(var2.getDomain()));
 	}
 }

@@ -22,15 +22,28 @@
 package com.kauri.ark;
 
 /**
- * Variable
+ * Represents a node in the constraint network.
  *
  * @author Eric Fritz
  */
 public class Variable<T extends Domain>
 {
+	/**
+	 * The solver.
+	 */
 	private Solver solver;
+
+	/**
+	 * The variable's current domain.
+	 */
 	private T domain;
 
+	/**
+	 * Creates a new Variable.
+	 *
+	 * @param solver The solver.
+	 * @param domain The current domain.
+	 */
 	public Variable(Solver solver, T domain) {
 		this.solver = solver;
 		this.domain = domain;
@@ -38,19 +51,41 @@ public class Variable<T extends Domain>
 		solver.addVariable(this);
 	}
 
+	/**
+	 * Returns the solver.
+	 *
+	 * @return The solver.
+	 */
 	public Solver getSolver() {
 		return solver;
 	}
 
+	/**
+	 * Returns the current domain.
+	 *
+	 * @return The current domain.
+	 */
 	public T getDomain() {
 		return domain;
 	}
 
+	/**
+	 * Updates the current domain.
+	 *
+	 * @param domain The domain.
+	 */
 	public void setDomain(T domain) {
 		this.domain = domain;
 	}
 
-	public boolean trySetValue(T value) {
-		return solver.trySetValue(this, value);
+	/**
+	 * Updates the current domain if the assignment is consistent with the network.
+	 *
+	 * @param domain The domain.
+	 *
+	 * @return <tt>true</tt> if the assignment is consistent, <tt>false</tt> otherwise,.
+	 */
+	public boolean trySetValue(T domain) {
+		return solver.trySetValue(this, domain);
 	}
 }

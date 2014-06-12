@@ -27,16 +27,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ProductConstraint
+ * A constraint which forces an integer variable to be the product of two other integer variables.
  *
  * @author Eric Fritz
  */
 public class IntegerProductConstraint implements Constraint<IntegerDomain>
 {
+	/**
+	 * The multiplicand variable.
+	 */
 	private Variable<IntegerDomain> a;
+
+	/**
+	 * The multiplier variable.
+	 */
 	private Variable<IntegerDomain> b;
+
+	/**
+	 * The product variable.
+	 */
 	private Variable<IntegerDomain> c;
 
+	/**
+	 * Creates a new IntegerProductConstraint.
+	 *
+	 * @param a The multiplicand variable.
+	 * @param b The multiplier variable.
+	 * @param c The product variable.
+	 */
 	public IntegerProductConstraint(Variable<IntegerDomain> a, Variable<IntegerDomain> b, Variable<IntegerDomain> c) {
 		this.a = a;
 		this.b = b;
@@ -44,36 +62,44 @@ public class IntegerProductConstraint implements Constraint<IntegerDomain>
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
+	public boolean narrow(Variable<IntegerDomain> variable) {
+		// Narrow the domain of the argument variable to include (at most) the intervals satisfying:
+		//   [when variable == a]: ci / bj for each interval ci in c and bj in b,
+		//   [when variable == b]: ci / aj for each interval ci in c and aj in a,
+		//   [when variable == c]: ai * bj for each interval ai in a and bj in b.
+
+		// Unfortunately, interval division is undefined for denominators containing the value `0'. This complicates
+		// the product identities `0 * b = c' and `a * 0 = c'. In the division cases, we can't attempt to narrow any
+		// domain if c's domain contains zero and either
+		//   1) b's domain contains zero (case ci / bj), or
+		//   2) a's domain contains zero (case ci / aj).
+
 		List<Interval> intervals = new ArrayList<>();
 
 		if (variable == a) {
-			// a = c / b
-			for (Interval interval2 : b.getDomain()) {
-				for (Interval interval3 : c.getDomain()) {
-					if (interval2.contains(0) && interval3.contains(0)) {
+			for (Interval ci : c.getDomain()) {
+				for (Interval bj : b.getDomain()) {
+					if (bj.contains(0) && ci.contains(0)) {
 						return true;
 					}
 
-					addQuotient(intervals, interval3, interval2);
+					addQuotient(intervals, ci, bj);
 				}
 			}
 		} else if (variable == b) {
-			// b = c / a
-			for (Interval interval1 : a.getDomain()) {
-				for (Interval interval3 : c.getDomain()) {
-					if (interval1.contains(0) && interval3.contains(0)) {
+			for (Interval ci : c.getDomain()) {
+				for (Interval aj : a.getDomain()) {
+					if (aj.contains(0) && ci.contains(0)) {
 						return true;
 					}
 
-					addQuotient(intervals, interval3, interval1);
+					addQuotient(intervals, ci, aj);
 				}
 			}
 		} else {
-			// c = a * b
-			for (Interval interval1 : a.getDomain()) {
-				for (Interval interval2 : b.getDomain()) {
-					addProduct(intervals, interval1, interval2);
+			for (Interval ai : a.getDomain()) {
+				for (Interval bj : b.getDomain()) {
+					addProduct(intervals, ai, bj);
 				}
 			}
 		}
@@ -81,15 +107,35 @@ public class IntegerProductConstraint implements Constraint<IntegerDomain>
 		return variable.trySetValue(variable.getDomain().retainAll(new IntegerDomain().concat(intervals)));
 	}
 
+	/**
+	 * Calculate `[a, b] * [c, d]' and add it to the list <tt>intervals</tt>.
+	 *
+	 * @param intervals The interval list.
+	 * @param interval1 The interval [a, b].
+	 * @param interval2 The interval [c, d].
+	 */
 	private void addProduct(List<Interval> intervals, Interval interval1, Interval interval2) {
 		int a = interval1.getLower();
 		int b = interval1.getUpper();
 		int c = interval2.getLower();
 		int d = interval2.getUpper();
 
-		addProduct(intervals, a, b, c, d);
+		int lower = Math.max(Interval.MIN_VALUE, min(a * c, a * d, b * c, b * d));
+		int upper = Math.min(Interval.MAX_VALUE, max(a * c, a * d, b * c, b * d));
+
+		intervals.add(new Interval(lower, upper));
 	}
 
+	/**
+	 * Calculate `[a, b] / [c, d]' and add it to the list <tt>intervals</tt>.
+	 * <p/>
+	 * This may add more than one interval to the list, as interval division is undefined when `[c, d]' contains `0'.
+	 * In that case, split the interval into `[c, -1]' and `[1, d]' and perform division on both subsets.
+	 *
+	 * @param intervals The interval list.
+	 * @param interval1 The interval [a, b].
+	 * @param interval2 The interval [c, d].
+	 */
 	private void addQuotient(List<Interval> intervals, Interval interval1, Interval interval2) {
 		int a = interval1.getLower();
 		int b = interval1.getUpper();
@@ -104,13 +150,17 @@ public class IntegerProductConstraint implements Constraint<IntegerDomain>
 		}
 	}
 
-	private void addProduct(List<Interval> intervals, int a, int b, int c, int d) {
-		int lower = Math.max(Interval.MIN_VALUE, min(a * c, a * d, b * c, b * d));
-		int upper = Math.min(Interval.MAX_VALUE, max(a * c, a * d, b * c, b * d));
-
-		intervals.add(new Interval(lower, upper));
-	}
-
+	/**
+	 * Calculate `[a, b] / [c, d]' and add it to teh list <tt>intervals</tt>.
+	 * <p/>
+	 * This assumes that `[c, d]' does not contain the value `0'.
+	 *
+	 * @param intervals The interval list.
+	 * @param a         The lower bound of interval1.
+	 * @param b         The upper bound of interval1.
+	 * @param c         The lower bound of interval2.
+	 * @param d         The upper bound of interval2.
+	 */
 	private void addQuotient(List<Interval> intervals, int a, int b, int c, int d) {
 		int lower = min(a / c, a / d, b / c, b / d);
 		int upper = max(a / c, a / d, b / c, b / d);
@@ -118,11 +168,11 @@ public class IntegerProductConstraint implements Constraint<IntegerDomain>
 		intervals.add(new Interval(lower, upper));
 	}
 
-	private int min(int a, int b, int c, int d) {
+	private static int min(int a, int b, int c, int d) {
 		return Math.min(a, Math.min(b, Math.min(c, d)));
 	}
 
-	private int max(int a, int b, int c, int d) {
+	private static int max(int a, int b, int c, int d) {
 		return Math.max(a, Math.max(b, Math.max(c, d)));
 	}
 }

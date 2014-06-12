@@ -25,28 +25,38 @@ import com.kauri.ark.Constraint;
 import com.kauri.ark.Variable;
 
 /**
- * IntervalEqualityConstraint
+ * A constraint which forces an integer variable to be equivalent to another integer variable.
  *
  * @author Eric Fritz
  */
 public class IntegerEqualityConstraint implements Constraint<IntegerDomain>
 {
-	private Variable<IntegerDomain>[] variables;
+	/**
+	 * The first variable.
+	 */
+	private Variable<IntegerDomain> var1;
 
-	public IntegerEqualityConstraint(Variable<IntegerDomain>... variables) {
-		this.variables = variables;
+	/**
+	 * The second variable.
+	 */
+	private Variable<IntegerDomain> var2;
+
+	/**
+	 * Creates a new IntegerEqualityConstraint.
+	 *
+	 * @param var1 The first variable.
+	 * @param var2 The second variable.
+	 */
+	public IntegerEqualityConstraint(Variable<IntegerDomain> var1, Variable<IntegerDomain> var2) {
+		this.var1 = var1;
+		this.var2 = var2;
 	}
 
 	@Override
-	public boolean update(Variable<IntegerDomain> variable) {
-		IntegerDomain domain = variable.getDomain();
+	public boolean narrow(Variable<IntegerDomain> variable) {
+		// Narrow the domain of the argument variable to include (at most) the elements of the other domain. Notice
+		// that retainAll performs an intersection on two domains, which is a transitive operation.
 
-		for (Variable<IntegerDomain> v : variables) {
-			if (v != variable) {
-				domain = domain.retainAll(v.getDomain());
-			}
-		}
-
-		return variable.trySetValue(domain);
+		return variable.trySetValue(var1.getDomain().retainAll(var2.getDomain()));
 	}
 }

@@ -22,21 +22,39 @@
 package com.kauri.ark;
 
 /**
- * Arc
+ * A variable/constraint pair.
  *
  * @author Eric Fritz
  */
-public class Arc<T extends Domain>
+final class Arc<T extends Domain>
 {
+	/**
+	 * The variable.
+	 */
 	private Variable<T> variable;
+
+	/**
+	 * The constraint.
+	 */
 	private Constraint<T> constraint;
 
+	/**
+	 * Creates a new Arc.
+	 *
+	 * @param variable   The variable.
+	 * @param constraint The constraint.
+	 */
 	public Arc(Variable<T> variable, Constraint<T> constraint) {
 		this.variable = variable;
 		this.constraint = constraint;
 	}
 
+	/**
+	 * Calls to <tt>constraint</tt> to narrow the domain of <tt>variable</tt>.
+	 *
+	 * @return <tt>true</tt> if the variable remains arc-consistent with its network.
+	 */
 	public boolean update() {
-		return constraint.update(variable);
+		return constraint.narrow(variable);
 	}
 }
